@@ -10,16 +10,18 @@ const options = {
     attributeNamePrefix : "attrib_"
 };
 
-const getUsers = (xmlState) => {
+const getUsers = (xmlState) => new Promise((resolve, reject) => {
     XmlConf.getDir()
     .then(directory => {
         let jsonUsers = fastxml.parse(directory, options);
         let newusers = pJ.parseDirectory(jsonUsers);
         xmlState.users = newusers;
+        resolve(xmlState);
     })
     .catch(error => {
         console.log(error);
+        reject(error);
     });
-}
+});
 
 exports.getUsers = getUsers;
