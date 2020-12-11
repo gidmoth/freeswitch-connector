@@ -37,6 +37,26 @@
             "name": "publicuser2"
         }
     ],
+    "conferences": [
+        {
+            "num": "30000",
+            "name": "team_16kHz",
+            "type": "v16",
+            "context": "team"
+        },
+        {
+            "num": "31000",
+            "name": "friends_16kHz",
+            "type": "v16",
+            "context": "friends"
+        },
+        {
+            "num": "32000",
+            "name": "public_16kHz",
+            "type": "v16",
+            "context": "public"
+        }
+    ],
     "availUsrIds": {
         "team": {},
         "friends": {},

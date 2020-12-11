@@ -2,6 +2,9 @@
  * parsers for jsonified xml
  */
 
+const ConfCtxConf = require('../config.js').getConfig('contexts');
+const Contexts = Object.keys(ConfCtxConf);
+
 function genArrayFilter(arr, aname) {
     return arr.filter(item => item.attrib_name == aname)[0].attrib_value;
 }
@@ -32,6 +35,16 @@ function getConfArray(dialplan) {
     return confArray;
 }
 
+function confCtxDetect(numb) {
+    let retval = '';
+    Contexts.forEach(ctx => {
+        if (+numb >= ConfCtxConf[ctx].confStart && +numb < ConfCtxConf[ctx].confStart + ConfCtxConf[ctx].confRange) {
+            retval = ctx;
+        }
+    });
+    return retval;
+}
+
 function parseConference(conf) {
     let pconf = {
         num: conf.condition.attrib_expression,
@@ -41,6 +54,7 @@ function parseConference(conf) {
         return act.hasOwnProperty('attrib_data')
     })[0];
     pconf.type = actObj.attrib_data.split('@')[1].split('+')[0];
+    pconf.context = confCtxDetect(pconf.num);
 
     return pconf;
 }

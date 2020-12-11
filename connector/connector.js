@@ -9,17 +9,23 @@ const getFilestate = require('./filestate/filesets');
 
 Monitor.startMon();
 
-getXmlState.getUsers(xmlState)
-.then(xmlState => getFilestate.getAvaiUsers(xmlState))
-.catch(error => {
-    console.log(error);
-});
+function updateXmlState(xmlState) {
+    getXmlState.getUsers(xmlState)
+    .then(xmlState => getXmlState.getConferences(xmlState))
+    .then(xmlState => getFilestate.getAvaiUsers(xmlState))
+    .catch(error => {
+        console.log(error);
+    });
+}
+
+updateXmlState(xmlState);
+
 
 
 function statetest() {
     console.log(JSON.stringify(xmlState));
     console.log(`next teamuser: ${[...xmlState.availUsrIds.team][0]}
-    next frienduser: ${[...xmlState.availUsrIds.friends][0]}
-    next publicuser: ${[...xmlState.availUsrIds.public][0]}`);
+next frienduser: ${[...xmlState.availUsrIds.friends][0]}
+next publicuser: ${[...xmlState.availUsrIds.public][0]}`);
 }
 setTimeout(statetest, 3600);

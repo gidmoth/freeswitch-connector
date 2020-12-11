@@ -28,7 +28,8 @@ const getConferences = (xmlState) => new Promise((resolve, reject) => {
     XmlConf.getDp()
     .then(plan => {
         let jsonPlan = fastxml.parse(plan, options);
-        xmlState.conferences = jsonPlan;
+        let newconfs = pJ.parseConferences(jsonPlan);
+        xmlState.conferences = newconfs;
         resolve(xmlState);
     })
     .catch(error => {
