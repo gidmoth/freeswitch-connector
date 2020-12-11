@@ -16,6 +16,35 @@ function parseUser(usr) {
     return puser;
 }
 
+function getConfArray(dialplan) {
+    let confArray = [];
+    dialplan.section.context.forEach(ctx => {
+        ctx.extension.forEach(ext => {
+            if (Array.isArray(ext.condition.action)) {
+                if (ext.condition.action.filter(e => {
+                    return e.attrib_application == 'conference'
+                }).length == 1) {
+                    confArray.push(ext);
+                }
+            }
+        })
+    })
+    return confArray;
+}
+
+function parseConference(conf) {
+    let pconf = {
+        num: conf.condition.attrib_expression,
+        name: conf.attrib_name
+    }
+    let actObj = conf.condition.action.filter(act => {
+        return act.hasOwnProperty('attrib_data')
+    })[0];
+    pconf.type = actObj.attrib_data.split('@')[1].split('+')[0];
+
+    return pconf;
+}
+
 const parseDirectory = (dir) => {
     let pusers = [];
     dir.section.domain.groups.group.forEach(gr => {
@@ -26,5 +55,13 @@ const parseDirectory = (dir) => {
     return pusers;
 }
 
-exports.parseDirectory = parseDirectory;
+const parseConferences = (dialplan) => {
+    let conferences = [];
+    getConfArray(dialplan).forEach(conf => {
+        conferences.push(parseConference(conf));
+    })
+    return conferences;
+}
 
+exports.parseDirectory = parseDirectory;
+exports.parseConferences = parseConferences;

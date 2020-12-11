@@ -1,0 +1,17 @@
+[
+    {
+        "num": "30000",
+        "name": "team_16kHz",
+        "type": "team_16kHz@v16+${conpin}+flags{${conf_flags}}"
+    },
+    {
+        "num": "31000",
+        "name": "friends_16kHz",
+        "type": "friends_16kHz@v16+${conpin}+flags{${conf_flags}}"
+    },
+    {
+        "num": "32000",
+        "name": "public_16kHz",
+        "type": "public_16kHz@v16+${conpin}+flags{${conf_flags}}"
+    }
+]

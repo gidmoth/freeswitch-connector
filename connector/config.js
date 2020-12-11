@@ -12,15 +12,18 @@
     contexts: {
         team: {
             start: 20000,
-            range: 1000
+            range: 1000,
+            path: `${process.env.SWITCHCONF || '/etc-freeswitch'}/directory/team`
         },
         friends: {
             start: 21000,
-            range: 1000
+            range: 1000,
+            path: `${process.env.SWITCHCONF || '/etc-freeswitch'}/directory/friends`
         },
         public: {
             start: 22000,
-            range: 1000
+            range: 1000,
+            path: `${process.env.SWITCHCONF || '/etc-freeswitch'}/directory/public`
         }
     }
  };

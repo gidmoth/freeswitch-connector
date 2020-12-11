@@ -1,0 +1,182 @@
+{
+    "section": {
+        "attrib_name": "dialplan",
+        "attrib_description": "Regex/XML Dialplan",
+        "context": [
+            {
+                "attrib_name": "friends",
+                "extension": [
+                    {
+                        "attrib_name": "enable_srtp",
+                        "attrib_continue": "true",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": ".*",
+                            "action": {
+                                "attrib_application": "set",
+                                "attrib_data": "rtp_secure_media=mandatory"
+                            }
+                        }
+                    },
+                    {
+                        "attrib_name": "friendusers_extension",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "^(21[0-9][0-9][0-9])$",
+                            "action": [
+                                {
+                                    "attrib_application": "export",
+                                    "attrib_data": "dialed_extension=$1"
+                                },
+                                {
+                                    "attrib_application": "set",
+                                    "attrib_data": "hangup_after_bridge=true"
+                                },
+                                {
+                                    "attrib_application": "bridge",
+                                    "attrib_data": "user/${dialed_extension}@${domain_name}"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "attrib_name": "friends_conferences",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "^(31[0-9][0-9][0-9])$",
+                            "action": {
+                                "attrib_application": "transfer",
+                                "attrib_data": "$1 XML team"
+                            }
+                        }
+                    },
+                    {
+                        "attrib_name": "public_conferences",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "^(32[0-9][0-9][0-9])$",
+                            "action": {
+                                "attrib_application": "transfer",
+                                "attrib_data": "$1 XML team"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "attrib_name": "public",
+                "extension": [
+                    {
+                        "attrib_name": "enable_srtp",
+                        "attrib_continue": "true",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": ".*",
+                            "action": {
+                                "attrib_application": "set",
+                                "attrib_data": "rtp_secure_media=mandatory"
+                            }
+                        }
+                    },
+                    {
+                        "attrib_name": "public_conferences",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "^(32[0-9][0-9][0-9])$",
+                            "action": {
+                                "attrib_application": "transfer",
+                                "attrib_data": "$1 XML team"
+                            }
+                        }
+                    }
+                ]
+            },
+            {
+                "attrib_name": "team",
+                "extension": [
+                    {
+                        "attrib_name": "enable_srtp",
+                        "attrib_continue": "true",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": ".*",
+                            "action": {
+                                "attrib_application": "set",
+                                "attrib_data": "rtp_secure_media=mandatory"
+                            }
+                        }
+                    },
+                    {
+                        "attrib_name": "teamusers_extension",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "^(20[0-9][0-9][0-9])$",
+                            "action": [
+                                {
+                                    "attrib_application": "export",
+                                    "attrib_data": "dialed_extension=$1"
+                                },
+                                {
+                                    "attrib_application": "set",
+                                    "attrib_data": "hangup_after_bridge=true"
+                                },
+                                {
+                                    "attrib_application": "bridge",
+                                    "attrib_data": "user/${dialed_extension}@${domain_name}"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "attrib_name": "team_16kHz",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "30000",
+                            "action": [
+                                {
+                                    "attrib_application": "answer"
+                                },
+                                {
+                                    "attrib_application": "conference",
+                                    "attrib_data": "team_16kHz@v16+${conpin}+flags{${conf_flags}}"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "attrib_name": "friends_16kHz",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "31000",
+                            "action": [
+                                {
+                                    "attrib_application": "answer"
+                                },
+                                {
+                                    "attrib_application": "conference",
+                                    "attrib_data": "friends_16kHz@v16+${conpin}+flags{${conf_flags}}"
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "attrib_name": "public_16kHz",
+                        "condition": {
+                            "attrib_field": "destination_number",
+                            "attrib_expression": "32000",
+                            "action": [
+                                {
+                                    "attrib_application": "answer"
+                                },
+                                {
+                                    "attrib_application": "conference",
+                                    "attrib_data": "public_16kHz@v16+${conpin}+flags{${conf_flags}}"
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        ]
+    }
+}

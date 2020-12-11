@@ -18,6 +18,8 @@ getXmlState.getUsers(xmlState)
 
 function statetest() {
     console.log(JSON.stringify(xmlState));
-    console.log([...xmlState.availUsrIds.team][0]);
+    console.log(`next teamuser: ${[...xmlState.availUsrIds.team][0]}
+    next frienduser: ${[...xmlState.availUsrIds.friends][0]}
+    next publicuser: ${[...xmlState.availUsrIds.public][0]}`);
 }
 setTimeout(statetest, 3600);

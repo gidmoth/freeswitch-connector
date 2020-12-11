@@ -24,4 +24,18 @@ const getUsers = (xmlState) => new Promise((resolve, reject) => {
     });
 });
 
+const getConferences = (xmlState) => new Promise((resolve, reject) => {
+    XmlConf.getDp()
+    .then(plan => {
+        let jsonPlan = fastxml.parse(plan, options);
+        xmlState.conferences = jsonPlan;
+        resolve(xmlState);
+    })
+    .catch(error => {
+        console.log(error);
+        reject(error);
+    });
+});
+
 exports.getUsers = getUsers;
+exports.getConferences = getConferences;

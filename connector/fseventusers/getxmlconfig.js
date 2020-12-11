@@ -14,4 +14,15 @@ const getDir = () => new Promise((resolve, reject) => {
     });
 });
 
+const getDp = () => new Promise((resolve, reject) => {
+    API.sendbgapi('xml_locate dialplan')
+    .then(answer => {
+        resolve(answer);
+    })
+    .catch(error => {
+        reject(error);
+    });
+});
+
 exports.getDir = getDir;
+exports.getDp = getDp;
