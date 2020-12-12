@@ -14,7 +14,9 @@ function parseUser(usr) {
         id: usr.attrib_id,
         password: genArrayFilter(usr.params.param, "password"),
         context: genArrayFilter(usr.variables.variable, "user_context"),
-        name: genArrayFilter(usr.variables.variable, "effective_caller_id_name")
+        name: genArrayFilter(usr.variables.variable, "effective_caller_id_name"),
+        email: genArrayFilter(usr.variables.variable, "verto_dvar_email"),
+        polymac: genArrayFilter(usr.variables.variable, "polymac")
     }
     return puser;
 }
