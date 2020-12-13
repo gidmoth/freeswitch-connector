@@ -9,6 +9,7 @@
         pw: `${process.env.FSPW || 'ClueCon'}`
     },
     xmldir: `${process.env.SWITCHCONF || '/etc-freeswitch'}`,
+    confdir: `${process.env.SWITCHCONF || '/etc-freeswitch'}/dialplan/conferences`,
     contexts: {
         team: {
             start: 20000,
