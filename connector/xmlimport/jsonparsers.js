@@ -13,6 +13,7 @@ function parseUser(usr) {
     let puser = {
         id: usr.attrib_id,
         password: genArrayFilter(usr.params.param, "password"),
+        conpin: genArrayFilter(usr.variables.variable, "conpin"),
         context: genArrayFilter(usr.variables.variable, "user_context"),
         name: genArrayFilter(usr.variables.variable, "effective_caller_id_name"),
         email: genArrayFilter(usr.variables.variable, "verto_dvar_email"),

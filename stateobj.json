@@ -3,38 +3,56 @@
         {
             "id": "20000",
             "password": "napw",
+            "conpin": "2357",
             "context": "team",
-            "name": "teamuser1"
+            "name": "teamuser1",
+            "email": "teamuser1@example.com",
+            "polymac": "none"
         },
         {
             "id": "20001",
             "password": "napw",
+            "conpin": "2357",
             "context": "team",
-            "name": "teamuser2"
+            "name": "teamuser2",
+            "email": "teamuser2@example.com",
+            "polymac": "none"
         },
         {
             "id": "21000",
             "password": "napw",
+            "conpin": "0815",
             "context": "friends",
-            "name": "friendsuser1"
+            "name": "friendsuser1",
+            "email": "frienduser1@example.com",
+            "polymac": "none"
         },
         {
             "id": "21001",
             "password": "napw",
+            "conpin": "0815",
             "context": "friends",
-            "name": "friendsuser2"
+            "name": "friendsuser2",
+            "email": "frienduser2@example.com",
+            "polymac": "none"
         },
         {
             "id": "22000",
             "password": "napw",
+            "conpin": "0815",
             "context": "public",
-            "name": "publicuser1"
+            "name": "publicuser1",
+            "email": "publicuser1@example.com",
+            "polymac": "none"
         },
         {
             "id": "22001",
             "password": "napw",
+            "conpin": "0815",
             "context": "public",
-            "name": "publicuser2"
+            "name": "publicuser2",
+            "email": "publicuser2@example.com",
+            "polymac": "none"
         }
     ],
     "conferences": [
@@ -58,6 +76,11 @@
         }
     ],
     "availUsrIds": {
+        "team": {},
+        "friends": {},
+        "public": {}
+    },
+    "availConfNums": {
         "team": {},
         "friends": {},
         "public": {}
