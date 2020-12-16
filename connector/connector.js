@@ -4,34 +4,8 @@
 
 const Monitor = require('./fseventconsumers/esmonitor.js');
 const xmlState = {};
-const getXmlState = require('./xmlimport/getxmlstate');
-const getFilestate = require('./filestate/filesets');
+const maintain = require('./maintainance');
 
-Monitor.startMon();
+Monitor.startMon(xmlState);
 
-function updateXmlState(xmlState) {
-    getXmlState.getUsers(xmlState)
-    .then(xmlState => getXmlState.getConferences(xmlState))
-    .then(xmlState => {
-        getFilestate.getAvaiUsers(xmlState);
-        getFilestate.getAvaiConfs(xmlState);
-    })
-    .catch(error => {
-        console.log(error);
-    });
-}
-
-updateXmlState(xmlState);
-
-
-
-function statetest() {
-    console.log(JSON.stringify(xmlState));
-    console.log(`next teamuser: ${[...xmlState.availUsrIds.team][0]}
-next frienduser: ${[...xmlState.availUsrIds.friends][0]}
-next publicuser: ${[...xmlState.availUsrIds.public][0]}`);
-    console.log(`next teamconference: ${[...xmlState.availConfNums.team][0]}
-next friendconference: ${[...xmlState.availConfNums.friends][0]}
-next publicconference: ${[...xmlState.availConfNums.public][0]}`);
-}
-setTimeout(statetest, 3600);
+maintain.updateXmlState(xmlState);

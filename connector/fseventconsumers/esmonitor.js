@@ -5,19 +5,19 @@
 const Conn = require('../apis/esapi');
 const Eswitch = require('./eventswitch');
 
-const startMon = () => {
+const startMon = (xmlState) => {
     Conn.connect()
     .then(connection => {
         // Subscribe to all FreeSWITCH events:
         connection.subscribe(Conn.ALL_EVENTS);
         connection.on(Conn.Event.RECEIVED, event => {
             // A new FreeSWITCH event has been received!
-            Eswitch.handle(event);
+            Eswitch.handle(event, xmlState);
         });
     })
     .catch(error => {
         // An error connecting to FreeSWITCH occurred!
-        console.log("Monitor Error");
+        console.log("Monitor Error", error);
     });
 };
 
