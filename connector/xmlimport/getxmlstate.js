@@ -38,5 +38,25 @@ const getConferences = (xmlState) => new Promise((resolve, reject) => {
     });
 });
 
+const getGlobals = (xmlState) => new Promise((resolve, reject) => {
+    XmlConf.getGlob()
+    .then(globs => {
+        let globject = {};
+        globs.split('\n').forEach(element => {
+            let property = element.split('=')[0];
+            if (property !== '') {
+                globject[property] = `${element.split('=')[1]}`;
+            }
+        });
+        xmlState.globals = globject;
+        resolve(xmlState);
+    })
+    .catch(error => {
+        console.log(error);
+        reject(error);
+    });
+});
+
 exports.getUsers = getUsers;
 exports.getConferences = getConferences;
+exports.getGlobals = getGlobals;

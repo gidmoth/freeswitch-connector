@@ -24,5 +24,16 @@ const getDp = () => new Promise((resolve, reject) => {
     });
 });
 
+const getGlob = () => new Promise((resolve, reject) => {
+    API.sendbgapi('global_getvar')
+    .then(answer => {
+        resolve(answer);
+    })
+    .catch(error => {
+        reject(error);
+    });
+});
+
 exports.getDir = getDir;
 exports.getDp = getDp;
+exports.getGlob = getGlob;
