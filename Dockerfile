@@ -11,7 +11,10 @@ ENV FSIP='127.0.0.1' \
     FSPORT='8021' \
     FSPW='ClueCon' \
     SWITCHCONF='/etc-freeswitch' \
-    NODE_ENV='production'
+    NODE_ENV='production' \
+    FASTIPORT='3000' \
+    FASTIIP='0.0.0.0' \
+    HOSTNAME='localhost.localdomain'
 
 ENV CRYPTDOM example.com
 
