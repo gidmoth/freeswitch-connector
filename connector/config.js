@@ -38,6 +38,9 @@
         ip: `${process.env.FASTIIP || '0.0.0.0'}`,
         hostname: `${process.env.HOSTNAME || 'localhost.localdomain'}`,
         apiallow: 'team'
+    },
+    provisioningpaths: {
+        polycom: `${process.env.STATICPATH || '/static'}/polycom`
     }
  };
 

@@ -14,7 +14,8 @@ ENV FSIP='127.0.0.1' \
     NODE_ENV='production' \
     FASTIPORT='3000' \
     FASTIIP='0.0.0.0' \
-    HOSTNAME='localhost.localdomain'
+    HOSTNAME='localhost.localdomain' \
+    STATICPATH='/static'
 
 ENV CRYPTDOM example.com
 

@@ -24,7 +24,6 @@
         "data_dir": "/usr/share/freeswitch",
         "localstate_dir": "/var/lib/freeswitch",
         "switch_serial": "c0a8b265d6cc",
-        "core_uuid": "a749cc20-8fb6-4512-b4eb-e3b7e75a559d",
         "default_password": "napw",
         "sound_prefix": "/usr/share/freeswitch/sounds/en/us/callie",
         "domain": "192.168.178.101",
@@ -48,7 +47,8 @@
         "es_listen_port": "8021",
         "es_pw": "ClueCon",
         "defconpin": "0815",
-        "modconpin": "2357"
+        "modconpin": "2357",
+        "core_uuid": "dd909450-0e8f-441b-b836-6946df2ddd5d"
     },
     "users": [
         {
@@ -105,6 +105,10 @@
             "email": "publicuser2@example.com",
             "polymac": "none"
         }
+    ],
+    "conferencetypes": [
+        "v16",
+        "v48"
     ],
     "conferences": [
         {
