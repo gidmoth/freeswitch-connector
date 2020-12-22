@@ -36,7 +36,8 @@
     fasti: {
         port: `${process.env.FASTIPORT || 3000}`,
         ip: `${process.env.FASTIIP || '0.0.0.0'}`,
-        hostname: `${process.env.HOSTNAME || 'localhost.localdomain'}`
+        hostname: `${process.env.HOSTNAME || 'localhost.localdomain'}`,
+        apiallow: 'team'
     }
  };
 

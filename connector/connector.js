@@ -23,16 +23,8 @@ const fastify = require ('fastify')({
 // pass xmlState to fastify instance
 fastify.decorate('xmlState', xmlState)
 
+// register api endpionts
 fastify.register(require('./fastify-rest/api'))
-
-
-
-fastify.get('/', function (request, reply) {
-    reply.send(this.xmlState.users)
-})
-
-
-
 
 
 // start fastify
