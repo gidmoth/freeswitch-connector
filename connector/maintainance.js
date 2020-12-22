@@ -38,6 +38,7 @@ next publicconference:  ${[...xmlState.availConfNums.public][0]}
 function updateXmlState(xmlState) {
     getXmlState.getGlobals(xmlState)
     .then(xmlState => getXmlState.getUsers(xmlState))
+    .then(xmlState => getXmlState.getConfTypes(xmlState))
     .then(xmlState => getXmlState.getConferences(xmlState))
     .then(xmlState => {
         getFilestate.getAvaiUsers(xmlState);

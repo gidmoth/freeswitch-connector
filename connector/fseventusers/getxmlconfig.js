@@ -34,6 +34,17 @@ const getGlob = () => new Promise((resolve, reject) => {
     });
 });
 
+const getConfConf = () => new Promise((resolve, reject) => {
+    API.sendbgapi('xml_locate configuration configuration name conference.conf')
+    .then(answer => {
+        resolve(answer);
+    })
+    .catch(error => {
+        reject(error);
+    });
+});
+
 exports.getDir = getDir;
 exports.getDp = getDp;
 exports.getGlob = getGlob;
+exports.getConfConf = getConfConf;

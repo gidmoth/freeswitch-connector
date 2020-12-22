@@ -80,5 +80,14 @@ const parseConferences = (dialplan) => {
     return conferences;
 }
 
+const parseConfTypes = (confconf) => {
+    let types = [];
+    confconf.configuration.profiles.profile.forEach(prof => {
+        types.push(prof.attrib_name);
+    })
+    return types;
+}
+
 exports.parseDirectory = parseDirectory;
 exports.parseConferences = parseConferences;
+exports.parseConfTypes = parseConfTypes;

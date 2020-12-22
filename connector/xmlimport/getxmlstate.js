@@ -57,6 +57,21 @@ const getGlobals = (xmlState) => new Promise((resolve, reject) => {
     });
 });
 
+const getConfTypes = (xmlState) => new Promise((resolve, reject) => {
+    XmlConf.getConfConf()
+    .then(confs => {
+        let jsonConfs = fastxml.parse(confs, options);
+        let conftypes = pJ.parseConfTypes(jsonConfs);
+        xmlState.conferencetypes = conftypes;
+        resolve(xmlState);
+    })
+    .catch(error => {
+        console.log(error);
+        reject(error);
+    });
+})
+
 exports.getUsers = getUsers;
 exports.getConferences = getConferences;
 exports.getGlobals = getGlobals;
+exports.getConfTypes = getConfTypes;
