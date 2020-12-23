@@ -1,0 +1,49 @@
+{
+    "done": [
+        {
+            "id": "20002",
+            "password": "SMwW19D1lN",
+            "conpin": "$${modconpin}",
+            "context": "team",
+            "name": "foo",
+            "email": "foo@bar.baz",
+            "polymac": "none"
+        },
+        {
+            "id": "22002",
+            "password": "DbrLKTVTWl",
+            "conpin": "$${defconpin}",
+            "context": "public",
+            "name": "lula",
+            "email": "sis@doinet.com",
+            "polymac": "funnymac"
+        },
+        {
+            "id": "20003",
+            "password": "schumpeter",
+            "conpin": "$${modconpin}",
+            "context": "team",
+            "name": "stefan",
+            "email": "my@mail.com",
+            "polymac": "none"
+        }
+    ],
+    "failed": [
+        {
+            "error": "name already taken",
+            "user": {
+                "name": "teamuser1",
+                "context": "friends",
+                "email": "hans@dampf.de"
+            }
+        },
+        {
+            "error": "email does not contain an email",
+            "user": {
+                "name": "anina",
+                "context": "team",
+                "email": "keineemail"
+            }
+        }
+    ]
+}

@@ -14,9 +14,11 @@
   "author": "Gidmoth",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "email-regex": "^4.0.0",
     "fast-xml-parser": "^3.17.5",
     "fastify": "^3.9.2",
     "fastify-basic-auth": "^1.0.1",
+    "generate-password": "^1.5.1",
     "modesl": "^1.2.1"
   }
 }
