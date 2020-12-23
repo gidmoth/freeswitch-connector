@@ -32,7 +32,7 @@ const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
         let newusr = {}
         newusr.id = getNext(xmlState, 'user', usr.context)
         newusers.push(newusr)
-        console.log(`next free id: ${[... xmlState.availUsrIds[usr.context]][0]}`)
+        console.log(`next free id: ${[...xmlState.availUsrIds[usr.context]][0]}`)
     })
     resolve(newusers);
 });
