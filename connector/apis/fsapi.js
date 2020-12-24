@@ -98,7 +98,7 @@ const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
-    reloadxml.run();
+    reloadxml.run(xmlState);
     resolve(newusers);
 });
 

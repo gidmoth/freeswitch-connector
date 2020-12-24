@@ -43,6 +43,7 @@ function updateXmlState(xmlState) {
     .then(xmlState => {
         getFilestate.getAvaiUsers(xmlState);
         getFilestate.getAvaiConfs(xmlState);
+        xmlState.info.maintainance.lastrun = new Date();
         statelog(xmlState);
     })
     .catch(error => {

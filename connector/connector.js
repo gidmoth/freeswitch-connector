@@ -9,6 +9,16 @@ const xmlState = {};
 const maintain = require('./maintainance');
 const fs = require('fs');
 
+xmlState.info = {
+    reloadxml: {
+        lastrun: 'not till now',
+        lastmsg: 'no Message'
+    },
+    maintainance: {
+        lastrun: 'not till now'
+    }
+}
+
 // start monitoring fsevents, xmlState is needed for reacting on
 // certain events.
 Monitor.startMon(xmlState);

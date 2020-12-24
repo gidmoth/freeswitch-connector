@@ -4,9 +4,11 @@
 
 const API = require('../apis/esapi');
 
-const run = () => new Promise((resolve, reject) => {
+const run = (xmlState) => new Promise((resolve, reject) => {
     API.sendbgapi('reloadxml')
     .then(answer => {
+        xmlState.info.reloadxml.lastrun = new Date();
+        xmlState.info.reloadxml.lastmsg = answer.trim();
         resolve(answer);
     })
     .catch(error => {

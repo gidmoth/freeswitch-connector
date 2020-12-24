@@ -2,7 +2,7 @@
     "done": [
         {
             "id": "20002",
-            "password": "ZxoqskKf8q",
+            "password": "2E3BPo8Tfi",
             "conpin": "$${modconpin}",
             "context": "team",
             "name": "foo",
@@ -11,7 +11,7 @@
         },
         {
             "id": "22002",
-            "password": "sGj8XOSayF",
+            "password": "vs9Y0wsWZ6",
             "conpin": "$${defconpin}",
             "context": "public",
             "name": "lula",
@@ -53,6 +53,5 @@
                 "context": "gibtsmich?"
             }
         }
-    ],
-    "reloadxml": "+OK [Success]"
+    ]
 }
