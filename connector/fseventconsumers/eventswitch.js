@@ -27,7 +27,7 @@ const handle = (event, xmlState) => {
             let jobname = event.getHeader('Job-Command');
             if(jobname == 'reloadxml' && event.getBody().startsWith('+OK')) {
                 maintain.updateXmlState(xmlState);
-                console.log(`${jobname}: ${event.getBody()}`);
+                console.log(`${jobname}: ${event.getBody().trim()}`);
             } else {
                 console.log(`${jobname}`);
             }

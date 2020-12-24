@@ -94,18 +94,12 @@ const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     if (users == []) {
         reject('no users given');
     }
-    let newusers = {done:[], failed:[], reloadxml: ''};
+    let newusers = {done:[], failed:[]};
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
-    reloadxml.run()
-    .then(result => {
-        newusers.reloadxml = result.trim();
-        resolve(newusers);
-    }).catch(err => {
-        console.error(err);
-        reject(err);
-    })
+    reloadxml.run();
+    resolve(newusers);
 });
 
 exports.newUsers = newUsers;
