@@ -41,6 +41,9 @@ fastify.decorate('xmlState', xmlState)
 // register api endpionts
 fastify.register(require('./fastify-rest/api'))
 
+// register static endpoints
+fastify.register(require('./fastify-static/static'))
+
 
 // start fastify
 fastify.listen(fasticonf.port, fasticonf.ip, function (err, address) {

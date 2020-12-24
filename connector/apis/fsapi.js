@@ -34,6 +34,10 @@ const genPass = () => {
     })
 }
 
+const provisionUser = (user, xmlState) => {
+    
+}
+
 const buildNewUser = (xmlState, user, newusers) => {
     let newuser = {}
     if (xmlState.users.map(usr => usr.name).includes(user.name)) {
@@ -90,6 +94,7 @@ const buildNewUser = (xmlState, user, newusers) => {
     return;
 }
 
+// functions
 const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     if (users == []) {
         reject('no users given');
@@ -98,7 +103,10 @@ const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
-    reloadxml.run(xmlState);
+    reloadxml.run(xmlState)
+    .then(msg => {
+        console.log(`reloadxml after newUsers: ${msg.trim()}`)
+    });
     resolve(newusers);
 });
 
