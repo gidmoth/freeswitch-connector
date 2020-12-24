@@ -7,6 +7,7 @@ const Monitor = require('./fseventconsumers/esmonitor.js');
 // the state will be the same objectinstance for the whole runtime
 const xmlState = {};
 const maintain = require('./maintainance');
+const fs = require('fs');
 
 // start monitoring fsevents, xmlState is needed for reacting on
 // certain events.
@@ -17,7 +18,11 @@ maintain.updateXmlState(xmlState);
 
 // init fastify for rest and static interface
 const fastify = require ('fastify')({
-    logger: true
+    logger: true,
+    https: {
+        key: fs.readFileSync(fasticonf.key),
+        cert: fs.readFileSync(fasticonf.cert)
+    }   
 })
 
 // pass xmlState to fastify instance

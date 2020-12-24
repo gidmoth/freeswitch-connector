@@ -2,7 +2,7 @@
     "done": [
         {
             "id": "20002",
-            "password": "SMwW19D1lN",
+            "password": "ZxoqskKf8q",
             "conpin": "$${modconpin}",
             "context": "team",
             "name": "foo",
@@ -11,7 +11,7 @@
         },
         {
             "id": "22002",
-            "password": "DbrLKTVTWl",
+            "password": "sGj8XOSayF",
             "conpin": "$${defconpin}",
             "context": "public",
             "name": "lula",
@@ -44,6 +44,15 @@
                 "context": "team",
                 "email": "keineemail"
             }
+        },
+        {
+            "error": "context does not exist",
+            "user": {
+                "name": "barbaz",
+                "email": "foo@bar.baz",
+                "context": "gibtsmich?"
+            }
         }
-    ]
+    ],
+    "reloadxml": "+OK [Success]"
 }

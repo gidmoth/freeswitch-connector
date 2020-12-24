@@ -15,7 +15,9 @@ ENV FSIP='127.0.0.1' \
     FASTIPORT='3000' \
     FASTIIP='0.0.0.0' \
     HOSTNAME='localhost.localdomain' \
-    STATICPATH='/static'
+    STATICPATH='/static' \
+    FASTICERT='/etc-freeswitch/tls/fullchain.pem' \
+    FASTIKEY='/etc-freeswitch/tls/privkey.pem'
 
 ENV CRYPTDOM example.com
 

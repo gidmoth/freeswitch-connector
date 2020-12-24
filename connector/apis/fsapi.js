@@ -10,6 +10,8 @@ const Provpaths = require('../config').getConfig('provisioningpaths');
 const emailRegex = require('email-regex');
 const passgen = require('generate-password');
 const fastiConf = require('../config').getConfig('fasti');
+const templates = require('./templates');
+const reloadxml = require('../fseventusers/reloadxml');
 
 // utilities
 const getNext = (xmlState, thing, ctx) => {
@@ -80,21 +82,30 @@ const buildNewUser = (xmlState, user, newusers) => {
     } else {
         newuser.polymac = 'none';
     }
+    let newuserXml = templates.getUserFile(newuser);
+    let newuserFile = path.join(Contexts[newuser.context].path, `${newuser.id}.xml`);
+    fs.writeFileSync(newuserFile, newuserXml);
     newusers.done.push(newuser);
     xmlState.users.push(newuser);
     return;
 }
 
-
 const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     if (users == []) {
         reject('no users given');
     }
-    let newusers = {done:[], failed:[]};
+    let newusers = {done:[], failed:[], reloadxml: ''};
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
-    resolve(newusers);
+    reloadxml.run()
+    .then(result => {
+        newusers.reloadxml = result.trim();
+        resolve(newusers);
+    }).catch(err => {
+        console.error(err);
+        reject(err);
+    })
 });
 
 exports.newUsers = newUsers;
