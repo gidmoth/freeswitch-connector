@@ -6,7 +6,6 @@
 const provpaths = require('../config').getConfig('provisioningpaths')
 
 async function polycomroutes (fastify, options) {
-    console.log(JSON.stringify(fastify))
     fastify.register(require('fastify-static'), {
         root: provpaths.polycom,
         prefix: '/polycom/',

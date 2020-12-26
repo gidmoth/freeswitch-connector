@@ -4,6 +4,8 @@ FROM node:15
 COPY entrypoint.sh /
 COPY entrypoint.d /entrypoint.d/
 COPY connector /connector/
+COPY static /static/
+COPY depinstall.sh /
 
 ENV LANG en_US.utf8
 
@@ -21,7 +23,9 @@ ENV FSIP='127.0.0.1' \
 
 ENV CRYPTDOM example.com
 
-RUN chmod +x /entrypoint.sh
+RUN chmod +x /entrypoint.sh && \
+    chmod +x /depinstall.sh && \
+    /depinstall.sh
 
 EXPOSE 443/tcp
 
