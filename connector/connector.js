@@ -29,7 +29,6 @@ maintain.updateXmlState(xmlState);
 // init fastify for rest and static interface
 const fastify = require ('fastify')({
     logger: {
-        prettyPrint: true,
         serializers: {
           res (reply) {
             // The default
