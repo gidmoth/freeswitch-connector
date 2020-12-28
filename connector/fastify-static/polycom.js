@@ -40,11 +40,6 @@ async function polycomroutes (fastify, options) {
     })
 
     fastify.post('/polycom/:file', async function (req, reply) {
-        console.log(`body: ${JSON.stringify(req.body)}`)
-        console.log(`query: ${JSON.stringify(req.query)}`)
-        console.log(`params: ${JSON.stringify(req.params)}`)
-        console.log(`headers: ${JSON.stringify(req.headers)}`)
-        console.log(`raw: ${req.raw.getHeader('Content-Type')}`)
         return req.params.file
     })
 
