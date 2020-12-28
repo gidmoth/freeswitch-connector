@@ -48,21 +48,21 @@ Here the concept as a diagram:
    ^-+     ^  +---^              | modesl |
      |     |  |    +-------------+--------+---+
      |     |  |    |                          |
-     |     |  |    |     freeswitch-connector |
+     |     |  |    |     freeswitch+connector |
     ++-----+--+----+    +-------------------+ |
     | generate or  +----+ my representation | |
     | delete files |    |    of xmlstate    | |
     +--------------+    +---------+---------+ |
                    |              |           |
                    |              |           |
-                   +--------+-----+-----+-----+
-                            | fastify / |
-                            | rest api  |
-                            +-+--+------+
-                              |  ^
-                              v  |
-                            +-+--+-+
-                            | USER |
++--------------+   +--------------+-----+-----+
+|   polycom    +<-----------| fastify / |
+| provisioning |       +----+ rest api  |
++--------------+       |    +-+--+------+
++--------------+       |      |  ^
+|    verto     +<------+      v  |
+| communicator |            +-+--+-+
++--------------+            | USER |
                             +------+
 ```
 
@@ -73,6 +73,13 @@ the eventsocket-connection (by vpn e.g.), and you will need somehow
 network-reachable storage of the xml files in that case. It's easier
 to just run connector on the same host, and in the same network
 namespace as freeswitch.
+
+The representation of the xml config is an in memory JS Object and
+gets updatet on every `reloadxml`. But it can also be partially
+updatet on more specific events. You can serialize it easily as JSON,
+except for some properties which are sets, but those are automatically
+managed anyways. All xml-files which are managable by connector can easily
+be reproduced from this JSON file.
 
 All usercredentials an privilleges for the REST api are derived
 from the freeswitch-config, no need to care for extra-users, but

@@ -8,8 +8,56 @@ const provpaths = require('../config').getConfig('provisioningpaths')
 async function polycomroutes (fastify, options) {
     fastify.register(require('fastify-static'), {
         root: provpaths.polycom,
-        prefix: '/polycom/',
-        list: true
+        prefix: '/polycom/'
+    })
+
+    function getName (req) {
+        return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
+            .toString()
+            .split(':')[0]
+    }
+
+    function getMac (user, userarray) {
+        let mac = userarray.filter(usr => {
+            return usr.name == user
+        })[0].polymac
+        return mac
+    }
+
+    fastify.get('/polycom', async function (req, reply) {
+        let mac = getMac(getName(req), this.xmlState.users)
+        console.log(`body: ${JSON.stringify(req.body)}`)
+        console.log(`query: ${JSON.stringify(req.query)}`)
+        console.log(`params: ${JSON.stringify(req.params)}`)
+        console.log(`headers: ${JSON.stringify(req.headers)}`)        
+        return mac
+    })
+
+    fastify.get('/polycom/', async function (req, reply) {
+        let mac = getMac(getName(req), this.xmlState.users)
+        console.log(`body: ${JSON.stringify(req.body)}`)
+        console.log(`query: ${JSON.stringify(req.query)}`)
+        console.log(`params: ${JSON.stringify(req.params)}`)
+        console.log(`headers: ${JSON.stringify(req.headers)}`)        
+        return mac
+    })
+
+    fastify.get('/polycom/:file', async function (req, reply) {
+        let mac = getMac(getName(req), this.xmlState.users)
+        console.log(`body: ${JSON.stringify(req.body)}`)
+        console.log(`query: ${JSON.stringify(req.query)}`)
+        console.log(`params: ${JSON.stringify(req.params)}`)
+        console.log(`headers: ${JSON.stringify(req.headers)}`)        
+        console.log(`requestpath: ${file}`)
+        return mac
+    })
+
+    fastify.post('/polycom/:file', async function (req, reply) {
+        console.log(`body: ${JSON.stringify(req.body)}`)
+        console.log(`query: ${JSON.stringify(req.query)}`)
+        console.log(`params: ${JSON.stringify(req.params)}`)
+        console.log(`headers: ${JSON.stringify(req.headers)}`)
+        return req.params.file
     })
 
 //    fastify.get('/:file', async function (req, reply) {
