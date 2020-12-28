@@ -26,29 +26,16 @@ async function polycomroutes (fastify, options) {
 
     fastify.get('/polycom', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        console.log(`body: ${JSON.stringify(req.body)}`)
-        console.log(`query: ${JSON.stringify(req.query)}`)
-        console.log(`params: ${JSON.stringify(req.params)}`)
-        console.log(`headers: ${JSON.stringify(req.headers)}`)        
         return mac
     })
 
     fastify.get('/polycom/', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        console.log(`body: ${JSON.stringify(req.body)}`)
-        console.log(`query: ${JSON.stringify(req.query)}`)
-        console.log(`params: ${JSON.stringify(req.params)}`)
-        console.log(`headers: ${JSON.stringify(req.headers)}`)        
         return mac
     })
 
     fastify.get('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        console.log(`body: ${JSON.stringify(req.body)}`)
-        console.log(`query: ${JSON.stringify(req.query)}`)
-        console.log(`params: ${JSON.stringify(req.params)}`)
-        console.log(`headers: ${JSON.stringify(req.headers)}`)        
-        console.log(`requestpath: ${file}`)
         return mac
     })
 
@@ -57,6 +44,7 @@ async function polycomroutes (fastify, options) {
         console.log(`query: ${JSON.stringify(req.query)}`)
         console.log(`params: ${JSON.stringify(req.params)}`)
         console.log(`headers: ${JSON.stringify(req.headers)}`)
+        console.log(`raw: ${req.raw.getHeader('Content-Type')}`)
         return req.params.file
     })
 
