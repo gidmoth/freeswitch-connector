@@ -7,6 +7,11 @@ COPY connector /connector/
 COPY static /static/
 COPY depinstall.sh /
 
+RUN cd /static/polycom/ucs && \
+    curl -O https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-combined.zip && \
+    unzip Polycom-UC-Software-4.0.15-rts22-release-sig-combined.zip && \
+    rm Polycom-UC-Software-4.0.15-rts22-release-sig-combined.zip
+
 ENV LANG en_US.utf8
 
 ENV FSIP='127.0.0.1' \
