@@ -1,17 +1,17 @@
 {
     "info": {
         "reloadxml": {
-            "lastrun": "2020-12-24T16:13:50.224Z",
-            "lastmsg": "+OK [Success]"
+            "lastrun": "not till now",
+            "lastmsg": "no Message"
         },
         "maintainance": {
-            "lastrun": "2020-12-24T16:13:50.299Z"
+            "lastrun": "2020-12-29T11:33:24.209Z"
         }
     },
     "globals": {
-        "hostname": "localhost.localdomain",
-        "local_ip_v4": "192.168.178.101",
-        "local_mask_v4": "255.255.255.0",
+        "hostname": "fcos.c8h10n4o2.news",
+        "local_ip_v4": "46.4.114.220",
+        "local_mask_v4": "255.255.255.224",
         "local_ip_v6": "::1",
         "base_dir": "/usr",
         "recordings_dir": "/var/lib/freeswitch/recordings",
@@ -32,16 +32,15 @@
         "cache_dir": "/var/cache/freeswitch",
         "data_dir": "/usr/share/freeswitch",
         "localstate_dir": "/var/lib/freeswitch",
-        "switch_serial": "c0a8b266d6cc",
-        "core_uuid": "5900a729-679f-4bc7-8be6-28125fae4b5d",
+        "switch_serial": "2e0472dcd6cc",
         "default_password": "napw",
         "sound_prefix": "/usr/share/freeswitch/sounds/en/us/callie",
-        "domain": "192.168.178.101",
-        "domain_name": "192.168.178.101",
+        "domain": "fcos.c8h10n4o2.news",
+        "domain_name": "fcos.c8h10n4o2.news",
         "global_codec_prefs": "OPUS,G722,H264,VP8",
         "outbound_codec_prefs": "OPUS,G722,H264,VP8",
-        "external_rtp_ip": "192.168.178.101",
-        "external_sip_ip": "192.168.178.101",
+        "external_rtp_ip": "46.4.114.220",
+        "external_sip_ip": "46.4.114.220",
         "xml_rpc_password": "napw",
         "internal_sip_port": "5060",
         "external_sip_port": "5080",
@@ -57,7 +56,8 @@
         "es_listen_port": "8021",
         "es_pw": "ClueCon",
         "defconpin": "0815",
-        "modconpin": "2357"
+        "modconpin": "2357",
+        "core_uuid": "4ceb3922-7a80-42a0-a681-b77c946632c7"
     },
     "users": [
         {
@@ -76,24 +76,6 @@
             "context": "team",
             "name": "teamuser2",
             "email": "teamuser2@example.com",
-            "polymac": "none"
-        },
-        {
-            "id": "20002",
-            "password": "2E3BPo8Tfi",
-            "conpin": "2357",
-            "context": "team",
-            "name": "foo",
-            "email": "foo@bar.baz",
-            "polymac": "none"
-        },
-        {
-            "id": "20003",
-            "password": "schumpeter",
-            "conpin": "2357",
-            "context": "team",
-            "name": "stefan",
-            "email": "my@mail.com",
             "polymac": "none"
         },
         {
@@ -131,15 +113,6 @@
             "name": "publicuser2",
             "email": "publicuser2@example.com",
             "polymac": "none"
-        },
-        {
-            "id": "22002",
-            "password": "vs9Y0wsWZ6",
-            "conpin": "0815",
-            "context": "public",
-            "name": "lula",
-            "email": "sis@doinet.com",
-            "polymac": "funnymac"
         }
     ],
     "conferencetypes": [

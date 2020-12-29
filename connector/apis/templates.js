@@ -34,4 +34,66 @@ const getUserFile = (user) => {
 </include>`
 }
 
+const getPolyMain = (user, hostname) => {
+    return `<?xml version="1.0" standalone="yes"?>
+<APPLICATION
+   APP_FILE_PATH="https://${user.name}:${user.password}@${hostname}/polycom/sip.ld"
+   CONFIG_FILES="https://${user.name}:${user.password}@${hostname}/polycom/allprov.cfg"
+   MISC_FILES=""
+   LOG_FILE_DIRECTORY=""
+   OVERRIDES_DIRECTORY=""
+   CONTACTS_DIRECTORY=""
+   LICENSE_DIRECTORY=""
+   USER_PROFILES_DIRECTORY=""
+   CALL_LISTS_DIRECTORY=""
+/>`
+}
+
+const getPolyAll = (user, hostname, globals) => {
+  return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  <PHONE_CONFIG>
+    <ALL
+      log.level.change.sip="0"
+      log.level.change.tls="0"
+      reg.1.address="20000"
+      reg.1.auth.domain="${hostname}"
+      reg.1.auth.userId="${user.id}"
+      reg.1.auth.password="${user.password}"
+      reg.1.displayName="${user.name}"
+      reg.1.server.1.address="${hostname}"
+      reg.1.server.1.port="${globals.internal_tls_port}"
+      reg.1.label="testhase"
+      reg.1.type="private"
+      reg.1.server.1.transport="TLS"
+      tcpIpApp.sntp.address="europe.pool.ntp.org"
+      tcpIpApp.sntp.address.overrideDHCP="1"
+      voIpProt.SIP.specialEvent.checkSync.alwaysReboot="1"
+      voIpProt.SIP.serverFeatureControl.cf="0"
+      voIpProt.SIP.serverFeatureControl.dnd="0"
+      voIpProt.server.1.address="${hostname}"
+      voIpProt.server.1.transport="TLS"
+      feature.presence.enabled="1"
+      feature.urlDialing.enabled="0"
+      pres.idleSoftkeys="0"
+      sec.srtp.offer="1"
+      sec.srtp.offer.HMAC_SHA1_32="1"
+      sec.srtp.offer.HMAC_SHA1_80="0"
+      sec.srtp.resumeWithNewKey="0"
+      device.set="1"
+      voice.codecPref.G729_AB="0"
+      voice.codecPref.G711_A="0"
+      device.prov.redunAttemptLimit.set="1"
+      device.prov.redunAttemptLimit="1"
+      device.prov.serverName.set="1"
+      device.prov.serverName="https://${user.name}:${user.password}@${hostname}/polycom"
+      device.prov.serverType.set="1"
+      device.prov.serverType="HTTPS"
+      device.prov.ztpEnabled.set="1"
+      device.prov.ztpEnabled="0"
+    />
+  </PHONE_CONFIG>`
+}
+
 exports.getUserFile = getUserFile;
+exports.getPolyMain = getPolyMain;
+exports.getPolyAll = getPolyAll;

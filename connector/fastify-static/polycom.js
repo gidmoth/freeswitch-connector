@@ -24,20 +24,20 @@ async function polycomroutes (fastify, options) {
         return mac
     }
 
-    fastify.get('/polycom', async function (req, reply) {
-        let mac = getMac(getName(req), this.xmlState.users)
-        return mac
+    fastify.get('/polycom/sip.ld', async function (req, reply) {
+        return reply.sendFile('ucs/sip.ld')
     })
 
-    fastify.get('/polycom/', async function (req, reply) {
-        let mac = getMac(getName(req), this.xmlState.users)
-        return mac
+    fastify.get('/polycom/sip.ver', async function (req, reply) {
+        return reply.sendFile('ucs/sip.ver')
     })
 
     fastify.get('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        return mac
+        return reply.sendFile(`${mac}/${req.params.file}`)
     })
+
+    
 
     fastify.put('/polycom/:file', async function (req, reply) {
         console.log(`body: ${JSON.stringify(req.body)}`)

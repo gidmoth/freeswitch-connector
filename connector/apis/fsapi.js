@@ -34,8 +34,16 @@ const genPass = () => {
     })
 }
 
-const provisionUser = (user, xmlState) => {
-    
+const polyProvUser = (user, xmlState) => {
+    let masterfileXml = templates.getPolyMain(user, fastiConf.hostname)
+    let masterfileFile = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}.cfg`)
+    let allprovXml = templates.getPolyAll(user, fastiConf.hostname, xmlState.globals)
+    let allprovFile = path.join(Provpaths.polycom, `${user.polymac}/allprov.cfg`)
+    if (!(fs.existsSync(path.dirname(allprovFile)))) {
+        fs.mkdirSync(path.dirname(allprovFile))
+    }
+    fs.writeFileSync(masterfileFile, masterfileXml)
+    fs.writeFileSync(allprovFile, allprovXml)
 }
 
 const buildNewUser = (xmlState, user, newusers) => {
@@ -89,6 +97,9 @@ const buildNewUser = (xmlState, user, newusers) => {
     let newuserXml = templates.getUserFile(newuser);
     let newuserFile = path.join(Contexts[newuser.context].path, `${newuser.id}.xml`);
     fs.writeFileSync(newuserFile, newuserXml);
+    if (newuser.polymac !== 'none') {
+        polyProvUser(newuser, xmlState)
+    }
     newusers.done.push(newuser);
     xmlState.users.push(newuser);
     return;
