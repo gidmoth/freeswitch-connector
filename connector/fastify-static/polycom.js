@@ -59,14 +59,13 @@ async function polycomroutes (fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-        .then(() => {
+        try {
+            await fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
             reply.send('OK')
-        })
-        .catch(error => {
+        } catch (err) {
             fastify.log.error(error)
             reply.send(`error: ${error}`)
-        })
+        }
     })
 }
 
