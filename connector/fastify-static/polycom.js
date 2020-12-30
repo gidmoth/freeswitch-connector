@@ -6,7 +6,7 @@
 const provpaths = require('../config').getConfig('provisioningpaths')
 const fs = require('fs')
 
-async function polycomroutes (fastify, options) {
+async function polycomroutes(fastify, options) {
     fastify.register(require('fastify-static'), {
         root: provpaths.polycom,
         prefix: '/polycom/',
@@ -15,19 +15,19 @@ async function polycomroutes (fastify, options) {
 
     fastify.addContentTypeParser('*', { asString: true }, function (req, payload, done) {
         let data = ''
-        payload.on('data', chunk => { data += chunk})
+        payload.on('data', chunk => { data += chunk })
         payload.on('end', () => {
             done(null, data)
         })
     })
 
-    function getName (req) {
+    function getName(req) {
         return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
             .toString()
             .split(':')[0]
     }
 
-    function getMac (user, userarray) {
+    function getMac(user, userarray) {
         let mac = userarray.filter(usr => {
             return usr.name == user
         })[0].polymac
@@ -39,8 +39,8 @@ async function polycomroutes (fastify, options) {
             req.params.file.endsWith('.jpg') ||
             req.params.file.endsWith('.wav') ||
             req.params.file.endsWith('.ver')) {
-                return reply.sendFile(`ucs/${req.params.file}`)
-            }
+            return reply.sendFile(`ucs/${req.params.file}`)
+        }
         let mac = getMac(getName(req), this.xmlState.users)
         return reply.sendFile(`${mac}/${req.params.file}`)
     })
@@ -59,13 +59,11 @@ async function polycomroutes (fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body, (err) => {
-            if (err) throw err
-            reply
-                .code(201)
-                .header('Content-Location', `/polycom/${req.params.file}`)
-                .send('OK')
-        })
+        fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
+        reply
+            .code(201)
+            .header('Content-Location', `/polycom/${req.params.file}`)
+            .send('OK')
     })
 }
 
