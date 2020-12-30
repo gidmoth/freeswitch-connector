@@ -38,8 +38,7 @@ async function polycomroutes (fastify, options) {
         if (req.params.file.endsWith('.ld') ||
             req.params.file.endsWith('.jpg') ||
             req.params.file.endsWith('.wav') ||
-            req.params.file.endsWith('.ver') ||
-            req.params.file.endsWith('-license.cfg')) {
+            req.params.file.endsWith('.ver')) {
                 return reply.sendFile(`ucs/${req.params.file}`)
             }
         let mac = getMac(getName(req), this.xmlState.users)
@@ -62,7 +61,9 @@ async function polycomroutes (fastify, options) {
         let mac = getMac(getName(req), this.xmlState.users)
         try {
             await fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-            reply.send()
+            reply
+                .code(201)
+                .header('Content-Location', `/polycom/${req.params.file}`)
         } catch (err) {
             fastify.log.error(error)
             reply.send(`error: ${error}`)
