@@ -4,7 +4,7 @@
 
 
 const provpaths = require('../config').getConfig('provisioningpaths')
-const fs = require('fs').promises
+const fs = require('fs')
 
 async function polycomroutes (fastify, options) {
     fastify.register(require('fastify-static'), {
@@ -59,15 +59,12 @@ async function polycomroutes (fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-        .then(() => {
+        fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body, (err) => {
+            if (err) throw err
             reply
-                .code(204)
+                .code(201)
                 .header('Content-Location', `/polycom/${req.params.file}`)
-        })
-        .catch(error => {
-            fastify.log.error(error)
-            reply.send(`error: ${error}`)
+                .send('OK')
         })
     })
 }
