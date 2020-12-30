@@ -4,7 +4,7 @@
 
 
 const provpaths = require('../config').getConfig('provisioningpaths')
-const fs = require('fs')
+const fs = require('fs').promises
 
 async function polycomroutes (fastify, options) {
     fastify.register(require('fastify-static'), {
@@ -13,7 +13,13 @@ async function polycomroutes (fastify, options) {
         serve: false
     })
 
-    fastify.addContentTypeParser('*', { asString: true }, fastify.defaultTextParser())
+    fastify.addContentTypeParser('*', { asString: true }, function (req, payload, done) {
+        let data = ''
+        payload.on('data', chunk => { data += chunk})
+        payload.on('end', () => {
+            done(null, data)
+        })
+    })
 
     function getName (req) {
         return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
