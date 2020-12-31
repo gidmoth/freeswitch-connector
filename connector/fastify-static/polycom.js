@@ -26,13 +26,7 @@ async function polycomroutes(fastify, options) {
         return mac
     }
 
-    fastify.addContentTypeParser('*', function (req, payload, done) {
-        let data = ''
-        payload.on('data', chunk => { data += chunk })
-        payload.on('end', () => {
-            done(null, data)
-        })
-    })
+    fastify.addContentTypeParser('*', { asString: true }, fastify.defaultTextParser())
 
     fastify.get('/polycom/:file', async function (req, reply) {
         if (req.params.file.endsWith('.ld') ||
