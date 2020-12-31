@@ -36,7 +36,7 @@
     fasti: {
         port: `${process.env.FASTIPORT || 3000}`,
         ip: `${process.env.FASTIIP || '0.0.0.0'}`,
-        hostname: `${process.env.HOSTNAME || 'localhost.localdomain'}`,
+        hostname: `${process.env.CONHOSTNAME || 'localhost.localdomain'}`,
         apiallow: 'team',
         cert: `${process.env.FASTICERT || '/etc-freeswitch/tls/fullchain.pem'}`,
         key: `${process.env.FASTIKEY || '/etc-freeswitch/tls/privkey.pem'}`

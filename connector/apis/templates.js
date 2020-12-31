@@ -55,7 +55,7 @@ const getPolyAll = (user, hostname, globals) => {
     <ALL
       log.level.change.sip="0"
       log.level.change.tls="0"
-      reg.1.address="20000"
+      reg.1.address="${user.id}"
       reg.1.auth.domain="${hostname}"
       reg.1.auth.userId="${user.id}"
       reg.1.auth.password="${user.password}"
