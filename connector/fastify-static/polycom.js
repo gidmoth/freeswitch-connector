@@ -27,15 +27,21 @@ async function polycomroutes(fastify, options) {
     }
 
     fastify.addContentTypeParser('*', { parseAs: 'string' }, function (req, payload, done) {
-        let mac = getMac(getName(req), this.xmlState.users)
-        console.log(`got MAC: ${mac}`)
-        let consumer = fs.createWriteStream(`${provpaths.polycom}/${mac}/${req.params.file}`)
-        payload.pipe(consumer)
+        let data = ''
+        payload.on('data', chunk => { data += chunk })
         payload.on('end', () => {
-            console.log('PAYLOAD ENDED')
-            done(null, 'OK')
+            done(null, data)
         })
     })
+
+    const polyFile = (mypath, data, file) => new Promise ((resolve, reject) => {
+        try {
+            fs.writeFileSync(mypath, data)
+        } catch (err) {
+            reject(err)
+        }
+        resolve({written: `${file}`});
+    });
 
     fastify.get('/polycom/:file', async function (req, reply) {
         if (req.params.file.endsWith('.ld') ||
@@ -61,7 +67,16 @@ async function polycomroutes(fastify, options) {
     })
 
     fastify.put('/polycom/:file', async function (req, reply) {
-        return 'OK'
+        let mac = getMac(getName(req), this.xmlState.users)
+        let mypath = `${provpaths.polycom}/${mac}/${req.params.file}`
+        polyFile(mypath, req.body, req.params.file)
+        .then(answer => {
+            reply.send(answer);
+        })
+        .catch(error => {
+            fastify.log.error(error)
+            reply.send(`error: ${error}`)
+        })
     })
 }
 
