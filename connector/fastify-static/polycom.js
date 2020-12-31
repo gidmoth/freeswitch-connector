@@ -26,10 +26,15 @@ async function polycomroutes(fastify, options) {
         return mac
     }
 
-    fastify.addContentTypeParser('*', { parseAs: 'string' }, async function (req, payload) {
+    fastify.addContentTypeParser('*', { parseAs: 'string' }, function (req, payload, done) {
         let mac = getMac(getName(req), this.xmlState.users)
-        let res = await fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, payload)
-        return res
+        console.log(`got MAC: ${mac}`)
+        let consumer = fs.createWriteStream(`${provpaths.polycom}/${mac}/${req.params.file}`)
+        payload.pipe(consumer)
+        payload.on('end', () => {
+            console.log('PAYLOAD ENDED')
+            done(null, 'OK')
+        })
     })
 
     fastify.get('/polycom/:file', async function (req, reply) {
