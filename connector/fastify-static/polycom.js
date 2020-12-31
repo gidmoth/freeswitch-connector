@@ -57,15 +57,11 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.put('/polycom/:file', function (req, reply) {
+    fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        try {
-            fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-        } catch (err) {
-            fastify.log.error(err)
-            reply.send(`error: ${error}`)
-        }
-        reply.send()       
+        console.log(`got writepah: ${provpaths.polycom}/${mac}/${req.params.file}`)
+        fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
+        return 'OK'
     })
 }
 
