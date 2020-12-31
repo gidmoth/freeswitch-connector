@@ -57,7 +57,7 @@ async function polycomroutes(fastify, options) {
         let mac = getMac(getName(req), this.xmlState.users)
         let capture = fs.createWriteStream(`${provpaths.polycom}/${mac}/${req.params.file}`)
         req.raw.pipe(capture)
-        req.raw.on('end', fastify.log(`written file: ${provpaths.polycom}/${mac}/${req.params.file}`))
+        req.raw.on('end', req.log.info(`written file: ${provpaths.polycom}/${mac}/${req.params.file}`))
     })
 }
 
