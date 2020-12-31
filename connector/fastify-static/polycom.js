@@ -30,6 +30,10 @@ async function polycomroutes(fastify, options) {
         let buffer = []
         payload.on('data', chunk => {
             buffer.push(chunk)
+        }).on('error', (err) => {
+            buffer.push(err)
+            buffer = Buffer.concat(buffer).toString()
+            done(null, buffer)
         }).on('end', () => {
             buffer = Buffer.concat(buffer).toString()
             done(null, buffer)
