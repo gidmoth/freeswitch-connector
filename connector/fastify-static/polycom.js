@@ -5,7 +5,9 @@
 
 const provpaths = require('../config').getConfig('provisioningpaths')
 const fs = require('fs')
-//const pump = require('pump')
+const util = require('util')
+const { pipeline } = require('stream')
+const pump = util.promisify(pipeline)
 
 async function polycomroutes(fastify, options) {
     fastify.register(require('fastify-static'), {
@@ -14,9 +16,7 @@ async function polycomroutes(fastify, options) {
         serve: false
     })
 
-    fastify.addContentTypeParser('*', { asString: true }, function (req, payload, done) {
-        done(null, payload)
-    })
+    fastify.register(require('fastify-multipart'))
 
     function getName(req) {
         return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
@@ -54,12 +54,11 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.put('/polycom/:file', function (req, reply) {
+    fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        let capture = fs.createWriteStream(`${provpaths.polycom}/${mac}/${req.params.file}`)
-        req.body.pipe(capture)
-        req.body.on('end', req.log.info(`written file: ${provpaths.polycom}/${mac}/${req.params.file}`))
-        return 'OK'
+        let data = await req.file()
+        await pump(data.file, fs.createWriteStream(`${provpaths.polycom}/${mac}/${data.filename}`))
+        reply.send()
     })
 }
 
