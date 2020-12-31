@@ -60,10 +60,7 @@ async function polycomroutes(fastify, options) {
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
         fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-        reply
-            .code(201)
-            .header('Content-Location', `/polycom/${req.params.file}`)
-            .send('OK')
+        return 'OK'
     })
 }
 
