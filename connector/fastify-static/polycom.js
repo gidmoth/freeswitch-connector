@@ -34,15 +34,6 @@ async function polycomroutes(fastify, options) {
         })
     })
 
-    const polyFile = (mypath, data, file) => new Promise ((resolve, reject) => {
-        try {
-            fs.writeFileSync(mypath, data)
-        } catch (err) {
-            reject(err)
-        }
-        resolve({written: `${file}`});
-    });
-
     fastify.get('/polycom/:file', async function (req, reply) {
         if (req.params.file.endsWith('.ld') ||
             req.params.file.endsWith('.jpg') ||
@@ -66,17 +57,15 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.put('/polycom/:file', async function (req, reply) {
+    fastify.put('/polycom/:file', function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        let mypath = `${provpaths.polycom}/${mac}/${req.params.file}`
-        polyFile(mypath, req.body, req.params.file)
-        .then(answer => {
-            reply.send(answer);
-        })
-        .catch(error => {
-            fastify.log.error(error)
+        try {
+            fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
+        } catch (err) {
+            fastify.log.error(err)
             reply.send(`error: ${error}`)
-        })
+        }
+        reply.send()       
     })
 }
 
