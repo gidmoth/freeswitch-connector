@@ -59,8 +59,6 @@ async function polycomroutes(fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        console.log(`got writepah: ${provpaths.polycom}/${mac}/${req.params.file}`)
-        console.log(`got data: ${req.body}`)
         let written = await fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body, (err) => {
             if (err) throw err
             return { 'written': `${req.params.file}`}
