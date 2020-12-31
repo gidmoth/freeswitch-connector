@@ -5,9 +5,6 @@
 
 const provpaths = require('../config').getConfig('provisioningpaths')
 const fs = require('fs')
-const util = require('util')
-const { pipeline } = require('stream')
-const pump = util.promisify(pipeline)
 
 async function polycomroutes(fastify, options) {
     fastify.register(require('fastify-static'), {
@@ -15,8 +12,6 @@ async function polycomroutes(fastify, options) {
         prefix: '/polycom/',
         serve: false
     })
-
-    fastify.register(require('fastify-multipart'))
 
     function getName(req) {
         return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
@@ -30,6 +25,12 @@ async function polycomroutes(fastify, options) {
         })[0].polymac
         return mac
     }
+
+    fastify.addContentTypeParser('*', { parseAs: 'string' }, async function (req, payload) {
+        let mac = getMac(getName(req), this.xmlState.users)
+        let res = await fs.writeFile(`${provpaths.polycom}/${mac}/${req.params.file}`, payload)
+        return res
+    })
 
     fastify.get('/polycom/:file', async function (req, reply) {
         if (req.params.file.endsWith('.ld') ||
@@ -55,10 +56,7 @@ async function polycomroutes(fastify, options) {
     })
 
     fastify.put('/polycom/:file', async function (req, reply) {
-        let mac = getMac(getName(req), this.xmlState.users)
-        let data = await req.file()
-        await pump(data.file, fs.createWriteStream(`${provpaths.polycom}/${mac}/${data.filename}`))
-        reply.send()
+        return 'OK'
     })
 }
 
