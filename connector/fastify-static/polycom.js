@@ -14,11 +14,7 @@ async function polycomroutes(fastify, options) {
     })
 
     fastify.addContentTypeParser('*', { asString: true }, function (req, payload, done) {
-        let data = ''
-        payload.on('data', chunk => { data += chunk })
-        payload.on('end', () => {
-            done(null, data)
-        })
+        done()
     })
 
     function getName(req) {
@@ -59,8 +55,9 @@ async function polycomroutes(fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
-        fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
-        return 'OK'
+        let capture = fs.createWriteStream(`${provpaths.polycom}/${mac}/${req.params.file}`)
+        req.raw.pipe(capture)
+        req.raw.on('end', fastify.log(`written file: ${provpaths.polycom}/${mac}/${req.params.file}`))
     })
 }
 
