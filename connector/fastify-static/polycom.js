@@ -29,7 +29,9 @@ async function polycomroutes(fastify, options) {
     fastify.addContentTypeParser('*', function (request, payload, done) {
         let buffer = []
         payload.on('error', (err) => {
-            console.error(err)
+            console.log(err)
+            buffer = Buffer.concat(buffer).toString()
+            done(null, buffer)
         }).on('data', chunk => {
             buffer.push(chunk)
         }).on('end', () => {
