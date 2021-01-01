@@ -65,6 +65,10 @@ async function polycomroutes(fastify, options) {
 
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = getMac(getName(req), this.xmlState.users)
+        if (req.params.file.endsWith('-app.log')) {
+            fs.appendFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
+            return { 'appended': `${req.params.file}` }
+        }
         fs.writeFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
         return { 'written': `${req.params.file}` }
     })
