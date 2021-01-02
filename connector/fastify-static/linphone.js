@@ -25,7 +25,7 @@ async function linphoneroutes(fastify, options) {
         return id
     }
 
-    fastify.get('/linphone', async function (req, reply) {
+    fastify.get('/linphone/:file', async function (req, reply) {
         let id = getId(getName(req), this.xmlState.users)
         return reply.sendFile(`${id}/linphone.xml`)
     })
