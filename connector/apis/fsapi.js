@@ -46,6 +46,15 @@ const polyProvUser = (user, xmlState) => {
     fs.writeFileSync(allprovFile, allprovXml)
 }
 
+const linProvUser = (user, xmlState) => {
+    let linphoneXml = templates.getLinXml(user, xmlState.globals.hostname, xmlState.globals.internal_tls_port)
+    let linphoneFile = path.join(Provpaths.linphone, `${user.id}/linphone.xml`)
+    if (!(fs.existsSync(path.dirname(linphoneFile)))) {
+        fs.mkdirSync(path.dirname(linphoneFile))
+    }
+    fs.writeFileSync(linphoneFile, linphoneXml)
+}
+
 const buildNewUser = (xmlState, user, newusers) => {
     let newuser = {}
     if (xmlState.users.map(usr => usr.name).includes(user.name)) {
@@ -100,6 +109,7 @@ const buildNewUser = (xmlState, user, newusers) => {
     if (newuser.polymac !== 'none') {
         polyProvUser(newuser, xmlState)
     }
+    linProvUser(newuser, xmlState);
     newusers.done.push(newuser);
     xmlState.users.push(newuser);
     return;
