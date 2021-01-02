@@ -13,9 +13,6 @@ async function linphoneroutes(fastify, options) {
     })
 
     fastify.get('/linphone', async function (req, reply) {
-        console.log(req.user)
-        console.log(req)
-        console.log(req.usr)
         let id = req.user.id
         return reply.sendFile(`${id}/linphone.xml`)
     })
