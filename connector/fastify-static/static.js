@@ -14,18 +14,15 @@ async function staticroutes(fastify, options) {
         return array.filter(usr => usr.name == name)[0]
     }
 
-    // validation function
-    function validate(username, done) {
-        let usr = getMyUser(fastify.xmlState.users, username);
-        if (usr == undefined) {
-            return done(null, false)
-        }
-        return done(null, usr, usr.password)
-    }
-
     // decorate fastify with passport-plugin
     passport.use('digest', new ppHttp.DigestStrategy({ qop: 'auth' },
-        validate(username, done)
+        function (username, done) {
+            let usr = getMyUser(fastify.xmlState.users, username);
+            if (usr == undefined) {
+                return done(null, false)
+            }
+            return done(null, usr, usr.password)
+        }
     ))
     fastify.register(secSession, { key: 'foobarbaz' })
     fastify.register(passport.initialize())
