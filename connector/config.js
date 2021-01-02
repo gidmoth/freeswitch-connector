@@ -42,6 +42,7 @@
         key: `${process.env.FASTIKEY || '/etc-freeswitch/tls/privkey.pem'}`
     },
     provisioningpaths: {
+        all: `${process.env.STATICPATH || '/static'}`,
         polycom: `${process.env.STATICPATH || '/static'}/polycom`,
         linphone: `${process.env.STATICPATH || '/static'}/linphone`
     }

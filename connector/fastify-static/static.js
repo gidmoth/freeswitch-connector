@@ -3,7 +3,8 @@
  */
 
 const { default: passport } = require('fastify-passport');
-const fasticonf = require('../config').getConfig('fasti');
+const statpaths = require('../config').getConfig('provisioningpaths');
+const fs = require('fs');
 const secSession = require('fastify-secure-session');
 const ppHttp = require('passport-http')
 
@@ -24,7 +25,7 @@ async function staticroutes(fastify, options) {
             return done(null, usr, usr.password)
         }
     ))
-    fastify.register(secSession, { key: 'foobarbaz' })
+    fastify.register(secSession, { key: fs.readFileSync(`${statpaths.all}/secrets/secret-key`) })
     fastify.register(passport.initialize())
     fastify.register(passport.secureSession())
 
