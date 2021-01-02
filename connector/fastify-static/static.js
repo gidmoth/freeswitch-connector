@@ -2,39 +2,37 @@
  * Entrypoint for all fastify static routes
  */
 
+const { default: passport } = require('fastify-passport');
 const fasticonf = require('../config').getConfig('fasti');
-const provpaths = require('../config').getConfig('provisioningpaths')
+const secSession = require('fastify-secure-session');
+const ppHttp = require('passport-http')
 
-async function staticroutes (fastify, options) {
+async function staticroutes(fastify, options) {
 
     // utility for getting user
-    function getMyUser(array, name, done) {
+    function getMyUser(array, name) {
         return array.filter(usr => usr.name == name)[0]
     }
 
     // validation function
-    function validate (username, password, req, reply, done) {
+    function validate(username, done) {
         let usr = getMyUser(fastify.xmlState.users, username);
         if (usr == undefined) {
-            done(new Error('User not found'))
+            return done(null, false)
         }
-        if (usr.password == password) {
-            done()
-        } else {
-            done(new Error('Wrong Pass'))
-        }
+        return done(null, usr, usr.password)
     }
 
-    // realm for clientuse
-    const authenticate = {realm: `${fasticonf.hostname}`}
+    // decorate fastify with passport-plugin
+    passport.use('digest', new ppHttp.DigestStrategy({ qop: 'auth' },
+        validate(username, done)
+    ))
+    fastify.register(secSession, { key: 'foobarbaz' })
+    fastify.register(passport.initialize())
+    fastify.register(passport.secureSession())
 
-    // decorate fastify with basic-auth
-    fastify.register(require('fastify-basic-auth'), {validate, authenticate})
-    
-    // add requesthook after loading plugin
     fastify.after(() => {
-        fastify.addHook('onRequest', fastify.basicAuth)
-
+        fastify.addHook('onRequest', passport.authenticate("digest", { session: false }))
         // load provisioning endpoints
         fastify.register(require('./polycom'))
         fastify.register(require('./linphone'))

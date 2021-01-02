@@ -13,6 +13,19 @@ async function polycomroutes(fastify, options) {
         serve: false
     })
 
+    function getName(req) {
+        return Buffer.from(req.headers.authorization.split(' ')[1], 'base64')
+            .toString()
+            .split(':')[0]
+    }
+
+    function getMac(user, userarray) {
+        let mac = userarray.filter(usr => {
+            return usr.name == user
+        })[0].polymac
+        return mac
+    }
+
     fastify.addContentTypeParser('*', function (request, payload, done) {
         let buffer = []
         payload.on('error', (err) => {
@@ -34,7 +47,7 @@ async function polycomroutes(fastify, options) {
             req.params.file.endsWith('.ver')) {
             return reply.sendFile(`ucs/${req.params.file}`)
         }
-        let mac = req.user.polymac
+        let mac = getMac(getName(req), this.xmlState.users)
         return reply.sendFile(`${mac}/${req.params.file}`)
     })
 
@@ -51,7 +64,7 @@ async function polycomroutes(fastify, options) {
     })
 
     fastify.put('/polycom/:file', async function (req, reply) {
-        let mac = req.user.polymac
+        let mac = getMac(getName(req), this.xmlState.users)
         if (req.params.file.endsWith('-app.log')) {
             fs.appendFileSync(`${provpaths.polycom}/${mac}/${req.params.file}`, req.body)
             return { 'appended': `${req.params.file}` }
