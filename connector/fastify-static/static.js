@@ -25,10 +25,13 @@ async function staticroutes(fastify, options) {
             return done(null, usr, usr.password)
         }
     ))
+
+    // register authmech
     fastify.register(secSession, { key: fs.readFileSync(`${statpaths.all}/secrets/secret-key`) })
     fastify.register(passport.initialize())
     fastify.register(passport.secureSession())
 
+    // add authhook
     fastify.after(() => {
         fastify.addHook('onRequest', passport.authenticate("digest", { session: false }))
         // load provisioning endpoints

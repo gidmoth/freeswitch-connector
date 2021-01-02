@@ -3,6 +3,11 @@
  */
 
 const fasticonf = require('../config').getConfig('fasti');
+const { default: passport } = require('fastify-passport');
+const statpaths = require('../config').getConfig('provisioningpaths');
+const fs = require('fs');
+const secSession = require('fastify-secure-session');
+const ppHttp = require('passport-http')
 
 async function apiroutes (fastify, options) {
 
@@ -11,29 +16,28 @@ async function apiroutes (fastify, options) {
         return array.filter(usr => usr.name == name)[0]
     }
 
-    // validation function
-    function validate (username, password, req, reply, done) {
-        let usr = getMyUser(fastify.xmlState.users, username);
-        if (usr == undefined) {
-            done(new Error('User not found'))
+    // decorate fastify with passport-plugin
+    passport.use('digest', new ppHttp.DigestStrategy({ qop: 'auth' },
+        function (username, done) {
+            let usr = getMyUser(fastify.xmlState.users, username);
+            if (usr == undefined) {
+                return done(null, false)
+            }
+            if (usr.context != fasticonf.apiallow) {
+                return done(null, false)
+            }
+            return done(null, usr, usr.password)
         }
-        if (usr.password == password && usr.context == fasticonf.apiallow) {
-            done()
-        } else {
-            done(new Error('Wrong Pass or Usercontext'))
-        }
-    }
+    ))
 
-    // realm for clientuse
-    const authenticate = {realm: `${fasticonf.hostname}`}
+    // register authmech
+    fastify.register(secSession, { key: fs.readFileSync(`${statpaths.all}/secrets/secret-key`) })
+    fastify.register(passport.initialize())
+    fastify.register(passport.secureSession())
 
-    // decorate fastify with basic-auth
-    fastify.register(require('fastify-basic-auth'), {validate, authenticate})
-    
     // add requesthook after loading plugin
     fastify.after(() => {
-        fastify.addHook('onRequest', fastify.basicAuth)
-
+        fastify.addHook('onRequest', passport.authenticate("digest", { session: false }))
         // load users endpoints
         fastify.register(require('./users'))
     })
