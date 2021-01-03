@@ -31,8 +31,7 @@ const fastify = require ('fastify')({
     logger: true,
     https: {
         key: fs.readFileSync(fasticonf.key),
-        cert: fs.readFileSync(fasticonf.cert),
-        secureProtocol: 'TLSv1_2_method'
+        cert: fs.readFileSync(fasticonf.cert)
     }   
 })
 
