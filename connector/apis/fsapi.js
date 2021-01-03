@@ -96,10 +96,10 @@ const buildNewUser = (xmlState, user, newusers) => {
         }
     }
     newuser.context = user.context;
-    newuser.name = user.name;
-    newuser.email = user.email;
+    newuser.name = user.name.trim();
+    newuser.email = user.email.trim();
     if (user.hasOwnProperty('polymac') && user.polymac !== '') {
-        newuser.polymac = user.polymac;
+        newuser.polymac = user.polymac.trim();
     } else {
         newuser.polymac = 'none';
     }

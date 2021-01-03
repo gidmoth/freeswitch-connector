@@ -31,7 +31,8 @@ const getUserFile = (user) => {
         <variable name="conpin" value="${user.conpin}"/>
       </variables>
     </user>
-</include>`
+</include>
+`
 }
 
 const getLinXml = (user, hostname, tlsport) => {
@@ -58,7 +59,8 @@ const getLinXml = (user, hostname, tlsport) => {
       <entry name="realm">${hostname}</entry>
       <entry name="domain">${hostname}</entry>
     </section>
-  </config>`
+  </config>
+`
 }
 
 const getPolyMain = (user, hostname) => {
@@ -73,7 +75,8 @@ const getPolyMain = (user, hostname) => {
    LICENSE_DIRECTORY=""
    USER_PROFILES_DIRECTORY=""
    CALL_LISTS_DIRECTORY=""
-/>`
+/>
+`
 }
 
 const getPolyAll = (user, hostname, globals) => {
@@ -116,7 +119,8 @@ const getPolyAll = (user, hostname, globals) => {
       device.prov.ztpEnabled.set="1"
       device.prov.ztpEnabled="0"
     />
-  </PHONE_CONFIG>`
+  </PHONE_CONFIG>
+`
 }
 
 exports.getUserFile = getUserFile;
