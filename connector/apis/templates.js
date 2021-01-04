@@ -53,6 +53,15 @@ const getLinXml = (user, hostname, tlsport) => {
       <entry name="push_notification_allowed">0</entry>
       <entry name="publish_expires">-1</entry>
     </section>
+    <section name="audio_codec_6">
+      <entry name="mime">G722</entry>
+      <entry name="rate">8000</entry>
+      <entry name="channels">1</entry>
+      <entry name="enabled">16</entry>
+    </section>
+    <section name="sip">
+      <entry name="media_encryption">srtp</entry>
+    </section>
     <section name="auth_info_0">
       <entry name="username">${user.id}</entry>
       <entry name="passwd">${user.password}</entry>
