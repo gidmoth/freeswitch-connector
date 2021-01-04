@@ -20,10 +20,7 @@ async function apiroutes (fastify, options) {
     passport.use('digest', new ppHttp.DigestStrategy({ qop: 'auth' },
         function (username, done) {
             let usr = getMyUser(fastify.xmlState.users, username);
-            if (usr == undefined) {
-                return done(null, false)
-            }
-            if (usr.context != fasticonf.apiallow) {
+            if (usr == undefined || usr.context !== fasticonf.apiallow) {
                 return done(null, false)
             }
             return done(null, usr, usr.password)

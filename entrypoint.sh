@@ -9,7 +9,7 @@ if [ "$1" = 'connector' ]; then
         done
     fi
     
-    exec node --trace-warnings connector.js
+    exec node connector.js
 fi
 
 exec "$@"
