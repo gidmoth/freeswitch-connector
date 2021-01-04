@@ -38,35 +38,35 @@ const getUserFile = (user) => {
 const getLinXml = (user, hostname, tlsport) => {
   return `<?xml version="1.0" encoding="UTF-8"?>
   <config xmlns="http://www.linphone.org/xsds/lpconfig.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.linphone.org/xsds/lpconfig.xsd lpconfig.xsd">
-    <section name="proxy_0">
-      <entry name="reg_proxy">&lt;sip:${hostname}:${tlsport};transport=tls&gt;</entry>
-      <entry name="reg_identity">"${user.name}" &lt;sip:${user.id}@${hostname}:${tlsport}&gt;</entry>
-      <entry name="quality_reporting_enabled">0</entry>
-      <entry name="quality_reporting_interval">0</entry>
-      <entry name="reg_expires">3600</entry>
-      <entry name="reg_sendregister">1</entry>
-      <entry name="publish">0</entry>
-      <entry name="avpf">0</entry>
-      <entry name="avpf_rr_interval">1</entry>
-      <entry name="dial_escape_plus">0</entry>
-      <entry name="privacy">32768</entry>
-      <entry name="push_notification_allowed">0</entry>
-      <entry name="publish_expires">-1</entry>
+    <section name="proxy_0" overwrite="true">
+      <entry name="reg_proxy" overwrite="true">&lt;sip:${hostname}:${tlsport};transport=tls&gt;</entry>
+      <entry name="reg_identity" overwrite="true">"${user.name}" &lt;sip:${user.id}@${hostname}:${tlsport}&gt;</entry>
+      <entry name="quality_reporting_enabled" overwrite="true">0</entry>
+      <entry name="quality_reporting_interval" overwrite="true">0</entry>
+      <entry name="reg_expires" overwrite="true">3600</entry>
+      <entry name="reg_sendregister" overwrite="true">1</entry>
+      <entry name="publish" overwrite="true">0</entry>
+      <entry name="avpf" overwrite="true">0</entry>
+      <entry name="avpf_rr_interval" overwrite="true">1</entry>
+      <entry name="dial_escape_plus" overwrite="true">0</entry>
+      <entry name="privacy" overwrite="true">32768</entry>
+      <entry name="push_notification_allowed" overwrite="true">0</entry>
+      <entry name="publish_expires" overwrite="true">-1</entry>
     </section>
-    <section name="audio_codec_6">
-      <entry name="mime">G722</entry>
-      <entry name="rate">8000</entry>
-      <entry name="channels">1</entry>
-      <entry name="enabled">16</entry>
+    <section name="audio_codec_6" overwrite="true">
+      <entry name="mime" overwrite="true">G722</entry>
+      <entry name="rate" overwrite="true">8000</entry>
+      <entry name="channels" overwrite="true">1</entry>
+      <entry name="enabled" overwrite="true">16</entry>
     </section>
     <section name="sip">
-      <entry name="media_encryption">srtp</entry>
+      <entry name="media_encryption" overwrite="true">srtp</entry>
     </section>
-    <section name="auth_info_0">
-      <entry name="username">${user.id}</entry>
-      <entry name="passwd">${user.password}</entry>
-      <entry name="realm">${hostname}</entry>
-      <entry name="domain">${hostname}</entry>
+    <section name="auth_info_0" overwrite="true">
+      <entry name="username" overwrite="true">${user.id}</entry>
+      <entry name="passwd" overwrite="true">${user.password}</entry>
+      <entry name="realm"  overwrite="true">${hostname}</entry>
+      <entry name="domain" overwrite="true">${hostname}</entry>
     </section>
   </config>
 `
