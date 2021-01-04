@@ -44,6 +44,32 @@ async function userroutes (fastify, options) {
             reply.send(`error: ${error}`)
         })
     })
+
+    //rebuild  users
+    fastify.get('/api/users/rebuild', async function (req, reply) {
+        FsOps.rebUsers(this.xmlState)
+        .then(rebuilt  => {
+            reply.send(rebuilt)
+        })
+        .catch(error => {
+            fastify.log.error(error)
+            reply.send(`error: ${error}`)
+        })
+
+    })
+
+    //reprovision  users
+    fastify.get('/api/users/reprov', async function (req, reply) {
+        FsOps.reprovUsers(this.xmlState)
+        .then(reproved  => {
+            reply.send(reproved)
+        })
+        .catch(error => {
+            fastify.log.error(error)
+            reply.send(`error: ${error}`)
+        })
+
+    })
 }
 
 module.exports = userroutes

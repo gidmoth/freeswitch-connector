@@ -8,10 +8,10 @@ const getUserFile = (user) => {
     let conferenceFlags = ''
     switch (user.context) {
         case fastiConf.apiallow:
-            conferenceFlags = 'moderator|mute';
+            conferenceFlags = 'moderator|mute|mute-detect';
             break;
         default:
-            conferenceFlags = 'mute';
+            conferenceFlags = 'mute|mute-detect';
     }
     return `<include>
     <user id="${user.id}">

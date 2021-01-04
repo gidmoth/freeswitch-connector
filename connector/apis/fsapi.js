@@ -55,6 +55,23 @@ const linProvUser = (user, xmlState) => {
     fs.writeFileSync(linphoneFile, linphoneXml)
 }
 
+const reprovUser = (usr, reproved, xmlState) => {
+    linProvUser(usr, xmlState)
+    if (usr.polymac !== 'none') {
+        polyProvUser(usr, xmlState)
+    }
+    reproved.done.push(usr)
+    return;
+}
+
+const rebuildUser =  (usr, rebuilt) => {
+    let userXml = templates.getUserFile(usr);
+    let userFile = path.join(Contexts[usr.context].path, `${usr.id}.xml`);
+    fs.writeFileSync(userFile, userXml);
+    rebuilt.done.push(usr)
+    return;
+}
+
 const buildNewUser = (xmlState, user, newusers) => {
     let newuser = {}
     if (xmlState.users.map(usr => usr.name).includes(user.name)) {
@@ -120,15 +137,51 @@ const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
     if (users == []) {
         reject('no users given');
     }
-    let newusers = {done:[], failed:[]};
+    let newusers = {op: 'users/add', done:[], failed:[]};
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
     reloadxml.run(xmlState)
     .then(msg => {
         console.log(`reloadxml after newUsers: ${msg.trim()}`)
+    })
+    .catch(err => {
+        console.log(err)
+        reject(err)
     });
     resolve(newusers);
 });
 
+const rebUsers =  (xmlState) => new Promise ((resolve, reject) =>{
+    if (xmlState.users == []) {
+        reject('no users given');
+    }
+    let rebuilt = {op: 'users/rebuild', done: [],  failed: []}
+    xmlState.users.forEach(usr => {
+        rebuildUser(usr, rebuilt);
+    })
+    reloadxml.run(xmlState)
+    .then(msg => {
+        console.log(`reloadxml after rebUsers: ${msg.trim()}`)
+    })
+    .catch(err => {
+        console.log(err)
+        reject(err)
+    });
+    resolve(rebuilt);
+})
+
+const reprovUsers =  (xmlState) => new Promise ((resolve, reject) =>{
+    if (xmlState.users == []) {
+        reject('no users given');
+    }
+    let reproved = {op: 'users/reprov', done: [],  failed: []}
+    xmlState.users.forEach(usr => {
+        reprovUser(usr, reproved, xmlState);
+    })
+    resolve(reproved);
+})
+
 exports.newUsers = newUsers;
+exports.rebUsers = rebUsers;
+exports.reprovUsers = reprovUsers;
