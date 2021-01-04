@@ -17,7 +17,7 @@ async function apiroutes (fastify, options) {
     }
 
     // decorate fastify with passport-plugin
-    passport.use(new ppHttp.DigestStrategy({ qop: 'auth' },
+    passport.use('digestapi', new ppHttp.DigestStrategy({ qop: 'auth' },
         function (username, done) {
             let usr = getMyUser(fastify.xmlState.users, username);
             if (usr == undefined || usr.context !== fasticonf.apiallow) {
@@ -34,7 +34,7 @@ async function apiroutes (fastify, options) {
 
     // add requesthook after loading plugin
     fastify.after(() => {
-        fastify.addHook('onRequest', passport.authenticate("digest", { session: false }))
+        fastify.addHook('onRequest', passport.authenticate('digestapi', { session: false }))
         // load users endpoints
         fastify.register(require('./users'))
     })

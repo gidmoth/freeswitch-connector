@@ -16,7 +16,7 @@ async function staticroutes(fastify, options) {
     }
 
     // decorate fastify with passport-plugin
-    passport.use(new ppHttp.DigestStrategy({ qop: 'auth' },
+    passport.use('digestall', new ppHttp.DigestStrategy({ qop: 'auth' },
         function (username, done) {
             let usr = getMyUser(fastify.xmlState.users, username);
             if (usr == undefined) {
@@ -33,7 +33,7 @@ async function staticroutes(fastify, options) {
 
     // add authhook
     fastify.after(() => {
-        fastify.addHook('onRequest', passport.authenticate("digest", { session: false }))
+        fastify.addHook('onRequest', passport.authenticate('digestall', { session: false }))
         // load provisioning endpoints
         fastify.register(require('./polycom'))
         fastify.register(require('./linphone'))
