@@ -17,7 +17,7 @@ async function apiroutes (fastify, options) {
     }
 
     // decorate fastify with passport-plugin
-    passport.use('digest', new ppHttp.DigestStrategy({ qop: 'auth' },
+    passport.use('digestapi', new ppHttp.DigestStrategy({ qop: 'auth' },
         function (username, done) {
             let usr = getMyUser(fastify.xmlState.users, username);
             if (usr == undefined || usr.context !== fasticonf.apiallow) {
