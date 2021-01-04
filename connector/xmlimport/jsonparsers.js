@@ -54,7 +54,7 @@ function parseConference(conf) {
         name: conf.attrib_name
     }
     let actObj = conf.condition.action.filter(act => {
-        return act.hasOwnProperty('attrib_data')
+        return act.attrib_application == 'conference'
     })[0];
     pconf.type = actObj.attrib_data.split('@')[1].split('+')[0];
     pconf.context = confCtxDetect(pconf.num);
