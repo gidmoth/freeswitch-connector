@@ -8,10 +8,10 @@ const getUserFile = (user) => {
     let conferenceFlags = ''
     switch (user.context) {
         case fastiConf.apiallow:
-            conferenceFlags = 'moderator|mute|mute-detect';
+            conferenceFlags = 'moderator|mute-detect';
             break;
         default:
-            conferenceFlags = 'mute|mute-detect';
+            conferenceFlags = 'mute-detect';
     }
     return `<include>
     <user id="${user.id}">
@@ -67,6 +67,9 @@ const getLinXml = (user, hostname, tlsport) => {
       <entry name="passwd" overwrite="true">${user.password}</entry>
       <entry name="realm"  overwrite="true">${hostname}</entry>
       <entry name="domain" overwrite="true">${hostname}</entry>
+    </section>
+    <section name="misc">
+      <entry name="config-uri" overwrite="true">https://${user.name}:${user.password}@${hostname}/linphone</entry>
     </section>
   </config>
 `
