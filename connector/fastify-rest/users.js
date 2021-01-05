@@ -8,18 +8,20 @@ const FsOps = require('../apis/fsapi');
 const fsDir = require('../config').getConfig('xmldir');
 const Provpaths = require('../config').getConfig('provisioningpaths');
 const statDir = Provpaths.all;
+const ConfCtxConf = require('../config.js').getConfig('contexts');
+const Contexts = Object.keys(ConfCtxConf);
 
 const storeDirectory = async (source, target) => {
     tar.pack(source).pipe(fs.createWriteStream(target, { emitClose: true })
-    .on('error', (err) => {
-        console.log(err)
-    })
-    .on('close', () => {
-        console.log(`stored ${source} to ${target}`)
-    }))
+        .on('error', (err) => {
+            console.log(err)
+        })
+        .on('close', () => {
+            console.log(`stored ${source} to ${target}`)
+        }))
 }
 
-async function userroutes (fastify, options) {
+async function userroutes(fastify, options) {
 
     // schemas for validation
     const userAddSchema = {
@@ -45,45 +47,60 @@ async function userroutes (fastify, options) {
 
     // get all users
     fastify.get('/api/users', async function (req, reply) {
-        return this.xmlState.users
+        function ctxNums(Contexts, usrarray) {
+            let retobj = {}
+            Contexts.forEach(ctx => {
+                retobj[ctx] = usrarray.filter(usr => usr.context == ctx).length
+            })
+            return retobj
+        }
+        let users = {
+            op: 'users',
+            info: {
+                total: this.xmlState.users.length,
+                contexts: ctxNums(Contexts, this.xmlState.users) 
+            }
+        }
+        return users
     })
 
     // add users
-    fastify.post('/api/users/add', { schema: userAddSchema }, async function(req, reply) {
+    fastify.post('/api/users/add', { schema: userAddSchema }, async function (req, reply) {
         FsOps.newUsers(this.xmlState, req.body)
-        .then(newusers => {
-            reply.send(newusers);
-            storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar`)
-        })
-        .catch(error => {
-            fastify.log.error(error)
-            reply.send(`error: ${error}`)
-        })
+            .then(newusers => {
+                reply.send(newusers);
+                storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar`)
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
     })
 
     //rebuild  users
     fastify.get('/api/users/rebuild', async function (req, reply) {
         FsOps.rebUsers(this.xmlState)
-        .then(rebuilt  => {
-            reply.send(rebuilt)
-        })
-        .catch(error => {
-            fastify.log.error(error)
-            reply.send(`error: ${error}`)
-        })
+            .then(rebuilt => {
+                reply.send(rebuilt)
+                storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar`)
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
 
     })
 
     //reprovision  users
     fastify.get('/api/users/reprov', async function (req, reply) {
         FsOps.reprovUsers(this.xmlState)
-        .then(reproved  => {
-            reply.send(reproved)
-        })
-        .catch(error => {
-            fastify.log.error(error)
-            reply.send(`error: ${error}`)
-        })
+            .then(reproved => {
+                reply.send(reproved)
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
 
     })
 }
