@@ -59,7 +59,8 @@ async function userroutes(fastify, options) {
             info: {
                 total: this.xmlState.users.length,
                 contexts: ctxNums(Contexts, this.xmlState.users) 
-            }
+            },
+            users: this.xmlState.users
         }
         return users
     })
