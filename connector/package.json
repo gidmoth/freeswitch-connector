@@ -23,6 +23,7 @@
     "fastify-static": "^3.3.0",
     "generate-password": "^1.5.1",
     "modesl": "^1.2.1",
-    "passport-http": "^0.3.0"
+    "passport-http": "^0.3.0",
+    "tar-fs": "^2.1.1"
   }
 }
