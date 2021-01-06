@@ -23,43 +23,57 @@ const runReload = async (xmlState) => {
 
 async function maitainroutes(fastify, options) {
 
-    fastify.get('/api/restore/directory', async function (req, reply) {
-        let answer = { op: 'restore/directory', done: '' }
-        let written = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
-        answer.done = written
+    fastify.get('/api/restore/:dir', async function (req, reply) {
+        let answer = { op: `restore/${dir}`, done: '' }
+        switch (dir) {
+            case 'directory':
+                let written = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
+                answer.done = written
+                break;
+            case 'dialplan':
+                let written = await storefuncts.reStoreDirectory(`${statDir}/store/dialplan.tar.gz`, `${fsDir}/dialplan`)
+                answer.done = written
+                break;
+            case 'freeswitch':
+                let written = await storefuncts.reStoreDirectory(`${statDir}/store/freeswitch.tar.gz`, `${fsDir}`)
+                answer.done = written
+                break;
+            case 'conferences':
+                let written = await storefuncts.reStoreDirectory(`${statDir}/store/conferences.tar.gz`, `${fsDir}/dialplan/conferences`)
+                answer.done = written
+                break;
+            default:
+                answer.done = `${dir} is not implementet`
+                return answer
+        }
         runReload(this.xmlState)
         return answer
     })
 
-    fastify.get('/api/restore/dialplan', async function (req, reply) {
-        let answer = { op: 'restore/dialplan', done: '' }
-        let written = await storefuncts.reStoreDirectory(`${statDir}/store/dialplan.tar.gz`, `${fsDir}/dialplan`)
-        answer.done = written
-        runReload(this.xmlState)
+    fastify.get('/api/store/:dir', async function (req, reply) {
+        let answer = { op: `store/${dir}`, done: '' }
+        switch (dir) {
+            case 'directory':
+                storefuncts.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
+                answer.done = `${statDir}/store/directory.tar.gz`
+                break;
+            case 'dialplan':
+                storefuncts.storeDirectory(`${fsDir}/dialplan`, `${statDir}/store/dialplan.tar.gz`)
+                answer.done = `${statDir}/store/dialplan.tar.gz`
+                break;
+            case 'freeswitch':
+                storefuncts.storeDirectory(`${fsDir}`, `${statDir}/store/freeswitch.tar.gz`)
+                answer.done = `${statDir}/store/freeswitch.tar.gz`
+                break;
+            case 'conferences':
+                storefuncts.storeDirectory(`${fsDir}/dialplan/conferences`, `${statDir}/store/conferences.tar.gz`)
+                answer.done = written
+                break;
+            default:
+                answer.done = `${dir} is not implementet`
+                break;
+        }
         return answer
-    })
-
-    fastify.get('/api/restore/freeswitch', async function (req, reply) {
-        let answer = { op: 'restore/freeswitch', done: '' }
-        let written = await storefuncts.reStoreDirectory(`${statDir}/store/freeswitch.tar.gz`, `${fsDir}`)
-        answer.done = written
-        runReload(this.xmlState)
-        return answer
-    })
-
-    fastify.get('/api/store/directory', async function (req, reply) {
-        storefuncts.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
-        return { op: 'store/directory', done: `${statDir}/store/directory.tar.gz` }
-    })
-
-    fastify.get('/api/store/dialplan', async function (req, reply) {
-        storefuncts.storeDirectory(`${fsDir}/dialplan`, `${statDir}/store/dialplan.tar.gz`)
-        return { op: 'store/directory', done: `${statDir}/store/dialplan.tar.gz` }
-    })
-
-    fastify.get('/api/store/freeswitch', async function (req, reply) {
-        storefuncts.storeDirectory(`${fsDir}`, `${statDir}/store/freeswitch.tar.gz`)
-        return { op: 'store/directory', done: `${statDir}/store/freeswitch.tar.gz` }
     })
 }
 
