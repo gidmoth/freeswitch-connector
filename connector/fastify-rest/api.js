@@ -37,6 +37,8 @@ async function apiroutes (fastify, options) {
         fastify.addHook('onRequest', passport.authenticate('digestapi', { session: false }))
         // load users endpoints
         fastify.register(require('./users'))
+        // load maintenance endpoints
+        fastify.register(require('./maintenance'))
     })
 }
 
