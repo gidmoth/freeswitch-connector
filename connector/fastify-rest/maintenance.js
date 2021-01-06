@@ -67,7 +67,7 @@ async function maitainroutes(fastify, options) {
                 break;
             case 'conferences':
                 storefuncts.storeDirectory(`${fsDir}/dialplan/conferences`, `${statDir}/store/conferences.tar.gz`)
-                answer.done = written
+                answer.done = `${statDir}/store/conferences.tar.gz`
                 break;
             default:
                 answer.done = `${req.params.dir} is not implementet`
