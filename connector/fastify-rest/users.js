@@ -2,24 +2,15 @@
  * Endpoints for users functions
  */
 
-const tar = require('tar-fs')
-const fs = require('fs')
+
 const FsOps = require('../apis/fsapi');
 const fsDir = require('../config').getConfig('xmldir');
 const Provpaths = require('../config').getConfig('provisioningpaths');
 const statDir = Provpaths.all;
 const ConfCtxConf = require('../config.js').getConfig('contexts');
 const Contexts = Object.keys(ConfCtxConf);
+const storefunct = require('./storefunctions')
 
-const storeDirectory = async (source, target) => {
-    tar.pack(source).pipe(fs.createWriteStream(target, { emitClose: true })
-        .on('error', (err) => {
-            console.log(err)
-        })
-        .on('close', () => {
-            console.log(`stored ${source} to ${target}`)
-        }))
-}
 
 async function userroutes(fastify, options) {
 
@@ -70,7 +61,7 @@ async function userroutes(fastify, options) {
         FsOps.newUsers(this.xmlState, req.body)
             .then(newusers => {
                 reply.send(newusers);
-                storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar`)
+                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)
@@ -83,7 +74,7 @@ async function userroutes(fastify, options) {
         FsOps.rebUsers(this.xmlState)
             .then(rebuilt => {
                 reply.send(rebuilt)
-                storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar`)
+                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)
