@@ -24,7 +24,7 @@ const runReload = async (xmlState) => {
 async function maitainroutes(fastify, options) {
 
     fastify.get('/api/restore/:dir', async function (req, reply) {
-        let answer = { op: `restore/${dir}`, done: '' }
+        let answer = { op: `restore/${req.params.dir}`, done: '' }
         switch (req.params.dir) {
             case 'directory':
                 let writtendir = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
@@ -43,7 +43,7 @@ async function maitainroutes(fastify, options) {
                 answer.done = writtenconf
                 break;
             default:
-                answer.done = `${dir} is not implementet`
+                answer.done = `${req.params.dir} is not implementet`
                 return answer
         }
         runReload(this.xmlState)
@@ -51,7 +51,7 @@ async function maitainroutes(fastify, options) {
     })
 
     fastify.get('/api/store/:dir', async function (req, reply) {
-        let answer = { op: `store/${dir}`, done: '' }
+        let answer = { op: `store/${req.params.dir}`, done: '' }
         switch (req.params.dir) {
             case 'directory':
                 storefuncts.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
@@ -70,7 +70,7 @@ async function maitainroutes(fastify, options) {
                 answer.done = written
                 break;
             default:
-                answer.done = `${dir} is not implementet`
+                answer.done = `${req.params.dir} is not implementet`
                 break;
         }
         return answer
