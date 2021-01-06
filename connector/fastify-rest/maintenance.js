@@ -30,6 +30,37 @@ async function maitainroutes(fastify, options) {
         runReload(this.xmlState)
         return answer
     })
+
+    fastify.get('/api/restore/dialplan', async function (req, reply) {
+        let answer = { op: 'restore/dialplan', done: '' }
+        let written = await storefuncts.reStoreDirectory(`${statDir}/store/dialplan.tar.gz`, `${fsDir}/dialplan`)
+        answer.done = written
+        runReload(this.xmlState)
+        return answer
+    })
+
+    fastify.get('/api/restore/freeswitch', async function (req, reply) {
+        let answer = { op: 'restore/freeswitch', done: '' }
+        let written = await storefuncts.reStoreDirectory(`${statDir}/store/freeswitch.tar.gz`, `${fsDir}`)
+        answer.done = written
+        runReload(this.xmlState)
+        return answer
+    })
+
+    fastify.get('/api/store/directory', async function (req, reply) {
+        storefuncts.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
+        return { op: 'store/directory', done: `${statDir}/store/directory.tar.gz` }
+    })
+
+    fastify.get('/api/store/dialplan', async function (req, reply) {
+        storefuncts.storeDirectory(`${fsDir}/dialplan`, `${statDir}/store/dialplan.tar.gz`)
+        return { op: 'store/directory', done: `${statDir}/store/dialplan.tar.gz` }
+    })
+
+    fastify.get('/api/store/freeswitch', async function (req, reply) {
+        storefuncts.storeDirectory(`${fsDir}`, `${statDir}/store/freeswitch.tar.gz`)
+        return { op: 'store/directory', done: `${statDir}/store/freeswitch.tar.gz` }
+    })
 }
 
 module.exports = maitainroutes
