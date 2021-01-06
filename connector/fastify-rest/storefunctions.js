@@ -5,7 +5,6 @@
 const tar = require('tar-fs')
 const fs = require('fs')
 const zlib = require('zlib')
-const reloadxml = require('../fseventusers/reloadxml')
 
 const storeDirectory = async (source, target) => {
     tar.pack(source).pipe(zlib.createGzip())
@@ -18,17 +17,16 @@ const storeDirectory = async (source, target) => {
             }))
 }
 
-const reStoreDirectory = async (source, target, xmlState) => {
+const reStoreDirectory = (source, target) => new Promise((resolve, reject) => {
     fs.createReadStream(source).pipe(zlib.createGunzip())
-        .pipe(tar.extract(target))
-    reloadxml.run(xmlState)
-        .then(msg => {
-            console.log(`reloadxml after reStoreDirectory: ${msg.trim()}`)
-        })
-        .catch(err => {
-            console.log(err)
-        });
-}
+        .pipe(tar.extract(target)
+            .on('error', (err) => {
+                reject(err)
+            }).on('finish', () => {
+                resolve(target)
+            }))
+})
+
 
 exports.storeDirectory = storeDirectory
 exports.reStoreDirectory = reStoreDirectory
