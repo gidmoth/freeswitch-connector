@@ -25,7 +25,7 @@ async function maitainroutes(fastify, options) {
 
     fastify.get('/api/restore/:dir', async function (req, reply) {
         let answer = { op: `restore/${dir}`, done: '' }
-        switch (dir) {
+        switch (req.params.dir) {
             case 'directory':
                 let writtendir = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
                 answer.done = writtendir
@@ -52,7 +52,7 @@ async function maitainroutes(fastify, options) {
 
     fastify.get('/api/store/:dir', async function (req, reply) {
         let answer = { op: `store/${dir}`, done: '' }
-        switch (dir) {
+        switch (req.params.dir) {
             case 'directory':
                 storefuncts.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
                 answer.done = `${statDir}/store/directory.tar.gz`
