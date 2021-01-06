@@ -27,20 +27,20 @@ async function maitainroutes(fastify, options) {
         let answer = { op: `restore/${dir}`, done: '' }
         switch (dir) {
             case 'directory':
-                let written = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
-                answer.done = written
+                let writtendir = await storefuncts.reStoreDirectory(`${statDir}/store/directory.tar.gz`, `${fsDir}/directory`)
+                answer.done = writtendir
                 break;
             case 'dialplan':
-                let written = await storefuncts.reStoreDirectory(`${statDir}/store/dialplan.tar.gz`, `${fsDir}/dialplan`)
-                answer.done = written
+                let writtenplan = await storefuncts.reStoreDirectory(`${statDir}/store/dialplan.tar.gz`, `${fsDir}/dialplan`)
+                answer.done = writtenplan
                 break;
             case 'freeswitch':
-                let written = await storefuncts.reStoreDirectory(`${statDir}/store/freeswitch.tar.gz`, `${fsDir}`)
-                answer.done = written
+                let writtenswitch = await storefuncts.reStoreDirectory(`${statDir}/store/freeswitch.tar.gz`, `${fsDir}`)
+                answer.done = writtenswitch
                 break;
             case 'conferences':
-                let written = await storefuncts.reStoreDirectory(`${statDir}/store/conferences.tar.gz`, `${fsDir}/dialplan/conferences`)
-                answer.done = written
+                let writtenconf = await storefuncts.reStoreDirectory(`${statDir}/store/conferences.tar.gz`, `${fsDir}/dialplan/conferences`)
+                answer.done = writtenconf
                 break;
             default:
                 answer.done = `${dir} is not implementet`
