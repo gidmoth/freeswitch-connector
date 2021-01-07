@@ -64,11 +64,32 @@ const reprovUser = (usr, reproved, xmlState) => {
     return;
 }
 
-const rebuildUser =  (usr, rebuilt) => {
+const rebuildUser = (usr, rebuilt) => {
     let userXml = templates.getUserFile(usr);
     let userFile = path.join(Contexts[usr.context].path, `${usr.id}.xml`);
     fs.writeFileSync(userFile, userXml);
     rebuilt.done.push(usr)
+    return;
+}
+
+const delUser = (xmlState, userid, delusers) => {
+    let user = xmlState.users.filter(usr => usr.id == userid)
+    if (user == []) {
+        delusers.failed.push({
+            'error': `no userid ${userid}`
+        })
+        return;
+    }
+    let wholeuser = user[0]
+    let userDirFile = path.join(Contexts[wholeuser.context].path, `${wholeuser.id}.xml`);
+    let userLinDir = path.join(Provpaths.linphone, `${wholeuser.id}`)
+    fs.rmdirSync(userLinDir, { recursive: true })
+    fs.unlinkSync(userDirFile)
+    if (wholeuser.polymac !== 'none') {
+        let userPolyDir = path.join(Provpaths.polycom, `${wholeuser.polymac}`)
+        fs.rmdirSync(userPolyDir, { recursive: true })
+    }
+    delusers.done.push(wholeuser)
     return;
 }
 
@@ -132,50 +153,176 @@ const buildNewUser = (xmlState, user, newusers) => {
     return;
 }
 
+const modUser = (xmlState, user, modiusers) => {
+    let myuser = xmlState.users.filter(usr => usr.id == user.id)
+    if (myuser == []) {
+        modiusers.failed.push({
+            'error': `no userid ${userid}`,
+            'user': user
+        })
+        return;
+    }
+    let mywholeuser = myuser[0]
+    let newuser = {}
+    if (user.hasOwnProperty('context')) {
+        if (!(Contexts.hasOwnProperty(user.context))) {
+            modiusers.failed.push({
+                'error': 'context does not exist',
+                'user': user
+            })
+            return;
+        }
+        if (user.context == mywholeuser.context) {
+            newuser.id = user.id
+            newuser.context = user.context;
+        } else {
+            newuser.id = getNext(xmlState, 'user', user.context);
+            newuser.context = user.context;
+        }
+    } else {
+        newuser.id = user.id
+        newuser.context = mywholeuser.context
+    }
+    if (user.hasOwnProperty('email')) {
+        if (!(emailRegex().test(user.email))) {
+            modiusers.failed.push({
+                'error': 'email does not contain an email',
+                'user': user
+            })
+            return;
+        } else {
+            newuser.email = user.email
+        }
+    } else {
+        newuser.email = mywholeuser.email
+    }
+    if (user.hasOwnProperty('password') && user.password !== '') {
+        newuser.password = user.password;
+    } else {
+        newuser.password = genPass();
+    }
+    if (user.hasOwnProperty('conpin') && user.conpin !== '') {
+        newuser.conpin = user.conpin;
+    } else {
+        switch (newuser.context) {
+            case fastiConf.apiallow:
+                newuser.conpin = '$${modconpin}';
+                break;
+            default:
+                newuser.conpin = '$${defconpin}';
+        }
+    }
+    if (user.hasOwnProperty('name')) {
+        newuser.name = user.name.trim();
+    } else {
+        newuser.name = mywholeuser.name;
+    }
+    if (user.hasOwnProperty('polymac') && user.polymac !== '') {
+        newuser.polymac = user.polymac.trim();
+    } else {
+        newuser.polymac = 'none';
+    }
+    let userDirFile = path.join(Contexts[mywholeuser.context].path, `${mywholeuser.id}.xml`);
+    let userLinDir = path.join(Provpaths.linphone, `${mywholeuser.id}`)
+    fs.rmdirSync(userLinDir, { recursive: true })
+    fs.unlinkSync(userDirFile)
+    if (mywholeuser.polymac !== 'none') {
+        let userPolyDir = path.join(Provpaths.polycom, `${mywholeuser.polymac}`)
+        fs.rmdirSync(userPolyDir, { recursive: true })
+    }
+    let newuserXml = templates.getUserFile(newuser);
+    let newuserFile = path.join(Contexts[newuser.context].path, `${newuser.id}.xml`);
+    fs.writeFileSync(newuserFile, newuserXml);
+    if (newuser.polymac !== 'none') {
+        polyProvUser(newuser, xmlState)
+    }
+    linProvUser(newuser, xmlState);
+    modiusers.done.push(newuser);
+    return;
+}
+
 // functions
-const newUsers = (xmlState, users) => new Promise ((resolve, reject) => {
+const newUsers = (xmlState, users) => new Promise((resolve, reject) => {
     if (users == []) {
         reject('no users given');
     }
-    let newusers = {op: 'users/add', done:[], failed:[]};
+    let newusers = { op: 'users/add', done: [], failed: [] };
     users.forEach(usr => {
         buildNewUser(xmlState, usr, newusers);
     })
     reloadxml.run(xmlState)
-    .then(msg => {
-        console.log(`reloadxml after newUsers: ${msg.trim()}`)
-    })
-    .catch(err => {
-        console.log(err)
-        reject(err)
-    });
+        .then(msg => {
+            console.log(`reloadxml after newUsers: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
     resolve(newusers);
 });
 
-const rebUsers =  (xmlState) => new Promise ((resolve, reject) =>{
+const modUsers = (xmlState, users) => new Promise((resolve, reject) => {
+    if (users == []) {
+        reject('no users given');
+    }
+    let modiusers = { op: 'users/mod', done: [], failed: [] };
+    users.forEach(usr => {
+        modUser(xmlState, usr, modiusers);
+    })
+    reloadxml.run(xmlState)
+        .then(msg => {
+            console.log(`reloadxml after modUsers: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
+    resolve(modiusers);
+});
+
+const delUsers = (xmlState, users) => new Promise((resolve, reject) => {
+    if (users == []) {
+        reject('no users given');
+    }
+    let delusers = { op: 'users/del', done: [], failed: [] };
+    users.forEach(usr => {
+        delUser(xmlState, usr, delusers);
+    })
+    reloadxml.run(xmlState)
+        .then(msg => {
+            console.log(`reloadxml after delUsers: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
+    resolve(delusers);
+});
+
+const rebUsers = (xmlState) => new Promise((resolve, reject) => {
     if (xmlState.users == []) {
         reject('no users given');
     }
-    let rebuilt = {op: 'users/rebuild', done: [],  failed: []}
+    let rebuilt = { op: 'users/rebuild', done: [], failed: [] }
     xmlState.users.forEach(usr => {
         rebuildUser(usr, rebuilt);
     })
     reloadxml.run(xmlState)
-    .then(msg => {
-        console.log(`reloadxml after rebUsers: ${msg.trim()}`)
-    })
-    .catch(err => {
-        console.log(err)
-        reject(err)
-    });
+        .then(msg => {
+            console.log(`reloadxml after rebUsers: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
     resolve(rebuilt);
 })
 
-const reprovUsers =  (xmlState) => new Promise ((resolve, reject) =>{
+const reprovUsers = (xmlState) => new Promise((resolve, reject) => {
     if (xmlState.users == []) {
         reject('no users given');
     }
-    let reproved = {op: 'users/reprov', done: [],  failed: []}
+    let reproved = { op: 'users/reprov', done: [], failed: [] }
     xmlState.users.forEach(usr => {
         reprovUser(usr, reproved, xmlState);
     })
@@ -185,3 +332,5 @@ const reprovUsers =  (xmlState) => new Promise ((resolve, reject) =>{
 exports.newUsers = newUsers;
 exports.rebUsers = rebUsers;
 exports.reprovUsers = reprovUsers;
+exports.delUsers = delUsers;
+exports.modUsers = modUsers;

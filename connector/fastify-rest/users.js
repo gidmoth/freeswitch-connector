@@ -36,6 +36,39 @@ async function userroutes(fastify, options) {
         }
     }
 
+    const userDelSchema = {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/userDelSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'string'
+            }
+        }
+    }
+
+    const userModSchema = {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/userModSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    id: { type: 'string' },
+                    password: { type: 'string' },
+                    conpin: { type: 'string' },
+                    context: { type: 'string' },
+                    name: { type: 'string' },
+                    email: { type: 'string' },
+                    polymac: { type: 'string' }
+                },
+                required: ['id'],
+                additionalProperties: false
+            }
+        }
+    }
+
     // get all users
     fastify.get('/api/users', async function (req, reply) {
         function ctxNums(Contexts, usrarray) {
@@ -94,6 +127,32 @@ async function userroutes(fastify, options) {
                 reply.send(`error: ${error}`)
             })
 
+    })
+
+    // delete users
+    fastify.post('/api/users/del', { schema: userDelSchema }, async function (req, reply) {
+        FsOps.delUsers(this.xmlState, req.body)
+            .then(deletet => {
+                reply.send(deletet);
+                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
+    })
+
+    // modify users
+    fastify.post('/api/users/mod', { schema: userModSchema }, async function (req, reply) {
+        FsOps.modUsers(this.xmlState, req.body)
+            .then(modified => {
+                reply.send(modified);
+                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
     })
 }
 
