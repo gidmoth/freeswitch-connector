@@ -116,7 +116,7 @@ schema is given in the following for each case.
 
 returns JSON with all users like this:
 
-```json
+```
 {
     "op": "users",
     "info": {
@@ -145,7 +145,7 @@ returns JSON with all users like this:
 
 Schema:
 
-```json
+```
 {
         $schema: 'http://json-schema.org/draft-07/schema#',
         $id: 'gidmoth/userAddSchema',
@@ -189,7 +189,7 @@ automatically.
 
 Schema:
 
-```json
+```
 {
         $schema: 'http://json-schema.org/draft-07/schema#',
         $id: 'gidmoth/userModSchema',
@@ -246,7 +246,7 @@ the new context does not exist.
 
 Schema:
 
-```json
+```
 {
         $schema: 'http://json-schema.org/draft-07/schema#',
         $id: 'gidmoth/userDelSchema',
