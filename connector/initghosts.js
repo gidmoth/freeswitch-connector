@@ -25,20 +25,12 @@ const getGhostUserFile = (user) => {
     return `<include>
     <user id="${user.id}">
       <params>
-        <param name="password" value="foo"/>
         <param name="vm-password" value="${user.id}"/>
         <param name="disable-register" value="true"/>
       </params>
       <variables>
         <variable name="user_context" value="${user.context}"/>
         <variable name="effective_caller_id_name" value="baz"/>
-        <variable name="effective_caller_id_number" value="bar"/>
-        <variable name="outbound_caller_id_name" value="$\${outbound_caller_name}"/>
-        <variable name="outbound_caller_id_number" value="$\${outbound_caller_id}"/>
-        <variable name="verto_dvar_email" value="foo"/>
-        <variable name="polymac" value="baz"/>
-        <variable name="conf_flags" value="bar"/>
-        <variable name="conpin" value="foo"/>
       </variables>
     </user>
 </include>
