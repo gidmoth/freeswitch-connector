@@ -1,7 +1,9 @@
 # freeswitch-connector
 
-> ## Contents
-> [API Reference](#api-reference)
+> #### Contents
+> * [API Reference](#api-reference)
+>   * [Userfunctions](#userfunctions)
+>   * [Functions to maintain the system](#functions-to-maintain-the-system)
 
 
 This is a somewhat special purpose interface to freeswitch.
@@ -25,7 +27,7 @@ recunstruct everything you do filewise with connector easily
 from it's internal state, which you can safe as JSON. Also you can
 do needed modifications directly in the xml-files and freeswitch-connector
 will have no problems with it. With one notable exception, see
-[Note below](#ghosts-note)
+[note below](#ghosts-note)
 
 The prize for such advantages is the dependency on a certain
 way of expressing the freeswitch configuration in xml files
@@ -318,7 +320,7 @@ from informations gathered through the eventsocket.
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
 
-## Ghosts Note
+#### Ghosts Note
 
 Due to a limitation in the way
 [fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser)
