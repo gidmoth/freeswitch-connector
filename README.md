@@ -1,5 +1,9 @@
 # freeswitch-connector
 
+> ## Contents
+> [API Reference](#api-reference)
+
+
 This is a somewhat special purpose interface to freeswitch.
 It is designed to use freeswitch as a conference
 system, but the concept is very expandibele.
@@ -20,15 +24,8 @@ just a bunch of xml-files which are human readable. And you can
 recunstruct everything you do filewise with connector easily
 from it's internal state, which you can safe as JSON. Also you can
 do needed modifications directly in the xml-files and freeswitch-connector
-will have no problems with it.
-
-> **alpha-Warning:** This is not entirely true at the moment.
-> Due to a limitation in parsing the directory xml as freeswitchs
-> eventsocket provides it, your directory needs at least two
-> users per context for the parsing to work. It's highly recommended
-> to use a directory like the one found
-> [here](https://github.com/gidmoth/freeswitch-container) for
-> testing.
+will have no problems with it. With one notable exception, see
+[Note below](#ghosts-note)
 
 The prize for such advantages is the dependency on a certain
 way of expressing the freeswitch configuration in xml files
@@ -223,17 +220,6 @@ password is provided, a new one will be generated.
 If you change a users context, he will get a new id (phonenumber).
 If you don't change the context, he/she will keep his/her id.
 
-But be careful:
-
-> **alpha-Warning:**
-> Due to a limitation in parsing the directory xml as freeswitchs
-> eventsocket provides it, your directory needs at least two
-> users per context for the parsing to work. It's highly recommended
-> to use a directory like the one found
-> [here](https://github.com/gidmoth/freeswitch-container) for
-> testing. Don't move users to other contexts if there would be
-> less then two users remaining in the old context.
-
 The answer looks like this:
 
 `{ op: 'users/mod', done: [], failed: [] }`
@@ -268,15 +254,6 @@ The answer looks like this:
 
 with the arrays filled or not. Deleting users fails if the id is not
 found.
-
-> **alpha-Warning:**
-> Due to a limitation in parsing the directory xml as freeswitchs
-> eventsocket provides it, your directory needs at least two
-> users per context for the parsing to work. It's highly recommended
-> to use a directory like the one found
-> [here](https://github.com/gidmoth/freeswitch-container) for
-> testing. Don't delete users if there would be
-> less then two users remaining in the context.
 
 #### GET: /api/users/rebuild
 
@@ -327,6 +304,9 @@ The folders are respectively:
 Other folders are not implementet. This is not meant as a backup, but
 more to hook in a backup conveniently or to move to a new host with ease.
 These are file operations, they don't involve the internal xml state.
+So It's also for testing changes in the
+[Templates](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/apis/templates.js)
+or by hand, and being able to restore with the following endpoint.
 
 #### GET: /api/restore/[directory|dialplan|conferences|freeswitch]
 
@@ -338,3 +318,79 @@ from informations gathered through the eventsocket.
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
 
+## Ghosts Note
+
+Due to a limitation in the way
+[fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser)
+parses the xml which connector recives from the eventsocket
+of freeswitch, maybe a limitation of translating xml data to
+JS Objects in general, connector creates ghost-users in the freeswitch
+directory on every startup. These files get parsed by freeswitch, but
+the users can't register. The're just placeholders for the structure
+of the xml, in case all other users get deletet from a context.
+
+It' a design-decision to keep the parsing simple and fast, and therefore
+create those dummiefiles on every startup.
+
+The problem in short: If you parse the following xml to JSON:
+
+```xml
+<group>
+<user id="foo"/>
+<user id="bar"/>
+<user id="baz"/>
+</group>
+```
+
+with fast-xml-parser, and the option not to ignore attributes, you get this:
+
+```json
+{"group":
+    {"user":
+        [
+            {"@_id":"foo"},
+            {"@_id":"bar"},
+            {"@_id":"baz"}
+        ]
+    }
+}
+```
+
+In other words, the group is holding an object which has a property
+user which is holding an array.
+
+But this:
+
+```xml
+<group>
+<user id="foo"/>
+</group>
+```
+
+results in the property holding an object:
+
+```json
+{"group":
+    {"user":
+        {"@_\"id\"":"foo"}
+    }
+}
+```
+
+and this:
+
+```xml
+<group>
+</group>
+```
+
+results in a string, and no user-property:
+
+```json
+{"group":""}
+```
+
+So to keep the parsing simple and fast, I decided to add ghost-users,
+for the case the real users drop under 2.
+
+But that's a hack -- any suggestions and pull-requests welcome!
