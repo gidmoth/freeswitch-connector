@@ -320,6 +320,8 @@ from informations gathered through the eventsocket.
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
 
+___
+
 #### Ghosts Note
 
 Due to a limitation in the way
