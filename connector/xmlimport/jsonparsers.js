@@ -66,7 +66,9 @@ const parseDirectory = (dir) => {
     let pusers = [];
     dir.section.domain.groups.group.forEach(gr => {
         gr.users.user.forEach(u => {
-            pusers.push(parseUser(u));
+            if (!(u.attrib_id.startsWith('ghost'))) {
+                pusers.push(parseUser(u));
+            }
         })
     })
     return pusers;

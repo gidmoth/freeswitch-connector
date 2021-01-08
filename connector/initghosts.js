@@ -25,12 +25,10 @@ const getGhostUserFile = (user) => {
     return `<include>
     <user id="${user.id}">
       <params>
-        <param name="vm-password" value="${user.id}"/>
         <param name="disable-register" value="true"/>
       </params>
       <variables>
         <variable name="user_context" value="${user.context}"/>
-        <variable name="effective_caller_id_name" value="baz"/>
       </variables>
     </user>
 </include>
