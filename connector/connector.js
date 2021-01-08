@@ -6,8 +6,9 @@ const fasticonf = require('./config').getConfig('fasti');
 const Monitor = require('./fseventconsumers/esmonitor.js');
 // the state will be the same objectinstance for the whole runtime
 const xmlState = {};
-const maintain = require('./maintainance');
+//const maintain = require('./maintainance');
 const fs = require('fs');
+const ghostinit = require('./initghosts')
 
 xmlState.info = {
     reloadxml: {
@@ -24,7 +25,7 @@ xmlState.info = {
 Monitor.startMon(xmlState);
 
 // init/fill xmlState.
-maintain.updateXmlState(xmlState);
+ghostinit.writeGhosts(xmlState);
 
 // init fastify for rest and static interface
 const fastify = require ('fastify')({

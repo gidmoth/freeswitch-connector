@@ -4,12 +4,8 @@
 
 
 const FsOps = require('../apis/fsapi');
-const fsDir = require('../config').getConfig('xmldir');
-const Provpaths = require('../config').getConfig('provisioningpaths');
-const statDir = Provpaths.all;
 const ConfCtxConf = require('../config.js').getConfig('contexts');
 const Contexts = Object.keys(ConfCtxConf);
-const storefunct = require('./storefunctions')
 
 
 async function userroutes(fastify, options) {
@@ -94,7 +90,6 @@ async function userroutes(fastify, options) {
         FsOps.newUsers(this.xmlState, req.body)
             .then(newusers => {
                 reply.send(newusers);
-                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)
@@ -107,7 +102,6 @@ async function userroutes(fastify, options) {
         FsOps.rebUsers(this.xmlState)
             .then(rebuilt => {
                 reply.send(rebuilt)
-                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)
@@ -134,7 +128,6 @@ async function userroutes(fastify, options) {
         FsOps.delUsers(this.xmlState, req.body)
             .then(deletet => {
                 reply.send(deletet);
-                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)
@@ -147,7 +140,6 @@ async function userroutes(fastify, options) {
         FsOps.modUsers(this.xmlState, req.body)
             .then(modified => {
                 reply.send(modified);
-                storefunct.storeDirectory(`${fsDir}/directory`, `${statDir}/store/directory.tar.gz`)
             })
             .catch(error => {
                 fastify.log.error(error)

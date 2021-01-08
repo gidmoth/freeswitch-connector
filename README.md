@@ -328,13 +328,6 @@ Other folders are not implementet. This is not meant as a backup, but
 more to hook in a backup conveniently or to move to a new host with ease.
 These are file operations, they don't involve the internal xml state.
 
-Also: connector will update the `/static/store/directory.tar.gz` automatically
-every time it changes the files in freeswitchs directory. If you want
-to test modifications you do manually in the directory, safe the tarball,
-do your changes and see if the work. If something goes wrong, put the
-safed tarball bach to `/static/store` and use the following endpoint to
-restore to a working state.
-
 #### GET: /api/restore/[directory|dialplan|conferences|freeswitch]
 
 Restores the respective directory in `/etc-freeswitch` from a previously
