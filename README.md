@@ -1,17 +1,16 @@
 # freeswitch-connector
 
-> #### Contents
-> * [API Reference](#api-reference)
->   * [Userfunctions](#userfunctions)
->   * [Functions to maintain the system](#functions-to-maintain-the-system)
-
-
 This is a somewhat special purpose interface to freeswitch.
 It is designed to use freeswitch as a conference
 system, but the concept is very expandibele.
 
 A suitable freeswitch-installation can be found
 [here](https://github.com/gidmoth/freeswitch-container).
+
+> #### Contents
+> * [API Reference](#api-reference)
+>   * [Userfunctions](#userfunctions)
+>   * [Functions to maintain the system](#functions-to-maintain-the-system)
 
 ## Concept
 
