@@ -32,27 +32,6 @@ const argv = yargs
     .demandCommand(1, 1, 'You need a command', 'I can\'t handle more than one commands')
     .argv;
 
-switch (argv._[0]) {
-    case 'users':
-        async () => {
-            if (argv.o) {
-                if (!(checkPath(argv.o))) {
-                    return `ERROR: no path to ${argv.o}`
-                }
-                let userlist = await users(argv.t)
-                fs.writeFileSync(path.normalize(argv.o), userlist)
-                return `written: ${path.normalize(argv.o)}`
-            } else {
-                let userlist = await users(argv.t)
-                process.stdout.write(userlist)
-            }
-        }
-        break;
-    default:
-        ;
-}
-
-
 const client = new digfetch(conf.user, conf.pw)
 
 const getPostoptions = (body) => {
@@ -67,29 +46,29 @@ const getPostoptions = (body) => {
 
 const checkPath = (myopt) => {
     let dir = path.parse(path.normalize(myopt)).dir
-    if ( !(fs.existsSync(dir) || dir == '')) {
+    if (!(fs.existsSync(dir) || dir == '')) {
         return false
     }
     return true
 }
 
-const users = (text) => {
+const users = (text) => new Promise((resolve, reject) => {
     client.fetch(`${conf.baseurl}/users`)
         .then(resp => resp.text())
         .then(txt => {
             try {
                 let data = JSON.parse(txt)
-                if  (text) {
+                if (text) {
                     let txtdata = ''
-                    txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n'
+                    txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n\n'
                     txtdata += `Total users: ${data.info.total}` + '\n'
                     txtdata += 'Users in contexts:\n'
                     for (let [key, value] of Object.entries(data.info.contexts)) {
                         txtdata += `    ${key}:  ${value}` + '\n'
                     }
-                    txtdata += 'Users:\n-----\n'
+                    txtdata += '\nUsers:\n-----\n'
                     for (let usr of data.users) {
-                        txtdata += `${usr.name}` + '\n'
+                        txtdata += '\n' + `${usr.name}` + '\n'
                         txtdata += `    id:       ${usr.id}` + '\n'
                         txtdata += `    password: ${usr.password}` + '\n'
                         txtdata += `    conpin:   ${usr.conpin}` + '\n'
@@ -98,18 +77,50 @@ const users = (text) => {
                         txtdata += `    email:    ${usr.email}` + '\n'
                         txtdata += `    polymac:  ${usr.polymac}` + '\n'
                     }
-                    return txtdata
+                    resolve(txtdata)
                 }
-                return JSON.stringify(data)
+                resolve(JSON.stringify(data))
             } catch (err) {
                 let data = txt
-                return `ERROR: ${data}`
+                resolve(`ERROR: ${data}`)
             }
         })
         .catch(err => {
             console.log(err)
+            reject(err)
         })
+})
+
+async function runMe(argv) {
+    switch (argv._[0]) {
+        case 'users':
+            if (argv.o) {
+                if (!(checkPath(argv.o))) {
+                    process.stdout.write(`ERROR: no path to ${argv.o}`  + '\n')
+                    return
+                }
+                users(argv.t)
+                    .then(userlist => {
+                        fs.writeFileSync(path.normalize(argv.o), userlist)
+                        process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
+                        return
+                    })
+                    .catch(err => console.log(err))
+            } else {
+                users(argv.t)
+                    .then(userlist => {
+                        process.stdout.write(userlist)
+                    })
+                    .catch(err => console.log(err))
+            }
+            break;
+        default:
+            ;
+    }
 }
+
+runMe(argv)
+//users(argv.t)
 
 //console.log(argv)
 
