@@ -12,8 +12,24 @@ const fs = require('fs')
 
 const argv = yargs
     .strict()
+    .scriptName('')
     .usage('Usage: $0 <command> [options]')
-    .command('users [-t, -o <file>]', 'show a list of users')
+    .command('users', 'show list of all users')
+    .command('addusers [userarray]',
+            'add users, takes json array of userobjects as arg',
+            (yargs) => {
+                return yargs.option('i', {
+                    alias: 'intact',
+                    type: 'boolean',
+                    describe: 'be interactive'
+                })
+                .option('f', {
+                    alias: 'file',
+                    describe: 'read userarray from file',
+                    type: 'string',
+                    nargs: 1
+                })
+            })
     .option('o', {
         nargs: 1,
         type: 'string',
@@ -91,7 +107,63 @@ const users = (text) => new Promise((resolve, reject) => {
         })
 })
 
+const addusers = (text, postbody) => new Promise((resolve, reject) => {
+    client.fetch(`${conf.baseurl}/users/add`, getPostoptions(postbody))
+        .then(resp => resp.text())
+        .then(txt => {
+            try {
+                let data = JSON.parse(txt)
+                if (text) {
+                    let txtdata = ''
+                    txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n\n'
+                    txtdata += 'Done:\n----\n'
+                    if (data.done.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.done) {
+                            txtdata += `  ${usr.name}` + '\n'
+                            txtdata += `      id:       ${usr.id}` + '\n'
+                            txtdata += `      password: ${usr.password}` + '\n'
+                            txtdata += `      conpin:   ${usr.conpin}` + '\n'
+                            txtdata += `      context:  ${usr.context}` + '\n'
+                            txtdata += `      name:     ${usr.name}` + '\n'
+                            txtdata += `      email:    ${usr.email}` + '\n'
+                            txtdata += `      polymac:  ${usr.polymac}` + '\n'
+                        }
+                        txtdata += ']\n\n'
+                    }
+                    txtdata += 'Failed:\n------\n'
+                    if (data.failed.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.failed) {
+                            txtdata += `  ERROR: ${usr.error}` + '\n'
+                            for (let [key, value] of Object.entries(usr.user)) {
+                                txtdata += `    ${key}: ${value}` + '\n'
+                            }
+                        }
+                        txtdata += ']\n'
+                    }
+                    resolve(txtdata)
+                }
+                resolve(JSON.stringify(data))
+            } catch (err) {
+                let data = txt
+                resolve(`ERROR: ${data}`)
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        })
+})
+
 async function runMe(argv) {
+    if (argv.i) {
+        console.log('i want to be interactive')
+    }
     switch (argv._[0]) {
         case 'users':
             if (argv.o) {
@@ -114,6 +186,29 @@ async function runMe(argv) {
                     .catch(err => console.log(err))
             }
             break;
+        case 'addusers': {
+            let postbody = JSON.parse(argv.userarray)
+            if (argv.o) {
+                if (!(checkPath(argv.o))) {
+                    process.stdout.write(`ERROR: no path to ${argv.o}`  + '\n')
+                    return
+                }
+                addusers(argv.t, postbody)
+                    .then(answer => {
+                        fs.writeFileSync(path.normalize(argv.o), answer)
+                        process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
+                        return
+                    })
+                    .catch(err => console.log(err))
+            } else {
+                addusers(argv.t, postbody)
+                    .then(answer => {
+                        process.stdout.write(answer)
+                    })
+                    .catch(err => console.log(err))
+            }
+            break;
+        }
         default:
             ;
     }
@@ -121,7 +216,6 @@ async function runMe(argv) {
 
 runMe(argv)
 //users(argv.t)
-
 //console.log(argv)
 
 //users()
