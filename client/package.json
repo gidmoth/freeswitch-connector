@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "digest-fetch": "^1.1.5",
+    "inquirer": "^7.3.3",
     "node-fetch": "^2.6.1",
     "yargs": "^16.2.0"
   }

@@ -9,6 +9,15 @@ const digfetch = require('digest-fetch')
 const path = require('path')
 const yargs = require('yargs')
 const fs = require('fs')
+const inquirer = require("inquirer")
+
+
+const interActive = (argv) => {
+    if (argv._[0] == 'addusers' && !argv.i && !argv.userarray) {
+        argv.i = true
+    }
+    return {}
+}
 
 const argv = yargs
     .strict()
@@ -16,20 +25,20 @@ const argv = yargs
     .usage('Usage: $0 <command> [options]')
     .command('users', 'show list of all users')
     .command('addusers [userarray]',
-            'add users, takes json array of userobjects as arg',
-            (yargs) => {
-                return yargs.option('i', {
-                    alias: 'intact',
-                    type: 'boolean',
-                    describe: 'be interactive'
-                })
+        'add users, takes json array of userobjects as arg',
+        (yargs) => {
+            return yargs.option('i', {
+                alias: 'intac',
+                type: 'boolean',
+                describe: 'be interactive'
+            })
                 .option('f', {
                     alias: 'file',
                     describe: 'read userarray from file',
                     type: 'string',
                     nargs: 1
                 })
-            })
+        })
     .option('o', {
         nargs: 1,
         type: 'string',
@@ -46,6 +55,7 @@ const argv = yargs
     .alias('help', 'h')
     .alias('version', 'v')
     .demandCommand(1, 1, 'You need a command', 'I can\'t handle more than one commands')
+    .middleware(interActive)
     .argv;
 
 const client = new digfetch(conf.user, conf.pw)
@@ -160,15 +170,62 @@ const addusers = (text, postbody) => new Promise((resolve, reject) => {
         })
 })
 
+const askAddUsers = () => {
+    const questions = [
+        {
+            name: 'name',
+            type: 'input',
+            message: 'how is the user called?'
+        },
+        {
+            name: 'context',
+            type: 'input',
+            message: 'which context should the user join?'
+        },
+        {
+            name: 'email',
+            type: 'input',
+            message: 'what\'s the users email?'
+        },
+        {
+            name: 'password',
+            type: 'input',
+            default: '',
+            message: 'custom password?'
+        },
+        {
+            name: 'conpin',
+            type: 'input',
+            default: '',
+            message: 'custom conpin?'
+        },
+        {
+            name: 'polymac',
+            type: 'input',
+            default: 'none',
+            message: 'provision a polycom phone?'
+        }
+    ]
+    return inquirer.prompt(questions)
+}
+
+
 async function runMe(argv) {
     if (argv.i) {
-        console.log('i want to be interactive')
+        switch (argv._[0]) {
+            case 'addusers':
+                let answers = await askAddUsers()
+                argv.userarray = `[${JSON.stringify(answers)}]`
+                break;
+            default:
+                console.log('i want to be interactive')
+        }
     }
     switch (argv._[0]) {
         case 'users':
             if (argv.o) {
                 if (!(checkPath(argv.o))) {
-                    process.stdout.write(`ERROR: no path to ${argv.o}`  + '\n')
+                    process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
                 users(argv.t)
@@ -186,11 +243,11 @@ async function runMe(argv) {
                     .catch(err => console.log(err))
             }
             break;
-        case 'addusers': {
+        case 'addusers':
             let postbody = JSON.parse(argv.userarray)
             if (argv.o) {
                 if (!(checkPath(argv.o))) {
-                    process.stdout.write(`ERROR: no path to ${argv.o}`  + '\n')
+                    process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
                 addusers(argv.t, postbody)
@@ -208,7 +265,6 @@ async function runMe(argv) {
                     .catch(err => console.log(err))
             }
             break;
-        }
         default:
             ;
     }
