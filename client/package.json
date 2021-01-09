@@ -1,0 +1,16 @@
+{
+  "name": "freeswitch-connector-client",
+  "version": "0.0.1",
+  "description": "testclient for freeswitch-connector",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gidoramothra@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "digest-fetch": "^1.1.5",
+    "node-fetch": "^2.6.1",
+    "yargs": "^16.2.0"
+  }
+}
