@@ -78,9 +78,64 @@ async function userroutes(fastify, options) {
             op: 'users',
             info: {
                 total: this.xmlState.users.length,
-                contexts: ctxNums(Contexts, this.xmlState.users) 
+                contexts: ctxNums(Contexts, this.xmlState.users)
             },
             users: this.xmlState.users
+        }
+        return users
+    })
+
+    // get users by id
+    fastify.get('/api/users/byid/:userid', async function (req, reply) {
+        let users = {
+            op: `users/byid/${req.params.userid}`,
+            users: this.xmlState.users.filter(usr => usr.id.startsWith(req.params.userid))
+        }
+        return users
+    })
+
+    // get users by name
+    fastify.get('/api/users/byname/:username', async function (req, reply) {
+        let users = {
+            op: `users/byname/${req.params.username}`,
+            users: this.xmlState.users.filter(usr => usr.name.startsWith(req.params.username))
+        }
+        return users
+    })
+
+    // get users by context
+    fastify.get('/api/users/bycontext/:userctx', async function (req, reply) {
+        let users = {
+            op: `users/bycontext/${req.params.userctx}`,
+            users: this.xmlState.users.filter(usr => usr.context.startsWith(req.params.userctx))
+        }
+        return users
+    })
+
+    // get users by polymac
+    fastify.get('/api/users/bypolymac/:userpmac', async function (req, reply) {
+        let users = {
+            op: `users/bypolymac/${req.params.userpmac}`,
+            users: this.xmlState.users.filter(usr => usr.polymac.startsWith(req.params.userpmac))
+        }
+        return users
+    })
+
+    // match in users email
+    fastify.get('/api/users/byemail/:usermail', async function (req, reply) {
+        let users = {
+            op: `users/byemail/${req.params.usermail}`,
+            users: this.xmlState.users.filter(usr => usr.email.includes(req.params.usermail))
+        }
+        return users
+    })
+
+    // match mail or name
+    fastify.get('/api/users/match/:matchstring', async function (req, reply) {
+        let users = {
+            op: `users/match/${req.params.matchstring}`,
+            namematches: this.xmlState.users.filter(usr => usr.name.includes(req.params.matchstring)),
+            emailmatches: this.xmlState.users.filter(usr => usr.email.includes(req.params.matchstring))
         }
         return users
     })

@@ -139,6 +139,34 @@ returns JSON with all users like this:
 }
 ```
 
+#### GET /api/users/[byid|byname|bycontext|bypolymac]/*yourstring*
+
+Uses the given string to match the userarray against it. The matching
+is done with the stringmethod `.startsWith()`. So those Endpoints return an array, if more than one match is found (the given string for a polycom mac may be, e.g.,
+`0004f`, which will match all users with polycoms), the array contains more than
+one user.
+
+The answers look like this:
+
+`{op: 'users/byid/yourstring', users: [{user},{user}...]}`
+
+#### GET: /api/users/byemail/*yourstring*
+
+The same as the endpoints aboth. But the email property is matched with the
+`.includes()` method, to be able to match all users in the same maildomain.
+Usage of `@` in `yourstring` is  not tested and not supported.
+
+The answer looks like this:
+
+`{op: 'users/byemail/yourstring', users: [{user},{user}...]}`
+
+#### GET: /api/users/match/*yourstring*
+
+Matches `yourstring` against all emails and all names, checks if any
+of them includes your string. The answer looks like this:
+
+`{op: 'users/match/yourstring', namematches: [{user},{user}...], emailmatches: [{user},{user}...]}`
+
 #### POST: /api/users/add
 
 Schema:
