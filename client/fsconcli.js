@@ -12,12 +12,26 @@ const fs = require('fs')
 const inquirer = require("inquirer")
 
 
-const interActive = (argv) => {
-    if (argv._[0] == 'addusers' && !argv.i && !argv.userarray) {
-        argv.i = true
-    }
-    return {}
-}
+const stdinRead = () => new Promise((resolve, reject) => {
+    let retval = '';
+    process.stdin.on('data', (chunk) => {
+        retval += chunk;
+    })
+    process.stdin.on('end', () => {
+        resolve(retval)
+    })
+})
+
+const fileRead = (file) => new Promise((resolve, reject) => {
+    let retval = '';
+    let mystream = fs.createReadStream(file)
+    mystream.on('data', (chunk) => {
+        retval += chunk;
+    })
+    mystream.on('end', () => {
+        resolve(retval)
+    })
+})
 
 const argv = yargs
     .strict()
@@ -27,18 +41,19 @@ const argv = yargs
     .command('addusers [userarray]',
         'add users, takes json array of userobjects as arg',
         (yargs) => {
-            return yargs.option('i', {
-                alias: 'intac',
-                type: 'boolean',
-                describe: 'be interactive'
+            return yargs.option('f', {
+                alias: 'file',
+                describe: 'read userarray from file',
+                type: 'string',
+                nargs: 1
             })
-                .option('f', {
-                    alias: 'file',
-                    describe: 'read userarray from file',
-                    type: 'string',
-                    nargs: 1
-                })
         })
+    .option('i', {
+        alias: 'intac',
+        type: 'boolean',
+        describe: 'be interactive',
+        default: false
+    })
     .option('o', {
         nargs: 1,
         type: 'string',
@@ -55,7 +70,6 @@ const argv = yargs
     .alias('help', 'h')
     .alias('version', 'v')
     .demandCommand(1, 1, 'You need a command', 'I can\'t handle more than one commands')
-    .middleware(interActive)
     .argv;
 
 const client = new digfetch(conf.user, conf.pw)
@@ -73,6 +87,15 @@ const getPostoptions = (body) => {
 const checkPath = (myopt) => {
     let dir = path.parse(path.normalize(myopt)).dir
     if (!(fs.existsSync(dir) || dir == '')) {
+        return false
+    }
+    return true
+}
+
+const checkFile = (myopt) => {
+    let file = path.normalize(myopt)
+    console.log(`thats checked: ${file}`)
+    if (!(fs.existsSync(file) || file == '')) {
         return false
     }
     return true
@@ -170,7 +193,7 @@ const addusers = (text, postbody) => new Promise((resolve, reject) => {
         })
 })
 
-const askAddUsers = () => {
+const askAddUsers = async (usrarr = []) => {
     const questions = [
         {
             name: 'name',
@@ -204,9 +227,18 @@ const askAddUsers = () => {
             type: 'input',
             default: 'none',
             message: 'provision a polycom phone?'
+        },
+        {
+            name: 'again',
+            type: 'confirm',
+            message: 'enter another user?',
+            default: false
         }
     ]
-    return inquirer.prompt(questions)
+
+    let { again, ...answers } = await inquirer.prompt(questions)
+    let newusers = [...usrarr, answers]
+    return again ? askAddUsers(newusers) : newusers
 }
 
 
@@ -215,7 +247,7 @@ async function runMe(argv) {
         switch (argv._[0]) {
             case 'addusers':
                 let answers = await askAddUsers()
-                argv.userarray = `[${JSON.stringify(answers)}]`
+                argv.userarray = JSON.stringify(answers)
                 break;
             default:
                 console.log('i want to be interactive')
@@ -244,6 +276,38 @@ async function runMe(argv) {
             }
             break;
         case 'addusers':
+            if (!process.stdin.isTTY && !argv.f && !argv.i) {
+                try {
+                    argv.userarray = await stdinRead()
+                } catch(err) {
+                    console.log(err)
+                    return
+                }
+            }
+            if (process.stdin.isTTY && !argv.f && !argv.i && !argv.userarray) {
+                process.stdout.write(`The ${argv._[0]} command needs an userarray.` + '\n')
+                process.stdout.write(`You can provide it as JSON by either means:` + '\n\n')
+                process.stdout.write(`- interactive, use the -i flag` + '\n')
+                process.stdout.write(`- pipe to stdin` + '\n')
+                process.stdout.write(`- read from file, use the -f flag` + '\n')
+                process.stdout.write(`- as argument on invocation` + '\n\n')
+                process.stdout.write(`For format information see here:` + '\n')
+                process.stdout.write(`https://github.com/gidmoth/freeswitch-connector#post-apiusersadd` + '\n')
+                return
+            }
+            if (argv.f) {
+                if (!(checkFile(argv.f))) {
+                    process.stdout.write(`ERROR: can't find ${argv.f}` + '\n')
+                    return
+                } else {
+                    try {
+                        argv.userarray = await fileRead(path.normalize(argv.f))
+                    } catch(err) {
+                        console.log(err)
+                        return
+                    }
+                }
+            }
             let postbody = JSON.parse(argv.userarray)
             if (argv.o) {
                 if (!(checkPath(argv.o))) {

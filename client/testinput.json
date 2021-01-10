@@ -1,0 +1,12 @@
+[
+    {
+        "context": "friends",
+        "name": "hallostefan2",
+        "email": "foo@bar.baz"
+    },
+    {
+        "context": "public",
+        "name": "foobazi",
+        "email": "pub@stone.wall"
+    }
+]
