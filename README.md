@@ -154,7 +154,6 @@ The answers look like this:
 
 The same as the endpoints aboth. But the email property is matched with the
 `.includes()` method, to be able to match all users in the same maildomain.
-Usage of `@` in `yourstring` is  not tested and not supported.
 
 The answer looks like this:
 

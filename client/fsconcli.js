@@ -35,15 +35,43 @@ const fileRead = (file) => new Promise((resolve, reject) => {
 
 const argv = yargs
     .strict()
-    .scriptName('')
+    .scriptName('fsconcli')
     .usage('Usage: $0 <command> [options]')
-    .command('users', 'show list of all users')
+    .command('users',
+        'Show list of users, by default shows all users. Use \'users -h\' for a list of options.',
+        (yargs) => {
+            return yargs.option('id', {
+                describe: 'Narrow list by user id.',
+                type: 'string',
+                nargs: 1
+            }).option('name', {
+                describe: 'Narrow list by user name.',
+                type: 'string',
+                nargs: 1
+            }).option('context', {
+                describe: 'Narrow list by user context.',
+                type: 'string',
+                nargs: 1
+            }).option('polymac', {
+                describe: 'Narrow list by users polyphone mac.',
+                type: 'string',
+                nargs: 1
+            }).option('email', {
+                describe: 'Narrow list by string matched to users emails.',
+                type: 'string',
+                nargs: 1
+            }).option('match', {
+                describe: 'Narrow list by matching string to emails and names.',
+                type: 'string',
+                nargs: 1
+            })
+        })
     .command('addusers [userarray]',
-        'add users, takes json array of userobjects as arg',
+        'Add users, takes json array of userobjects as arg.',
         (yargs) => {
             return yargs.option('f', {
                 alias: 'file',
-                describe: 'read userarray from file',
+                describe: 'Read userarray from file.',
                 type: 'string',
                 nargs: 1
             })
@@ -51,25 +79,25 @@ const argv = yargs
     .option('i', {
         alias: 'intac',
         type: 'boolean',
-        describe: 'be interactive',
+        describe: 'Be interactive.',
         default: false
     })
     .option('o', {
         nargs: 1,
         type: 'string',
-        describe: 'output to named file',
+        describe: 'Output to named file.',
         alias: 'out'
     })
     .option('t', {
         type: 'boolean',
-        describe: 'output text instead of json',
+        describe: 'Output text instead of json.',
         default: false,
         alias: 'text'
     })
     .help()
     .alias('help', 'h')
     .alias('version', 'v')
-    .demandCommand(1, 1, 'You need a command', 'I can\'t handle more than one commands')
+    .demandCommand(1, 1, 'You need a command.', 'I can\'t handle more than 1 command')
     .argv;
 
 const client = new digfetch(conf.user, conf.pw)
@@ -101,30 +129,84 @@ const checkFile = (myopt) => {
     return true
 }
 
-const users = (text) => new Promise((resolve, reject) => {
-    client.fetch(`${conf.baseurl}/users`)
+const retTextUser = (usr) => {
+    let text = ''
+    text += `  ${usr.name}` + '\n'
+    text += `      id:       ${usr.id}` + '\n'
+    text += `      password: ${usr.password}` + '\n'
+    text += `      conpin:   ${usr.conpin}` + '\n'
+    text += `      context:  ${usr.context}` + '\n'
+    text += `      name:     ${usr.name}` + '\n'
+    text += `      email:    ${usr.email}` + '\n'
+    text += `      polymac:  ${usr.polymac}` + '\n'
+    return text
+}
+
+const users = (argv) => new Promise((resolve, reject) => {
+    let userreq = '/users'
+    switch (true) {
+        case argv.hasOwnProperty('id'):
+            userreq += `/byid/${argv.id}`
+            break;
+        case argv.hasOwnProperty('name'):
+            userreq += `/byname/${argv.name}`
+            break;
+        case argv.hasOwnProperty('context'):
+            userreq += `/bycontext/${argv.context}`
+            break;
+        case argv.hasOwnProperty('polymac'):
+            userreq += `/bypolymac/${argv.polymac}`
+            break;
+        case argv.hasOwnProperty('email'):
+            userreq += `/byemail/${argv.email}`
+            break;
+        case argv.hasOwnProperty('match'):
+            userreq += `/match/${argv.match}`
+            break;
+        default:
+            ;
+    }
+    client.fetch(`${conf.baseurl}${userreq}`)
         .then(resp => resp.text())
         .then(txt => {
             try {
                 let data = JSON.parse(txt)
-                if (text) {
+                if (argv.t) {
                     let txtdata = ''
                     txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n\n'
-                    txtdata += `Total users: ${data.info.total}` + '\n'
-                    txtdata += 'Users in contexts:\n'
-                    for (let [key, value] of Object.entries(data.info.contexts)) {
-                        txtdata += `    ${key}:  ${value}` + '\n'
+                    if (!data.op.includes('/')) {
+                        txtdata += `Total users: ${data.info.total}` + '\n'
+                        txtdata += 'Users in contexts:\n'
+                        for (let [key, value] of Object.entries(data.info.contexts)) {
+                            txtdata += `    ${key}:  ${value}` + '\n'
+                        }
                     }
-                    txtdata += '\nUsers:\n-----\n'
-                    for (let usr of data.users) {
-                        txtdata += '\n' + `${usr.name}` + '\n'
-                        txtdata += `    id:       ${usr.id}` + '\n'
-                        txtdata += `    password: ${usr.password}` + '\n'
-                        txtdata += `    conpin:   ${usr.conpin}` + '\n'
-                        txtdata += `    context:  ${usr.context}` + '\n'
-                        txtdata += `    name:     ${usr.name}` + '\n'
-                        txtdata += `    email:    ${usr.email}` + '\n'
-                        txtdata += `    polymac:  ${usr.polymac}` + '\n'
+                    if (data.op.includes('match')) {
+                        txtdata += 'Namematches:\n-----------\n'
+                        if (data.namematches.length < 1) {
+                            txtdata += '[]\n\n'
+                        } else {
+                            txtdata += '[\n'
+                            for (let usr of data.namematches) {
+                                txtdata += retTextUser(usr)
+                            }
+                            txtdata += ']\n\n'
+                        }
+                        txtdata += 'Emailmatches:\n------\n'
+                        if (data.emailmatches.length < 1) {
+                            txtdata += '[]\n\n'
+                        } else {
+                            txtdata += '[\n'
+                            for (let usr of data.emailmatches) {
+                                txtdata += retTextUser(usr)
+                            }
+                            txtdata += ']\n'
+                        }
+                    } else {
+                        txtdata += '\nUsers:\n-----\n'
+                        for (let usr of data.users) {
+                            txtdata += retTextUser(usr)
+                        }
                     }
                     resolve(txtdata)
                 }
@@ -155,14 +237,7 @@ const addusers = (text, postbody) => new Promise((resolve, reject) => {
                     } else {
                         txtdata += '[\n'
                         for (let usr of data.done) {
-                            txtdata += `  ${usr.name}` + '\n'
-                            txtdata += `      id:       ${usr.id}` + '\n'
-                            txtdata += `      password: ${usr.password}` + '\n'
-                            txtdata += `      conpin:   ${usr.conpin}` + '\n'
-                            txtdata += `      context:  ${usr.context}` + '\n'
-                            txtdata += `      name:     ${usr.name}` + '\n'
-                            txtdata += `      email:    ${usr.email}` + '\n'
-                            txtdata += `      polymac:  ${usr.polymac}` + '\n'
+                            txtdata += retTextUser(usr)
                         }
                         txtdata += ']\n\n'
                     }
@@ -241,6 +316,25 @@ const askAddUsers = async (usrarr = []) => {
     return again ? askAddUsers(newusers) : newusers
 }
 
+const askUsers = async () => {
+    const questions = [
+        {
+            name: 'userfilter',
+            type: 'list',
+            message: 'choose userfilter',
+            choices: ['all', 'id', 'name', 'context', 'polymac', 'email', 'match'],
+            default: 'all'
+        },
+        {
+            name: 'matchstring',
+            type: 'input',
+            message: 'enter matchstring:',
+            when: (choice) => choice.userfilter != 'all'
+        }
+    ]
+    let answers = await inquirer.prompt(questions)
+    return answers
+}
 
 async function runMe(argv) {
     if (argv.i) {
@@ -248,6 +342,12 @@ async function runMe(argv) {
             case 'addusers':
                 let answers = await askAddUsers()
                 argv.userarray = JSON.stringify(answers)
+                break;
+            case 'users':
+                let uanswers = await askUsers()
+                if (uanswers.userfilter != 'all') {
+                    argv[uanswers.userfilter] = uanswers.matchstring
+                }
                 break;
             default:
                 console.log('i want to be interactive')
@@ -260,7 +360,7 @@ async function runMe(argv) {
                     process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
-                users(argv.t)
+                users(argv)
                     .then(userlist => {
                         fs.writeFileSync(path.normalize(argv.o), userlist)
                         process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
@@ -268,7 +368,7 @@ async function runMe(argv) {
                     })
                     .catch(err => console.log(err))
             } else {
-                users(argv.t)
+                users(argv)
                     .then(userlist => {
                         process.stdout.write(userlist)
                     })
@@ -279,7 +379,7 @@ async function runMe(argv) {
             if (!process.stdin.isTTY && !argv.f && !argv.i) {
                 try {
                     argv.userarray = await stdinRead()
-                } catch(err) {
+                } catch (err) {
                     console.log(err)
                     return
                 }
@@ -287,10 +387,10 @@ async function runMe(argv) {
             if (process.stdin.isTTY && !argv.f && !argv.i && !argv.userarray) {
                 process.stdout.write(`The ${argv._[0]} command needs an userarray.` + '\n')
                 process.stdout.write(`You can provide it as JSON by either means:` + '\n\n')
-                process.stdout.write(`- interactive, use the -i flag` + '\n')
-                process.stdout.write(`- pipe to stdin` + '\n')
-                process.stdout.write(`- read from file, use the -f flag` + '\n')
-                process.stdout.write(`- as argument on invocation` + '\n\n')
+                process.stdout.write(`  - interactive, use the -i flag` + '\n')
+                process.stdout.write(`  - pipe to stdin` + '\n')
+                process.stdout.write(`  - read from file, use the -f flag` + '\n')
+                process.stdout.write(`  - as argument on invocation` + '\n\n')
                 process.stdout.write(`For format information see here:` + '\n')
                 process.stdout.write(`https://github.com/gidmoth/freeswitch-connector#post-apiusersadd` + '\n')
                 return
@@ -302,7 +402,7 @@ async function runMe(argv) {
                 } else {
                     try {
                         argv.userarray = await fileRead(path.normalize(argv.f))
-                    } catch(err) {
+                    } catch (err) {
                         console.log(err)
                         return
                     }
