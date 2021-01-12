@@ -76,6 +76,16 @@ const argv = yargs
                 nargs: 1
             })
         })
+    .command('modusers [userarray]',
+        'Modify users, takes json array of userobjects as arg.',
+        (yargs) => {
+            return yargs.option('f', {
+                alias: 'file',
+                describe: 'Read userarray from file.',
+                type: 'string',
+                nargs: 1
+            })
+        })
     .option('i', {
         alias: 'intac',
         type: 'boolean',
@@ -203,7 +213,7 @@ const users = (argv) => new Promise((resolve, reject) => {
                             txtdata += ']\n'
                         }
                     } else {
-                        txtdata += '\nUsers:\n-----\n'
+                        txtdata += 'Users:\n-----\n'
                         for (let usr of data.users) {
                             txtdata += retTextUser(usr)
                         }
@@ -268,45 +278,91 @@ const addusers = (text, postbody) => new Promise((resolve, reject) => {
         })
 })
 
+const modUsers = (text, postbody) => new Promise((resolve, reject) => {
+    client.fetch(`${conf.baseurl}/users/mod`, getPostoptions(postbody))
+        .then(resp => resp.text())
+        .then(txt => {
+            try {
+                let data = JSON.parse(txt)
+                if (text) {
+                    let txtdata = ''
+                    txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n\n'
+                    txtdata += 'Done:\n----\n'
+                    if (data.done.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.done) {
+                            txtdata += retTextUser(usr)
+                        }
+                        txtdata += ']\n\n'
+                    }
+                    txtdata += 'Failed:\n------\n'
+                    if (data.failed.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.failed) {
+                            txtdata += `  ERROR: ${usr.error}` + '\n'
+                            for (let [key, value] of Object.entries(usr.user)) {
+                                txtdata += `    ${key}: ${value}` + '\n'
+                            }
+                        }
+                        txtdata += ']\n'
+                    }
+                    resolve(txtdata)
+                }
+                resolve(JSON.stringify(data))
+            } catch (err) {
+                let data = txt
+                resolve(`ERROR: ${data}`)
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        })
+})
+
 const askAddUsers = async (usrarr = []) => {
     const questions = [
         {
             name: 'name',
             type: 'input',
-            message: 'how is the user called?'
+            message: 'How is the user called?'
         },
         {
             name: 'context',
             type: 'input',
-            message: 'which context should the user join?'
+            message: 'Which context should the user join?'
         },
         {
             name: 'email',
             type: 'input',
-            message: 'what\'s the users email?'
+            message: 'What\'s the users email?'
         },
         {
             name: 'password',
             type: 'input',
             default: '',
-            message: 'custom password?'
+            message: 'Custom password?'
         },
         {
             name: 'conpin',
             type: 'input',
             default: '',
-            message: 'custom conpin?'
+            message: 'Custom conpin?'
         },
         {
             name: 'polymac',
             type: 'input',
             default: 'none',
-            message: 'provision a polycom phone?'
+            message: 'Provision a polycom phone?'
         },
         {
             name: 'again',
             type: 'confirm',
-            message: 'enter another user?',
+            message: 'Enter another user?',
             default: false
         }
     ]
@@ -321,19 +377,113 @@ const askUsers = async () => {
         {
             name: 'userfilter',
             type: 'list',
-            message: 'choose userfilter',
+            message: 'Choose userfilter',
             choices: ['all', 'id', 'name', 'context', 'polymac', 'email', 'match'],
             default: 'all'
         },
         {
             name: 'matchstring',
             type: 'input',
-            message: 'enter matchstring:',
+            message: 'Enter matchstring:',
             when: (choice) => choice.userfilter != 'all'
         }
     ]
     let answers = await inquirer.prompt(questions)
     return answers
+}
+
+const prepopulate = () => new Promise((resolve, reject) => {
+    inquirer.prompt([
+        {
+            name: 'id',
+            type: 'input',
+            message: 'input userid:'
+        }
+    ])
+        .then(async (answer) => {
+            let usrans = {}
+            await client.fetch(`${conf.baseurl}/users/byid/${answer.id}`)
+                .then(resp => resp.text())
+                .then(txt => {
+                    try {
+                        let data = JSON.parse(txt)
+                        usrans = data
+                    } catch (err) {
+                        let data = txt
+                        console.log(`ERROR: ${data}`)
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    reject(err)
+                })
+            if (usrans.users.length < 1 || usrans.users.length > 1) {
+                reject('User not found or not unique, try again.')
+            } else {
+                resolve({
+                    quest: [
+                        {
+                            name: 'name',
+                            type: 'input',
+                            message: 'New name for the user?',
+                            default: usrans.users[0].name
+                        },
+                        {
+                            name: 'context',
+                            type: 'input',
+                            message: 'New context for the user?',
+                            default: usrans.users[0].context
+                        },
+                        {
+                            name: 'email',
+                            type: 'input',
+                            message: 'New email for the user?',
+                            default: usrans.users[0].email
+                        },
+                        {
+                            name: 'password',
+                            type: 'input',
+                            message: 'Change password?',
+                            default: usrans.users[0].password
+                        },
+                        {
+                            name: 'conpin',
+                            type: 'input',
+                            message: 'Change conpin?',
+                            default: usrans.users[0].conpin
+                        },
+                        {
+                            name: 'polymac',
+                            type: 'input',
+                            message: 'Provision (none) or another polycom phone?',
+                            default: usrans.users[0].polymac
+                        },
+                        {
+                            name: 'again',
+                            type: 'confirm',
+                            message: 'Modify another user?',
+                            default: false
+                        }
+                    ],
+                    id: usrans.users[0].id
+                })
+            }
+        })
+})
+
+const askModUsers = async (usrarr = []) => {
+    let questions = []
+    try {
+        questionsall = await prepopulate()
+        questions = questionsall.quest
+    } catch (err) {
+        console.log(err)
+        return askModUsers(usrarr)
+    }
+    let { again, ...answers } = await inquirer.prompt(questions)
+    answers.id = questionsall.id
+    let newusers = [...usrarr, answers]
+    return again ? askModUsers(newusers) : newusers
 }
 
 async function runMe(argv) {
@@ -342,6 +492,10 @@ async function runMe(argv) {
             case 'addusers':
                 let answers = await askAddUsers()
                 argv.userarray = JSON.stringify(answers)
+                break;
+            case 'modusers':
+                let manswers = await askModUsers()
+                argv.userarray = JSON.stringify(manswers)
                 break;
             case 'users':
                 let uanswers = await askUsers()
@@ -423,6 +577,60 @@ async function runMe(argv) {
                     .catch(err => console.log(err))
             } else {
                 addusers(argv.t, postbody)
+                    .then(answer => {
+                        process.stdout.write(answer)
+                    })
+                    .catch(err => console.log(err))
+            }
+            break;
+        case 'modusers':
+            if (!process.stdin.isTTY && !argv.f && !argv.i) {
+                try {
+                    argv.userarray = await stdinRead()
+                } catch (err) {
+                    console.log(err)
+                    return
+                }
+            }
+            if (process.stdin.isTTY && !argv.f && !argv.i && !argv.userarray) {
+                process.stdout.write(`The ${argv._[0]} command needs an userarray.` + '\n')
+                process.stdout.write(`You can provide it as JSON by either means:` + '\n\n')
+                process.stdout.write(`  - interactive, use the -i flag` + '\n')
+                process.stdout.write(`  - pipe to stdin` + '\n')
+                process.stdout.write(`  - read from file, use the -f flag` + '\n')
+                process.stdout.write(`  - as argument on invocation` + '\n\n')
+                process.stdout.write(`For format information see here:` + '\n')
+                process.stdout.write(`https://github.com/gidmoth/freeswitch-connector#post-apiusersmod` + '\n')
+                return
+            }
+            if (argv.f) {
+                if (!(checkFile(argv.f))) {
+                    process.stdout.write(`ERROR: can't find ${argv.f}` + '\n')
+                    return
+                } else {
+                    try {
+                        argv.userarray = await fileRead(path.normalize(argv.f))
+                    } catch (err) {
+                        console.log(err)
+                        return
+                    }
+                }
+            }
+            let postbodymod = JSON.parse(argv.userarray)
+            if (argv.o) {
+                if (!(checkPath(argv.o))) {
+                    process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
+                    return
+                }
+                modUsers(argv.t, postbodymod)
+                    .then(answer => {
+                        fs.writeFileSync(path.normalize(argv.o), answer)
+                        process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
+                        return
+                    })
+                    .catch(err => console.log(err))
+            } else {
+                modUsers(argv.t, postbodymod)
                     .then(answer => {
                         process.stdout.write(answer)
                     })
