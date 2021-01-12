@@ -64,12 +64,24 @@ function parseConference(conf) {
 
 const parseDirectory = (dir) => {
     let pusers = [];
+    console.log(JSON.stringify(dir.section.domain.groups))
     dir.section.domain.groups.group.forEach(gr => {
-        gr.users.user.forEach(u => {
-            if (!(u.attrib_id.startsWith('ghost'))) {
-                pusers.push(parseUser(u));
-            }
-        })
+        switch (typeof (gr.users)) {
+            case 'string':
+                break;
+            case 'object':
+                if (Array.isArray(gr.users.user)) {
+                    gr.users.user.forEach(u => {
+                        pusers.push(parseUser(u));
+                    })
+                } else {
+                    pusers.push(parseUser(gr.users.user))
+                }
+                break;
+            default:
+                ;
+        }
+
     })
     return pusers;
 }

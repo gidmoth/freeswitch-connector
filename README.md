@@ -25,8 +25,7 @@ just a bunch of xml-files which are human readable. And you can
 recunstruct everything you do filewise with connector easily
 from it's internal state, which you can safe as JSON. Also you can
 do needed modifications directly in the xml-files and freeswitch-connector
-will have no problems with it. With one notable exception, see
-[note below](#ghosts-note)
+will have no problems with it.
 
 The prize for such advantages is the dependency on a certain
 way of expressing the freeswitch configuration in xml files
@@ -346,81 +345,3 @@ from informations gathered through the eventsocket.
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
 
-___
-
-#### Ghosts Note
-
-Due to a limitation in the way
-[fast-xml-parser](https://www.npmjs.com/package/fast-xml-parser)
-parses the xml which connector recives from the eventsocket
-of freeswitch, maybe a limitation of translating xml data to
-JS Objects in general, connector creates ghost-users in the freeswitch
-directory on every startup. These files get parsed by freeswitch, but
-the users can't register. The're just placeholders for the structure
-of the xml, in case all other users get deletet from a context.
-
-It' a design-decision to keep the parsing simple and fast, and therefore
-create those dummiefiles on every startup.
-
-The problem in short: If you parse the following xml to JSON:
-
-```xml
-<group>
-<user id="foo"/>
-<user id="bar"/>
-<user id="baz"/>
-</group>
-```
-
-with fast-xml-parser, and the option not to ignore attributes, you get this:
-
-```json
-{"group":
-    {"user":
-        [
-            {"@_id":"foo"},
-            {"@_id":"bar"},
-            {"@_id":"baz"}
-        ]
-    }
-}
-```
-
-In other words, the group is holding an object which has a property
-user which is holding an array.
-
-But this:
-
-```xml
-<group>
-<user id="foo"/>
-</group>
-```
-
-results in the property holding an object:
-
-```json
-{"group":
-    {"user":
-        {"@_\"id\"":"foo"}
-    }
-}
-```
-
-and this:
-
-```xml
-<group>
-</group>
-```
-
-results in a string, and no user-property:
-
-```json
-{"group":""}
-```
-
-So to keep the parsing simple and fast, I decided to add ghost-users,
-for the case the real users drop under 2.
-
-But that's a hack -- any suggestions and pull-requests welcome!
