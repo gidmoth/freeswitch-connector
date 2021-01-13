@@ -43,11 +43,19 @@ const getConfFile = (conf) => {
 }
 
 getPolyDir = (confs) => {
-  let dirxml = '<dirctory><item_list>'
+  let dirxml = `<directory>
+  <item_list>`
   for (let conf of confs) {
-    dirxml += `<item><fn>${conf.type}</fn><ln>${conf.name}</ln><ct>${conf.num}</ct></item>`
+    dirxml += `<item>
+    <fn>${conf.type}</fn>
+    <ln>${conf.name}</ln>
+    <ct>${conf.num}</ct>
+    </item>
+    `
   }
-  dirxml += "</item_list></directory>"
+  dirxml += `  </item_list>
+</directory>
+`
   return dirxml
 }
 

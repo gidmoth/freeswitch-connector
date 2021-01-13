@@ -52,11 +52,11 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.get('/polycom/:dir/*', async function (req, reply) {
+    fastify.get('/polycom/:dir/:file', async function (req, reply) {
         if (myCtx.includes(req.params.dir)){
             return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
         }
-        return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
+        return { 'Question': 'Are you kidding me?' }
     })
 
     fastify.put('/polycom/:file', async function (req, reply) {
