@@ -4,6 +4,8 @@
 
 
 const provpaths = require('../config').getConfig('provisioningpaths')
+const Contexts = require('../config').getConfig('contexts');
+const myCtx = Object.keys(Contexts);
 const fs = require('fs')
 
 async function polycomroutes(fastify, options) {
@@ -50,7 +52,10 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.get('/polycom/:dir/000000000000-directory.xml', async function (req, reply) {
+    fastify.get('/polycom/:dir/:file', async function (req, reply) {
+        if (myCtx.includes(req.params.dir)){
+            return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
+        }
         return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
     })
 
