@@ -38,6 +38,8 @@
         ip: `${process.env.FASTIIP || '0.0.0.0'}`,
         hostname: `${process.env.CONHOSTNAME || 'localhost.localdomain'}`,
         apiallow: 'team',
+        allow: 'friends',
+        disallow: 'public',
         cert: `${process.env.FASTICERT || '/etc-freeswitch/tls/fullchain.pem'}`,
         key: `${process.env.FASTIKEY || '/etc-freeswitch/tls/privkey.pem'}`
     },

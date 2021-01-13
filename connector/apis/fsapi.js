@@ -334,11 +334,38 @@ const reprovUsers = (xmlState) => new Promise((resolve, reject) => {
 // conference functions
 const buildPolyDir = (xmlState) => {
     for (let ctx of myCtx) {
-        let confs = xmlState.conferences.filter(conf => conf.context == ctx)
-        if (confs.length > 0) {
-            let dirxml = conftpl.getPolyDir(confs)
-            let dirpath = path.join(Provpaths.polycom, `${ctx}-directory.xml`)
-            fs.writeFileSync(dirpath, dirxml);
+        if (!(fs.existsSync(path.join(Provpaths.polycom, `${ctx}`)))) {
+            fs.mkdirSync(path.join(Provpaths.polycom, `${ctx}`))
+        }
+        switch (ctx) {
+            case fastiConf.apiallow:
+                let confs = xmlState.conferences
+                if (confs.length > 0) {
+                    let dirxml = conftpl.getPolyDir(confs)
+                    let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(dirpath, dirxml);
+                }
+                break;
+            case fastiConf.allow:
+                let bconfs = xmlState.conferences.filter(conf => conf.context == ctx)
+                let cconfs = xmlState.conferences.filter(conf => conf.context == fastiConf.disallow)
+                cconfs.forEach(c => bconfs.push(c))
+                if (bconfs.length > 0) {
+                    let bdirxml = conftpl.getPolyDir(bconfs)
+                    let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(bdirpath, bdirxml);
+                }
+                break;
+            case fastiConf.disallow:
+                let dconfs = xmlState.conferences.filter(conf => conf.context == ctx)
+                if (dconfs.length > 0) {
+                    let cdirxml = conftpl.getPolyDir(dconfs)
+                    let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(cdirpath, cdirxml);
+                }
+                break;
+            default:
+                ;
         }
     }
 }

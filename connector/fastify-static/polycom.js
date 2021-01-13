@@ -34,9 +34,6 @@ async function polycomroutes(fastify, options) {
             req.params.file.endsWith('.ver')) {
             return reply.sendFile(`ucs/${req.params.file}`)
         }
-        if (req.params.file.endsWith('-directory.xml')) {
-            return reply.sendFile(`${req.params.file}`)
-        }
         let mac = req.user.polymac
         return reply.sendFile(`${mac}/${req.params.file}`)
     })
@@ -51,6 +48,10 @@ async function polycomroutes(fastify, options) {
 
     fastify.get('/polycom/languages/:file', async function (req, reply) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
+    })
+
+    fastify.get('/polycom/:dir/000000000000-directory.xml', async function (req, reply) {
+        return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
     })
 
     fastify.put('/polycom/:file', async function (req, reply) {
