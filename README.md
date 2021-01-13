@@ -12,8 +12,6 @@ A suitable freeswitch-installation can be found
 >   * [Userfunctions](#userfunctions)
 >   * [Functions to maintain the system](#functions-to-maintain-the-system)
 
----
-
 ## Concept
 
 Depending on your usecase the concept might fit to your needs
@@ -97,8 +95,6 @@ make the TLS work, and adapt all as necessary for your security-needs.
 See the `fasti.apiallow` property in
 [config.js](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/config.js).
 
----
-
 ## API Reference
 
 Connector exposes a REST API to all users in the `fast.apiallow` context.
@@ -110,8 +106,6 @@ need to send Headers like this:
 
 All POST endpoints are validated against a JSON schema, for brevity the
 schema is given in the following for each case.
-
----
 
 ### Userfunctions
 
@@ -318,8 +312,6 @@ If you try connector with the
 [example freeswitch](https://github.com/gidmoth/freeswitch-container)
 you should run this endpoint to provision the users in there.
 
----
-
 ### Conference Functions
 
 #### `GET: /api/conferences`
@@ -327,9 +319,66 @@ you should run this endpoint to provision the users in there.
 Returns JSON with a List of all conferences like that:
 
 ```
+{
+    "op": "conferences",
+    "info": {
+        "total": 4,
+        "contexts": {
+            "team": 2,
+            "friends": 1,
+            "public": 1
+        },
+        "types": [
+            "16kHz-novideo",
+            "48kHz-video"
+        ]
+    },
+    "conferences": [
+        {
+            "num": "30000",
+            "name": "team_g722",
+            "type": "16kHz-novideo",
+            "context": "team"
+        }, ...
+    ]
+}
+```
 
+#### `POST: /api/conferences/add`
 
----
+Schema:
+
+```
+{
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/confAddSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    name: { type: 'string' },
+                    type: { type: 'string' },
+                    context: { type: 'string' },
+                },
+                required: ['type', 'context', 'name'],
+                additionalProperties: false
+            }
+        }
+    }
+```
+
+Adds conferences to the System. As you can see, you can add
+more than one conference at a time.
+
+The answer looks like this:
+
+`{ op: 'conferences/add', done:[], failed:[] }`
+
+With the arrays filled with conference objects or not. Adding a
+conference fails if the name is already taken, the context does not
+exist, or the type of conference is not implementet as profile
+in freeswitchs `conference.conf.xml`.
 
 ### Functions to maintain the system
 
