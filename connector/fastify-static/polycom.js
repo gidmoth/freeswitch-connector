@@ -34,6 +34,9 @@ async function polycomroutes(fastify, options) {
             req.params.file.endsWith('.ver')) {
             return reply.sendFile(`ucs/${req.params.file}`)
         }
+        if (req.params.file.endsWith('-directory.xml')) {
+            return reply.sendFile(`${req.params.file}`)
+        }
         let mac = req.user.polymac
         return reply.sendFile(`${mac}/${req.params.file}`)
     })

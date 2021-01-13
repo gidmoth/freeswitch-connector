@@ -13,6 +13,7 @@ const fastiConf = require('../config').getConfig('fasti');
 const templates = require('./templates');
 const conftpl = require('./conftemplates');
 const reloadxml = require('../fseventusers/reloadxml');
+const myCtx = Object.keys(Contexts);
 
 // utilities
 const getNext = (xmlState, thing, ctx) => {
@@ -331,6 +332,19 @@ const reprovUsers = (xmlState) => new Promise((resolve, reject) => {
 })
 
 // conference functions
+const buildPolyDir = (xmlState) => {
+    for (let ctx of myCtx) {
+        let confs = xmlState.conferences.filter(conf => conf.context == ctx)
+        if (confs.length > 0) {
+            let dirxml = conftpl.getPolyDir(confs)
+            let dirpath = path.join(Provpaths.polycom, `${ctx}-directory.xml`)
+            fs.writeFileSync(dirpath, dirxml);
+        }
+    }
+}
+
+
+
 const buildNewConf = (xmlState, conf, newconfs) => {
     let newconf = {}
     if (xmlState.conferences.map(cnf => cnf.name).includes(conf.name)) {
@@ -363,9 +377,9 @@ const buildNewConf = (xmlState, conf, newconfs) => {
     fs.writeFileSync(newconfFile, newconfXml);
     newconfs.done.push(newconf);
     xmlState.conferences.push(newconf);
+    buildPolyDir(xmlState);
     return;
 }
-
 
 const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     if (conferences == []) {
