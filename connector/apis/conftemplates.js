@@ -52,3 +52,4 @@ getPolyDir = (confs) => {
 }
 
 exports.getConfFile = getConfFile;
+exports.getPolyDir = getPolyDir;
