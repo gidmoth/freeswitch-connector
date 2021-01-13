@@ -12,6 +12,8 @@ A suitable freeswitch-installation can be found
 >   * [Userfunctions](#userfunctions)
 >   * [Functions to maintain the system](#functions-to-maintain-the-system)
 
+---
+
 ## Concept
 
 Depending on your usecase the concept might fit to your needs
@@ -95,6 +97,8 @@ make the TLS work, and adapt all as necessary for your security-needs.
 See the `fasti.apiallow` property in
 [config.js](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/config.js).
 
+---
+
 ## API Reference
 
 Connector exposes a REST API to all users in the `fast.apiallow` context.
@@ -107,9 +111,11 @@ need to send Headers like this:
 All POST endpoints are validated against a JSON schema, for brevity the
 schema is given in the following for each case.
 
+---
+
 ### Userfunctions
 
-#### GET: /api/users
+#### `GET: /api/users`
 
 returns JSON with all users like this:
 
@@ -138,7 +144,7 @@ returns JSON with all users like this:
 }
 ```
 
-#### GET /api/users/[byid|byname|bycontext|bypolymac]/*yourstring*
+#### `GET: /api/users/[byid|byname|bycontext|bypolymac]/*yourstring*`
 
 Uses the given string to match the userarray against it. The matching
 is done with the stringmethod `.startsWith()`. So those Endpoints return an array, if more than one match is found (the given string for a polycom mac may be, e.g.,
@@ -149,7 +155,7 @@ The answers look like this:
 
 `{op: 'users/byid/yourstring', users: [{user},{user}...]}`
 
-#### GET: /api/users/byemail/*yourstring*
+#### `GET: /api/users/byemail/*yourstring*`
 
 The same as the endpoints aboth. But the email property is matched with the
 `.includes()` method, to be able to match all users in the same maildomain.
@@ -158,14 +164,14 @@ The answer looks like this:
 
 `{op: 'users/byemail/yourstring', users: [{user},{user}...]}`
 
-#### GET: /api/users/match/*yourstring*
+#### `GET: /api/users/match/*yourstring*`
 
 Matches `yourstring` against all emails and all names, checks if any
 of them includes your string. The answer looks like this:
 
 `{op: 'users/match/yourstring', namematches: [{user},{user}...], emailmatches: [{user},{user}...]}`
 
-#### POST: /api/users/add
+#### `POST: /api/users/add`
 
 Schema:
 
@@ -209,7 +215,7 @@ context you try to add him/her does not exists.
 Ids, which are the same as the phonenumbers in freeswitch, are assigned
 automatically.
 
-#### POST: /api/users/mod
+#### `POST: /api/users/mod`
 
 Schema:
 
@@ -255,7 +261,7 @@ with users filled in the arrays or not. Modding a user fails if
 the id does not exist, or the new email is not a formal email, or
 the new context does not exist.
 
-#### POST: /api/users/del
+#### `POST: /api/users/del`
 
 Schema:
 
@@ -282,7 +288,7 @@ The answer looks like this:
 with the arrays filled or not. Deleting users fails if the id is not
 found.
 
-#### GET: /api/users/rebuild
+#### `GET: /api/users/rebuild`
 
 Rebuilds all userfiles in the directory from the internal xml state.
 Useful if you make changes to the userfiles in the
@@ -295,7 +301,7 @@ The answer looks like this:
 Nothing should fail in this operation, so only the done array should
 contain users.
 
-#### GET: /api/users/reprov
+#### `GET: /api/users/reprov`
 
 Reprovisions all users from the internal xml state.
 Useful if you make changes to the userfiles in the
@@ -312,13 +318,26 @@ If you try connector with the
 [example freeswitch](https://github.com/gidmoth/freeswitch-container)
 you should run this endpoint to provision the users in there.
 
+---
+
+### Conference Functions
+
+#### `GET: /api/conferences`
+
+Returns JSON with a List of all conferences like that:
+
+```
+
+
+---
+
 ### Functions to maintain the system
 
 All paths mentioned in the following refer to the defaults as provided
 in
 [config.js](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/config.js).
 
-#### GET: /api/store/[directory|dialplan|conferences|freeswitch]
+#### `GET: /api/store/[directory|dialplan|conferences|freeswitch]`
 
 Stores a gzipped tar of the requested folder in `/static/store`.
 The folders are respectively:
@@ -335,7 +354,7 @@ So It's also for testing changes in the
 [Templates](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/apis/templates.js)
 or by hand, and being able to restore with the following endpoint.
 
-#### GET: /api/restore/[directory|dialplan|conferences|freeswitch]
+#### `GET: /api/restore/[directory|dialplan|conferences|freeswitch]`
 
 Restores the respective directory in `/etc-freeswitch` from a previously
 stored tarball in `/static/store`. After restoring this endpoint causes

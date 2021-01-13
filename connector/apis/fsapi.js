@@ -11,6 +11,7 @@ const emailRegex = require('email-regex');
 const passgen = require('generate-password');
 const fastiConf = require('../config').getConfig('fasti');
 const templates = require('./templates');
+const conftpl = require('./conftemplates');
 const reloadxml = require('../fseventusers/reloadxml');
 
 // utilities
@@ -329,8 +330,66 @@ const reprovUsers = (xmlState) => new Promise((resolve, reject) => {
     resolve(reproved);
 })
 
+// conference functions
+const buildNewConf = (xmlState, conf, newconfs) => {
+    let newconf = {}
+    if (xmlState.conferences.map(cnf => cnf.name).includes(conf.name)) {
+        newconfs.failed.push({
+            'error': 'name already taken',
+            'conference': conf
+        })
+        return;
+    }
+    if (!xmlState.conferencetypes.includes(conf.type)) {
+        newconfs.failed.push({
+            'error': 'type not implementet',
+            'conference': conf
+        })
+        return;
+    }
+    if (!(Contexts.hasOwnProperty(conf.context))) {
+        newconfs.failed.push({
+            'error': 'context does not exist',
+            'conference': conf
+        })
+        return;
+    }
+    newconf.num = getNext(xmlState, 'conf', conf.context);
+    newconf.type = conf.type;
+    newconf.context = conf.context;
+    newconf.name = conf.name.trim();
+    let newconfXml = conftpl.getConfFile(newconf);
+    let newconfFile = path.join(Confpath, `${newconf.num}.xml`);
+    fs.writeFileSync(newconfFile, newconfXml);
+    newconfs.done.push(newconf);
+    xmlState.conferences.push(newconf);
+    return;
+}
+
+
+const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
+    if (conferences == []) {
+        reject('no users given');
+    }
+    let newconfs = { op: 'conferences/add', done: [], failed: [] };
+    conferences.forEach(conf => {
+        buildNewConf(xmlState, conf, newconfs);
+    })
+    reloadxml.run(xmlState)
+        .then(msg => {
+            console.log(`reloadxml after newConfs: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
+    resolve(newconfs);
+});
+
+
 exports.newUsers = newUsers;
 exports.rebUsers = rebUsers;
 exports.reprovUsers = reprovUsers;
 exports.delUsers = delUsers;
 exports.modUsers = modUsers;
+exports.newConfs = newConfs;
