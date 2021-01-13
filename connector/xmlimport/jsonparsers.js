@@ -64,7 +64,6 @@ function parseConference(conf) {
 
 const parseDirectory = (dir) => {
     let pusers = [];
-    console.log(JSON.stringify(dir.section.domain.groups))
     dir.section.domain.groups.group.forEach(gr => {
         switch (typeof (gr.users)) {
             case 'string':
@@ -96,9 +95,21 @@ const parseConferences = (dialplan) => {
 
 const parseConfTypes = (confconf) => {
     let types = [];
-    confconf.configuration.profiles.profile.forEach(prof => {
-        types.push(prof.attrib_name);
-    })
+    switch (typeof (confconf.configuration.profiles)) {
+        case 'string':
+            break;
+        case 'object':
+            if (Array.isArray(confconf.configuration.profiles.profile)) {
+                confconf.configuration.profiles.profile.forEach(prof => {
+                    types.push(prof.attrib_name);
+                })
+            } else {
+                types.push(confconf.configuration.profiles.profile.attrib_name)
+            }
+            break;
+        default:
+            ;
+    }
     return types;
 }
 
