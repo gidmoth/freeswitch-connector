@@ -14,10 +14,10 @@ const getConfFile = (conf) => {
       xml += `<include>
     <extension name="${conf.name}">
         <condition field="destination_number" expression="${conf.num}">
-          <!-- force codec for all conferees -->
-          <action application="set" data="codec_string=G722"/>
-          <action application="answer"/>
-          <action application="conference" data="${conf.name}@${conf.type}+\${conpin}+flags{\${conf_flags}}"/>
+            <!-- force codec for all conferees -->
+            <action application="set" data="codec_string=G722"/>
+            <action application="answer"/>
+            <action application="conference" data="${conf.name}@${conf.type}+\${conpin}+flags{\${conf_flags}}"/>
         </condition>
     </extension>
 </include>
@@ -25,14 +25,14 @@ const getConfFile = (conf) => {
       break;
     case '48kHz-video':
       xml += `<include>
-      <extension name="${conf.name}">
-          <condition field="destination_number" expression="${conf.num}">
+    <extension name="${conf.name}">
+        <condition field="destination_number" expression="${conf.num}">
             <!-- force codec for all conferees -->
             <action application="set" data="codec_string=OPUS,H264"/>
             <action application="answer"/>
             <action application="conference" data="${conf.name}@${conf.type}+\${conpin}+flags{\${conf_flags}}"/>
-          </condition>
-      </extension>
+        </condition>
+    </extension>
 </include>
 `
       break;
@@ -44,16 +44,17 @@ const getConfFile = (conf) => {
 
 getPolyDir = (confs) => {
   let dirxml = `<directory>
-  <item_list>
+    <item_list>
 `
   for (let conf of confs) {
-    dirxml += `    <item>
-      <ln>${conf.name}</ln>
-      <ct>${conf.num}</ct>
-    </item>
-    `
+    dirxml += `        <item>
+            <fn>${conf.name}</fn>
+            <ln>${conf.type}</ln>
+            <ct>${conf.num}</ct>
+        </item>
+`
   }
-  dirxml += `  </item_list>
+  dirxml += `    </item_list>
 </directory>
 `
   return dirxml
