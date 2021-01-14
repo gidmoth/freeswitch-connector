@@ -54,21 +54,17 @@ const getConfArrays = (xmlState) => {
     colls[apiallow] = []
     colls[allow] = []
     colls[disallow] = []
-    console.log(`empty colls: ${JSON.stringify(colls)}`)
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.disallow)) {
         colls[fastiConf.apiallow].push(conf)
         colls[fastiConf.allow].push(conf)
         colls[fastiConf.disallow].push(conf)
-        console.log(`public filled: ${JSON.stringify(colls)}`)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.allow)) {
         colls[fastiConf.apiallow].push(conf)
         colls[fastiConf.allow].push(conf)
-        console.log(`friends filled: ${JSON.stringify(colls)}`)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.apiallow)) {
         colls[fastiConf.apiallow].push(conf)
-        console.log(`team filled: ${JSON.stringify(colls)}`)
     }
     return colls
 }
@@ -363,20 +359,30 @@ const buildPolyDir = (xmlState) => {
             fs.mkdirSync(path.join(Provpaths.polycom, `${ctx}`))
         }
         let confcols = getConfArrays(xmlState)
-        if (confcols[fastiConf.apiallow].length > 0) {
-            let dirxml = conftpl.getPolyDir(confcols[fastiConf.apiallow])
-            let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-            fs.writeFileSync(dirpath, dirxml);
-        }
-        if (confcols[fastiConf.allow].length > 0) {
-            let bdirxml = conftpl.getPolyDir(confcols[fastiConf.allow])
-            let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-            fs.writeFileSync(bdirpath, bdirxml);
-        }
-        if (confcols[fastiConf.disallow].length > 0) {
-            let cdirxml = conftpl.getPolyDir(confcols[fastiConf.disallow])
-            let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-            fs.writeFileSync(cdirpath, cdirxml);
+        switch (ctx) {
+            case fastiConf.apiallow:
+                if (confcols[fastiConf.apiallow].length > 0) {
+                    let dirxml = conftpl.getPolyDir(confcols[fastiConf.apiallow])
+                    let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(dirpath, dirxml);
+                }
+                break;
+            case fastiConf.allow:
+                if (confcols[fastiConf.allow].length > 0) {
+                    let bdirxml = conftpl.getPolyDir(confcols[fastiConf.allow])
+                    let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(bdirpath, bdirxml);
+                }
+                break;
+            case fastiConf.disallow:
+                if (confcols[fastiConf.disallow].length > 0) {
+                    let cdirxml = conftpl.getPolyDir(confcols[fastiConf.disallow])
+                    let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+                    fs.writeFileSync(cdirpath, cdirxml);
+                }
+                break;
+            default:
+                ;
         }
     }
 }
