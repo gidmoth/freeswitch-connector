@@ -388,8 +388,6 @@ const buildPolyDir = (xmlState) => {
     }
 }
 
-
-
 const buildNewConf = (xmlState, conf, newconfs) => {
     let newconf = {}
     if (xmlState.conferences.map(cnf => cnf.name).includes(conf.name)) {
@@ -443,7 +441,9 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
         });
     resolve(newconfs);
     buildPolyDir(xmlState);
-
+    for (let usr of xmlState.users) {
+        linProvUser(usr, xmlState)
+    }
 });
 
 
