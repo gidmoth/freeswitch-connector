@@ -54,17 +54,21 @@ const getConfArrays = (xmlState) => {
     colls[apiallow] = []
     colls[allow] = []
     colls[disallow] = []
+    console.log(`empty colls: ${JSON.stringify(colls)}`)
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.disallow)) {
         colls[fastiConf.apiallow].push(conf)
         colls[fastiConf.allow].push(conf)
         colls[fastiConf.disallow].push(conf)
+        console.log(`public filled: ${JSON.stringify(colls)}`)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.allow)) {
         colls[fastiConf.apiallow].push(conf)
         colls[fastiConf.allow].push(conf)
+        console.log(`friends filled: ${JSON.stringify(colls)}`)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.apiallow)) {
         colls[fastiConf.apiallow].push(conf)
+        console.log(`team filled: ${JSON.stringify(colls)}`)
     }
     return colls
 }
