@@ -42,7 +42,7 @@ const getLinContacts = (confarray, hostname, tlsport) => {
     contacts += `<section name="friend_${iter}">
       <entry name="url">"${conf.name} ${conf.type}" &lt;sip:${conf.num}@${hostname}:${tlsport}&gt;</entry>
       <entry name="pol">accept</entry>
-      <entry name="subscribe">0</entry>
+      <entry name="subscribe">1</entry>
     </section>
 `
     iter++
