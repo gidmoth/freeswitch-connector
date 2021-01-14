@@ -55,16 +55,16 @@ const getConfArrays = (xmlState) => {
     colls[allow] = []
     colls[disallow] = []
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.disallow)) {
-        colls.apiallow.push(conf)
-        colls.allow.push(conf)
-        colls.disallow.push(conf)
+        colls[fastiConf.apiallow].push(conf)
+        colls[fastiConf.allow].push(conf)
+        colls[fastiConf.disallow].push(conf)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.allow)) {
-        colls.apiallow.push(conf)
-        colls.allow.push(conf)
+        colls[fastiConf.apiallow].push(conf)
+        colls[fastiConf.allow].push(conf)
     }
     for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.apiallow)) {
-        colls.apiallow.push(conf)
+        colls[fastiConf.apiallow].push(conf)
     }
     return colls
 }
