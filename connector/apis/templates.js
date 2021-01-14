@@ -35,7 +35,23 @@ const getUserFile = (user) => {
 `
 }
 
-const getLinXml = (user, hostname, tlsport) => {
+const getLinContacts = (confarray, hostname, tlsport) => {
+  let iter = 0
+  let contacts = ''
+  for (let conf of confarray) {
+    contacts += `<section name="friend_${iter}">
+      <entry name="url">"${conf.name} ${conf.type}" &lt;sip:${hostname}:${tlsport}&gt;</entry>
+      <entry name="pol">accept</entry>
+      <entry name="subscribe">0</entry>
+    </section>
+`
+    iter++
+  }
+  return contacts
+}
+
+const getLinXml = (user, hostname, tlsport, confObj) => {
+  let mycontacts = getLinContacts(confObj[user.context], hostname, tlsport)
   return `<?xml version="1.0" encoding="UTF-8"?>
   <config xmlns="http://www.linphone.org/xsds/lpconfig.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.linphone.org/xsds/lpconfig.xsd lpconfig.xsd">
     <section name="proxy_0" overwrite="true">
@@ -68,6 +84,7 @@ const getLinXml = (user, hostname, tlsport) => {
       <entry name="realm"  overwrite="true">${hostname}</entry>
       <entry name="domain" overwrite="true">${hostname}</entry>
     </section>
+      ${mycontacts}
     <section name="misc">
       <entry name="config-uri" overwrite="true">https://${user.name}:${user.password}@${hostname}/linphone</entry>
     </section>

@@ -70,7 +70,8 @@ const getConfArrays = (xmlState) => {
 }
 
 const linProvUser = (user, xmlState) => {
-    let linphoneXml = templates.getLinXml(user, xmlState.globals.hostname, xmlState.globals.internal_tls_port)
+    let confObj = getConfArrays(xmlState)
+    let linphoneXml = templates.getLinXml(user, xmlState.globals.hostname, xmlState.globals.internal_tls_port, confObj)
     let linphoneFile = path.join(Provpaths.linphone, `${user.id}/linphone.xml`)
     if (!(fs.existsSync(path.dirname(linphoneFile)))) {
         fs.mkdirSync(path.dirname(linphoneFile))
@@ -440,8 +441,9 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
             console.log(err)
             reject(err)
         });
-    buildPolyDir(xmlState);
     resolve(newconfs);
+    buildPolyDir(xmlState);
+
 });
 
 
