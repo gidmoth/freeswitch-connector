@@ -39,7 +39,7 @@ const getLinContacts = (confarray, hostname, tlsport) => {
   let iter = 0
   let contacts = ''
   for (let conf of confarray) {
-    contacts += `<section name="friend_${iter}">
+    contacts += `    <section name="friend_${iter}">
       <entry name="url">"${conf.name} ${conf.type}" &lt;sip:${conf.num}@${hostname}:${tlsport}&gt;</entry>
       <entry name="pol">accept</entry>
       <entry name="subscribe">1</entry>
@@ -84,7 +84,7 @@ const getLinXml = (user, hostname, tlsport, confObj) => {
       <entry name="realm"  overwrite="true">${hostname}</entry>
       <entry name="domain" overwrite="true">${hostname}</entry>
     </section>
-      ${mycontacts}
+${mycontacts}
     <section name="misc">
       <entry name="config-uri" overwrite="true">https://${user.name}:${user.password}@${hostname}/linphone</entry>
     </section>

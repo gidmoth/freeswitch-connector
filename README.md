@@ -380,6 +380,11 @@ conference fails if the name is already taken, the context does not
 exist, or the type of conference is not implementet as profile
 in freeswitchs `conference.conf.xml`.
 
+Adding one or more conferences will trigger an update of the contacts
+provisioning for linphone and polycom phones.
+
+
+
 ### Functions to maintain the system
 
 All paths mentioned in the following refer to the defaults as provided
