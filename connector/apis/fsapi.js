@@ -48,6 +48,27 @@ const polyProvUser = (user, xmlState) => {
     fs.writeFileSync(allprovFile, allprovXml)
 }
 
+const getConfArrays = (xmlState) => {
+    let { apiallow, allow, disallow } = fastiConf
+    let colls = {}
+    colls[apiallow] = []
+    colls[allow] = []
+    colls[disallow] = []
+    for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.disallow)) {
+        colls.apiallow.push(conf)
+        colls.allow.push(conf)
+        colls.disallow.push(conf)
+    }
+    for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.allow)) {
+        colls.apiallow.push(conf)
+        colls.allow.push(conf)
+    }
+    for (let conf of xmlState.conferences.filter(c => c.context == fastiConf.apiallow)) {
+        colls.apiallow.push(conf)
+    }
+    return colls
+}
+
 const linProvUser = (user, xmlState) => {
     let linphoneXml = templates.getLinXml(user, xmlState.globals.hostname, xmlState.globals.internal_tls_port)
     let linphoneFile = path.join(Provpaths.linphone, `${user.id}/linphone.xml`)
@@ -337,35 +358,21 @@ const buildPolyDir = (xmlState) => {
         if (!(fs.existsSync(path.join(Provpaths.polycom, `${ctx}`)))) {
             fs.mkdirSync(path.join(Provpaths.polycom, `${ctx}`))
         }
-        switch (ctx) {
-            case fastiConf.apiallow:
-                let confs = xmlState.conferences
-                if (confs.length > 0) {
-                    let dirxml = conftpl.getPolyDir(confs)
-                    let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-                    fs.writeFileSync(dirpath, dirxml);
-                }
-                break;
-            case fastiConf.allow:
-                let bconfs = xmlState.conferences.filter(conf => conf.context == ctx)
-                let cconfs = xmlState.conferences.filter(conf => conf.context == fastiConf.disallow)
-                cconfs.forEach(c => bconfs.push(c))
-                if (bconfs.length > 0) {
-                    let bdirxml = conftpl.getPolyDir(bconfs)
-                    let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-                    fs.writeFileSync(bdirpath, bdirxml);
-                }
-                break;
-            case fastiConf.disallow:
-                let dconfs = xmlState.conferences.filter(conf => conf.context == ctx)
-                if (dconfs.length > 0) {
-                    let cdirxml = conftpl.getPolyDir(dconfs)
-                    let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-                    fs.writeFileSync(cdirpath, cdirxml);
-                }
-                break;
-            default:
-                ;
+        let confcols = getConfArrays(xmlState)
+        if (confcols[fastiConf.apiallow].length > 0) {
+            let dirxml = conftpl.getPolyDir(confcols[fastiConf.apiallow])
+            let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+            fs.writeFileSync(dirpath, dirxml);
+        }
+        if (confcols[fastiConf.allow].length > 0) {
+            let bdirxml = conftpl.getPolyDir(confcols[fastiConf.allow])
+            let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+            fs.writeFileSync(bdirpath, bdirxml);
+        }
+        if (confcols[fastiConf.disallow].length > 0) {
+            let cdirxml = conftpl.getPolyDir(confcols[fastiConf.disallow])
+            let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+            fs.writeFileSync(cdirpath, cdirxml);
         }
     }
 }
@@ -404,7 +411,6 @@ const buildNewConf = (xmlState, conf, newconfs) => {
     fs.writeFileSync(newconfFile, newconfXml);
     newconfs.done.push(newconf);
     xmlState.conferences.push(newconf);
-    buildPolyDir(xmlState);
     return;
 }
 
@@ -424,6 +430,7 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
             console.log(err)
             reject(err)
         });
+    buildPolyDir(xmlState);
     resolve(newconfs);
 });
 
