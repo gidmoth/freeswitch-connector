@@ -40,7 +40,7 @@ const getLinContacts = (confarray, hostname, tlsport) => {
   let contacts = ''
   for (let conf of confarray) {
     contacts += `<section name="friend_${iter}">
-      <entry name="url">"${conf.name} ${conf.type}" &lt;sip:${hostname}:${tlsport}&gt;</entry>
+      <entry name="url">"${conf.name} ${conf.type}" &lt;sip:${conf.num}@${hostname}:${tlsport}&gt;</entry>
       <entry name="pol">accept</entry>
       <entry name="subscribe">0</entry>
     </section>
