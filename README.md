@@ -491,7 +491,8 @@ With the arrays filled or not. Modding a conference fails if the
 conference (by its `num` property) does not exist, the new context
 does not exist, the new type is not implementet in freeswitchs
 `conferences.conf.xml`, or the new name is already taken by another
-conference.
+conference. The modded conference will keep it's number unless
+you change the context, then it will get a new number.
 
 Remember to run `GET: /api/conferences/rebuildcontacts` after
 changes to conferences, if you wish the provisioned contacts
@@ -529,4 +530,103 @@ from informations gathered through the eventsocket.
 
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
+
+#### `GET: /api/info`
+
+Returns some metainfo about connector and the global variables of
+freeswitch. The answer looks like this:
+
+```
+{
+    "op": "info",
+    "info": {
+        "reloadxml": {
+            "lastrun": "not till now",
+            "lastmsg": "no Message"
+        },
+        "maintainance": {
+            "lastrun": "2021-01-15T15:01:46.560Z"
+        }
+    },
+    "globals": {
+        "hostname": "fcos.c8h10n4o2.news",
+        "local_ip_v4": "46.4.114.220",
+        ...
+    }
+}
+```
+
+#### `GET: /api/info/state`
+
+Returns the whole internal state of connector, the answer looks like
+this:
+
+```
+{
+    "op": "info/state",
+    "state": {
+        "info": {
+            "reloadxml": {
+                "lastrun": "not till now",
+                "lastmsg": "no Message"
+            },
+            "maintainance": {
+                "lastrun": "2021-01-15T15:01:46.560Z"
+            }
+        },
+        "globals": {
+            "hostname": "fcos.c8h10n4o2.news",
+            "local_ip_v4": "46.4.114.220",
+            ...
+
+        },
+        "users": [
+            {
+                "id": "20000",
+                "password": "napw",
+                "conpin": "2357",
+                "context": "team",
+                "name": "teamuser1",
+                "email": "teamuser1@example.com",
+                "polymac": "none"
+            },
+            ...
+        ],
+        "conferencetypes": [
+            "16kHz-novideo",
+            "48kHz-video"
+        ],
+        "conferences": [
+            {
+                "num": "30000",
+                "name": "team_g722",
+                "type": "16kHz-novideo",
+                "context": "team"
+            },
+            ...
+        ],
+        "availUsrIds": {
+            "team": {},
+            "friends": {},
+            "public": {}
+        },
+        "availConfNums": {
+            "team": {},
+            "friends": {},
+            "public": {}
+        }
+    }
+}
+```
+
+The last two properties of the serialized state object,
+`availUsrIds` and `availConfNums`,
+will always contain what looks like empty objects. The reason
+is that they're sets, and serialized like this by fastify.
+The real contents are calculated atomatically, exploiting the
+property of sets, not to contain duplicates, to ensure
+consistency of user ids (phonenumbers) and conference phonenumbers
+(theese are like ids for connector).
+
+
 
