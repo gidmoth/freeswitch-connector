@@ -29,6 +29,42 @@ async function confroutes(fastify, options) {
         }
     }
 
+    const confDelSchema = {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/confDelSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    num: { type: 'string' }
+                },
+                required: ['num'],
+                additionalProperties: false
+            }
+        }
+    }
+
+    const confModSchema = {
+        $schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/confAddSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    num: { type: 'string' },
+                    name: { type: 'string' },
+                    type: { type: 'string' },
+                    context: { type: 'string' },
+                },
+                required: ['num'],
+                additionalProperties: false
+            }
+        }
+    }
+
+
     // get all conferences
     fastify.get('/api/conferences', async function (req, reply) {
         function ctxNums(Contexts, confarray) {
@@ -55,6 +91,30 @@ async function confroutes(fastify, options) {
         FsOps.newConfs(this.xmlState, req.body)
             .then(newconfs => {
                 reply.send(newconfs);
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
+    })
+
+    // delete conferences
+    fastify.post('/api/conferences/del', { schema: confDelSchema }, async function (req, reply) {
+        FsOps.delConfs(this.xmlState, req.body)
+            .then(delconfs => {
+                reply.send(delconfs);
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
+    })
+
+    // modify conferences
+    fastify.post('/api/conferences/mod', { schema: confModSchema }, async function (req, reply) {
+        FsOps.modConfs(this.xmlState, req.body)
+            .then(modconfs => {
+                reply.send(modconfs);
             })
             .catch(error => {
                 fastify.log.error(error)

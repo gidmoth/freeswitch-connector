@@ -423,9 +423,87 @@ const buildNewConf = (xmlState, conf, newconfs) => {
     return;
 }
 
+const delConf = (xmlState, conf, delconfs) => {
+    let deletet = xmlState.conferences.filter(cnf => cnf.num == conf.num)
+    if (deletet.length < 1) {
+        delconfs.failed.push({
+            'error': `no conference ${conf.num}`,
+            'conference': conf
+        })
+        return;
+    }
+    let delconfFile = path.join(Confpath, `${conf.num}.xml`);
+    fs.unlinkSync(delconfFile)
+    delconfs.done.push(deletet[0])
+    return;
+}
+
+const modConf = (xmlState, conf, modconfs) => {
+    let modded = xmlState.conferences.filter(cnf => cnf.num == conf.num)
+    if (modded.length < 1) {
+        modconfs.failed.push({
+            'error': `no conference ${conf.num}`,
+            'conference': conf
+        })
+        return;
+    }
+    let oldconf = modded[0]
+    if (! conf.hasOwnProperty('name')) {
+        conf.name = oldconf.name
+    }
+    if (! conf.hasOwnProperty('context')) {
+        conf.context = oldconf.context
+    }
+    if (! conf.hasOwnProperty('type')) {
+        conf.type = oldconf.type
+    }
+    let moddedconf = {}
+    if (oldconf.context == conf.context) {
+        moddedconf.num = conf.num
+    } else {
+        if (!(Contexts.hasOwnProperty(conf.context))) {
+            modconfs.failed.push({
+                'error': 'context does not exist',
+                'conference': conf
+            })
+            return;
+        }
+        moddedconf.num = getNext(xmlState, 'conf', conf.context)
+    }
+    if (oldconf.name == conf.name) {
+        moddedconf.name = conf.name
+    } else {
+        if (xmlState.conferences.map(cnf => cnf.name).includes(conf.name)) {
+            modconfs.failed.push({
+                'error': 'name already taken',
+                'conference': conf
+            })
+            return;
+        } else {
+            moddedconf.name = conf.name
+        }
+    }
+    if (!xmlState.conferencetypes.includes(conf.type)) {
+        modconfs.failed.push({
+            'error': 'type not implementet',
+            'conference': conf
+        })
+        return;
+    }
+    moddedconf.type = conf.type
+    let oldconfFile = path.join(Confpath, `${oldconf.num}.xml`);
+    fs.unlinkSync(oldconfFile)
+    let moddedconfXml = conftpl.getConfFile(moddedconf);
+    let moddedconfFile = path.join(Confpath, `${moddedconf.num}.xml`);
+    fs.writeFileSync(moddedconfFile, moddedconfXml);
+    modconfs.done.push(moddedconf);
+    xmlState.conferences.push(moddedconf);
+    return;
+}
+
 const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     if (conferences == []) {
-        reject('no users given');
+        reject('no conferences given');
     }
     let newconfs = { op: 'conferences/add', done: [], failed: [] };
     conferences.forEach(conf => {
@@ -446,6 +524,52 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     }
 });
 
+const modConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
+    if (conferences == []) {
+        reject('no conferences given');
+    }
+    let modconfs = { op: 'conferences/mod', done: [], failed: [] };
+    conferences.forEach(conf => {
+        modConf(xmlState, conf, modconfs);
+    })
+    reloadxml.run(xmlState)
+        .then(msg => {
+            console.log(`reloadxml after modConfs: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
+    resolve(modconfs);
+    buildPolyDir(xmlState);
+    for (let usr of xmlState.users) {
+        linProvUser(usr, xmlState)
+    }
+});
+
+const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
+    if (conferences == []) {
+        reject('no conferences given');
+    }
+    let delconfs = { op: 'conferences/del', done: [], failed: [] };
+    conferences.forEach(conf => {
+        delConf(xmlState, conf, delconfs);
+    })
+    reloadxml.run(xmlState)
+        .then(msg => {
+            console.log(`reloadxml after delConfs: ${msg.trim()}`)
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        });
+    resolve(delconfs);
+    buildPolyDir(xmlState);
+    for (let usr of xmlState.users) {
+        linProvUser(usr, xmlState)
+    }
+});
+
 
 exports.newUsers = newUsers;
 exports.rebUsers = rebUsers;
@@ -453,3 +577,5 @@ exports.reprovUsers = reprovUsers;
 exports.delUsers = delUsers;
 exports.modUsers = modUsers;
 exports.newConfs = newConfs;
+exports.delConfs = delConfs;
+exports.modConfs = modConfs;

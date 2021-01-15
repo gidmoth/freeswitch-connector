@@ -383,7 +383,80 @@ in freeswitchs `conference.conf.xml`.
 Adding one or more conferences will trigger an update of the contacts
 provisioning for linphone and polycom phones.
 
+#### `POST: /api/conference/del`
 
+Schema:
+
+```
+$schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/confDelSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    num: { type: 'string' }
+                },
+                required: ['num'],
+                additionalProperties: false
+            }
+        }
+```
+
+Deletes conferences by the num property, that is the number
+of the conference in the dialplan. You can bulk-delete conferences.
+
+The answer looks like this:
+
+`{ op: 'conferences/del', done:[], failed:[] }`
+
+Deleting a conference will fail if a conference with the requested
+number is not found.
+
+Deleting conferences will trigger an update of the provisioned
+contact lists.
+
+#### `POST: /api/conferences/mod`
+
+Schema:
+
+```
+$schema: 'http://json-schema.org/draft-07/schema#',
+        $id: 'gidmoth/confAddSchema',
+        body: {
+            type: 'array',
+            items: {
+                type: 'object',
+                properties: {
+                    num: { type: 'string' },
+                    name: { type: 'string' },
+                    type: { type: 'string' },
+                    context: { type: 'string' },
+                },
+                required: ['num'],
+                additionalProperties: false
+            }
+        }
+```
+
+Modify conferences. If you give only the number there
+will be no effect except a rebuild of the file in the dialplan.
+It normally makes no sense, in contrast to the usermod interface,
+where a user only modded by providing his/her id will get a new
+password and the polycom provisioning will be deleted.
+
+The Answer looks like this:
+
+`{ op: 'conferences/del', done:[], failed:[] }`
+
+With the arrays filled or not. Modding a conference fails if the
+conference (by its `num` property) does not exist, the new context
+does not exist, the new type is not implementet in freeswitchs
+`conferences.conf.xml`, or the new name is already taken by another
+conference.
+
+Modding conferences will trigger an update of the provisioned
+contacts.
 
 ### Functions to maintain the system
 
