@@ -82,6 +82,12 @@ async function maitainroutes(fastify, options) {
         answer.globals = this.xmlState.globals
         return answer
     })
+
+    fastify.get('/api/info/state', async function (req, reply) {
+        let answer = { op: 'info/state' }
+        answer.state = this.xmlState
+        return answer
+    })
 }
 
 module.exports = maitainroutes
