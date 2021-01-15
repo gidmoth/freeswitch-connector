@@ -448,13 +448,13 @@ const modConf = (xmlState, conf, modconfs) => {
         return;
     }
     let oldconf = modded[0]
-    if (! conf.hasOwnProperty('name')) {
+    if (!conf.hasOwnProperty('name')) {
         conf.name = oldconf.name
     }
-    if (! conf.hasOwnProperty('context')) {
+    if (!conf.hasOwnProperty('context')) {
         conf.context = oldconf.context
     }
-    if (! conf.hasOwnProperty('type')) {
+    if (!conf.hasOwnProperty('type')) {
         conf.type = oldconf.type
     }
     let moddedconf = {}
@@ -512,16 +512,16 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after newConfs: ${msg.trim()}`)
+            buildPolyDir(xmlState);
+            for (let usr of xmlState.users) {
+                linProvUser(usr, xmlState)
+            }
         })
         .catch(err => {
             console.log(err)
             reject(err)
         });
     resolve(newconfs);
-    buildPolyDir(xmlState);
-    for (let usr of xmlState.users) {
-        linProvUser(usr, xmlState)
-    }
 });
 
 const modConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
@@ -535,16 +535,16 @@ const modConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after modConfs: ${msg.trim()}`)
+            buildPolyDir(xmlState);
+            for (let usr of xmlState.users) {
+                linProvUser(usr, xmlState)
+            }
         })
         .catch(err => {
             console.log(err)
             reject(err)
         });
     resolve(modconfs);
-    buildPolyDir(xmlState);
-    for (let usr of xmlState.users) {
-        linProvUser(usr, xmlState)
-    }
 });
 
 const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
@@ -558,16 +558,16 @@ const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after delConfs: ${msg.trim()}`)
+            buildPolyDir(xmlState);
+            for (let usr of xmlState.users) {
+                linProvUser(usr, xmlState)
+            }
         })
         .catch(err => {
             console.log(err)
             reject(err)
         });
     resolve(delconfs);
-    buildPolyDir(xmlState);
-    for (let usr of xmlState.users) {
-        linProvUser(usr, xmlState)
-    }
 });
 
 
