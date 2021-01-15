@@ -558,12 +558,18 @@ const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     resolve(delconfs);
 });
 
-const rebuildContacts = (xmlState) => {
+const rebuildContacts = (xmlState) => new Promise ((resolve, reject) => {
+    if (xmlState == {}) {
+        reject('xmlstate empty')
+    }
+    let recon = { op: 'conferences/rebuildcontacts', done: ''}
     buildPolyDir(xmlState);
     for (let usr of xmlState.users) {
         linProvUser(usr, xmlState)
     }
-}
+    recon.done = new Date()
+    resolve(recon);
+})
 
 
 exports.newUsers = newUsers;

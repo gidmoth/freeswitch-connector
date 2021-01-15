@@ -88,10 +88,14 @@ async function confroutes(fastify, options) {
 
     // rebuild contacts lists
     fastify.get('/api/conferences/rebuildcontacts'), async function (req, reply) {
-        let retobj = {op: 'conferences/rebuildcontacts', done: ``}
         FsOps.rebuildContacts(this.xmlState)
-        retobj.done = new Date()
-        return retobj
+            .then(recon => {
+                reply.send(recon);
+            })
+            .catch(error => {
+                fastify.log.error(error)
+                reply.send(`error: ${error}`)
+            })
     }
 
     // add conferences
