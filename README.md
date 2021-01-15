@@ -344,6 +344,28 @@ Returns JSON with a List of all conferences like that:
 }
 ```
 
+#### `GET: /api/conferences/rebuildcontacts`
+
+Rebuilds the contacts that are provisioned to clients.
+
+Contacts are only provisioned for conferences, not for the users.
+
+Rebuilding those is a somewhat expensive operation, since Linphone can't be provisioned
+with contacts by a file besides it's whole configuration. So all Linphone
+provisioning is rebuilt by this opertation. (The alternative: calculate
+all provisioning for Linphone when requested, would be even more expensive,
+since provisioning should be more often requested than changes in the contacts
+take place.)
+
+Also: due to the concept of connector, it would be a hack to ensure consistency of
+the contacts if this operation was done automatically after each
+change in the conferences. So don't forget to run this
+endpoint after you add, mod, or delete conferences.
+
+The answer looks like this:
+
+`{op: 'conferences/rebuildcontacts', done: `${new Date()}`}`
+
 #### `POST: /api/conferences/add`
 
 Schema:
@@ -380,8 +402,9 @@ conference fails if the name is already taken, the context does not
 exist, or the type of conference is not implementet as profile
 in freeswitchs `conference.conf.xml`.
 
-Adding one or more conferences will trigger an update of the contacts
-provisioning for linphone and polycom phones.
+Remember to run `GET: /api/conferences/rebuildcontacts` after
+changes to conferences, if you wish the provisioned contacts
+lists updated.
 
 #### `POST: /api/conference/del`
 
@@ -413,8 +436,9 @@ The answer looks like this:
 Deleting a conference will fail if a conference with the requested
 number is not found.
 
-Deleting conferences will trigger an update of the provisioned
-contact lists.
+Remember to run `GET: /api/conferences/rebuildcontacts` after
+changes to conferences, if you wish the provisioned contacts
+lists updated.
 
 #### `POST: /api/conferences/mod`
 
@@ -455,8 +479,9 @@ does not exist, the new type is not implementet in freeswitchs
 `conferences.conf.xml`, or the new name is already taken by another
 conference.
 
-Modding conferences will trigger an update of the provisioned
-contacts.
+Remember to run `GET: /api/conferences/rebuildcontacts` after
+changes to conferences, if you wish the provisioned contacts
+lists updated.
 
 ### Functions to maintain the system
 

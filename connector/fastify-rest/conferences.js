@@ -86,6 +86,12 @@ async function confroutes(fastify, options) {
         return conferences
     })
 
+    // rebuild contacts lists
+    fastify.get('/api/conferences/rebuildcontacts'), async function (req, reply) {
+        FsOps.rebuildContacts(this.xmlState)
+        return {op: 'conferences/rebuildcontacts', done: `${new Date()}`}
+    }
+
     // add conferences
     fastify.post('/api/conferences/add', { schema: confAddSchema }, async function (req, reply) {
         FsOps.newConfs(this.xmlState, req.body)

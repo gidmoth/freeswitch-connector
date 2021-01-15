@@ -512,10 +512,6 @@ const newConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after newConfs: ${msg.trim()}`)
-            buildPolyDir(xmlState);
-            for (let usr of xmlState.users) {
-                linProvUser(usr, xmlState)
-            }
         })
         .catch(err => {
             console.log(err)
@@ -535,10 +531,6 @@ const modConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after modConfs: ${msg.trim()}`)
-            buildPolyDir(xmlState);
-            for (let usr of xmlState.users) {
-                linProvUser(usr, xmlState)
-            }
         })
         .catch(err => {
             console.log(err)
@@ -558,10 +550,6 @@ const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     reloadxml.run(xmlState)
         .then(msg => {
             console.log(`reloadxml after delConfs: ${msg.trim()}`)
-            buildPolyDir(xmlState);
-            for (let usr of xmlState.users) {
-                linProvUser(usr, xmlState)
-            }
         })
         .catch(err => {
             console.log(err)
@@ -569,6 +557,13 @@ const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
         });
     resolve(delconfs);
 });
+
+const rebuildContacts = (xmlState) => {
+    buildPolyDir(xmlState);
+    for (let usr of xmlState.users) {
+        linProvUser(usr, xmlState)
+    }
+}
 
 
 exports.newUsers = newUsers;
@@ -579,3 +574,4 @@ exports.modUsers = modUsers;
 exports.newConfs = newConfs;
 exports.delConfs = delConfs;
 exports.modConfs = modConfs;
+exports.rebuildContacts = rebuildContacts;
