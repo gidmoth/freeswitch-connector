@@ -366,6 +366,20 @@ The answer looks like this:
 
 `{op: 'conferences/rebuildcontacts', done: `${new Date()}`}`
 
+If you try connector with the
+[example freeswitch](https://github.com/gidmoth/freeswitch-container)
+you should run this endpoint to fill the contacts lists initially.
+
+#### `GET: /api/conferences/[bynum|bytype|byname|bycontext]/*yourstring*`
+
+Functions to filter the conference array. matching is done with the
+stringmethod `.startsWith()`, which is useful or not, depending on your
+naming conventions.
+
+The answer looks like this:
+
+`{op: 'conferences/byname/yourstring', conferences: [{conf},...]}`
+
 #### `POST: /api/conferences/add`
 
 Schema:

@@ -86,6 +86,38 @@ async function confroutes(fastify, options) {
         return conferences
     })
 
+    fastify.get('/api/conferences/bynum/:num', async function (req, reply) {
+        let conferences = {
+            op: `conferences/bynum/${req.params.num}`,
+            conferences: this.xmlState.conferences.filter(cnf => cnf.num.startsWith(req.params.num))
+        }
+        return conferences
+    })
+
+    fastify.get('/api/conferences/byname/:name', async function (req, reply) {
+        let conferences = {
+            op: `conferences/byname/${req.params.name}`,
+            conferences: this.xmlState.conferences.filter(cnf => cnf.name.startsWith(req.params.name))
+        }
+        return conferences
+    })
+
+    fastify.get('/api/conferences/bytype/:type', async function (req, reply) {
+        let conferences = {
+            op: `conferences/bytype/${req.params.type}`,
+            conferences: this.xmlState.conferences.filter(cnf => cnf.type.startsWith(req.params.type))
+        }
+        return conferences
+    })
+
+    fastify.get('/api/conferences/bycontext/:ctx', async function (req, reply) {
+        let conferences = {
+            op: `conferences/bycontext/${req.params.ctx}`,
+            conferences: this.xmlState.conferences.filter(cnf => cnf.context.startsWith(req.params.ctx))
+        }
+        return conferences
+    })
+
     // rebuild contacts lists
     fastify.get('/api/conferences/rebuildcontacts', async function (req, reply) {
         FsOps.rebuildContacts(this.xmlState)
