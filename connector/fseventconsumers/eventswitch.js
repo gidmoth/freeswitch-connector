@@ -46,6 +46,7 @@ const handle = (event, xmlState) => {
         }
         default: {
             console.log(eventName)
+            console.log(event.serialize(json))
             console.log(event.getBody())
             break;
         }
