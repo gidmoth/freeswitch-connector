@@ -13,7 +13,7 @@ const Event = {
 };
 
 const handle = (event, xmlState) => {
-    const eventName = event.getHeader('Event-Name');
+    let eventName = event.getHeader('Event-Name');
     switch (eventName) {
         case Event.Channel.CREATE: {
             ;
@@ -44,10 +44,11 @@ const handle = (event, xmlState) => {
                 }
             }
         }
-        default:
-            ;
-            // A new unhandled event has been received...
+        default: {
+            console.log(eventName)
+            console.log(event.getBody())
             break;
+        }
     }
 };
 
