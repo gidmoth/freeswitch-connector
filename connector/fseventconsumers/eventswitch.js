@@ -54,7 +54,7 @@ const handle = (event, xmlState) => {
                     .then(answer => {
                         console.log(answer)
                     })
-                    .ctach(err => {
+                    .catch(err => {
                         console.log(err)
                     })
                     break;
