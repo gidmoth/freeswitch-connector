@@ -3,6 +3,7 @@
  */
 
 const maintain = require('../maintainance');
+const muteall = require('../fseventusers/muteallfunc')
 
 const Event = {
     Channel: {
@@ -48,8 +49,14 @@ const handle = (event, xmlState) => {
             let mymsg = event.getHeader('Data')
             switch (mymsg) {
                 case 'muteall': {
-                    console.log(mymsg)
-                    console.log(event.getHeader('Conference-Name'))
+                    let conference = event.getHeader('Conference-Name')
+                    muteall.run(conference)
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .ctach(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 default: {
