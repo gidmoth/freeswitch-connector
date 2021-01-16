@@ -15,23 +15,35 @@ const Event = {
 const handle = (event, xmlState) => {
     const eventName = event.getHeader('Event-Name');
     switch (eventName) {
-        case Event.Channel.CREATE:
+        case Event.Channel.CREATE: {
             ;
             // ...
             break;
-        case Event.Channel.HANGUP:
+        }
+        case Event.Channel.HANGUP: {
             ;
             // ...
             break;
-        case Event.BACKGROUND_JOB:
+        }
+        case Event.BACKGROUND_JOB: {
             let jobname = event.getHeader('Job-Command');
-            if(jobname == 'reloadxml' && event.getBody().startsWith('+OK')) {
-                maintain.updateXmlState(xmlState);
-                console.log(`${jobname}: ${event.getBody().trim()}`);
-            } else {
-                console.log(`${jobname}`);
+            switch (jobname) {
+                case 'reloadxml': {
+                    if (event.getBody().startsWith('+OK')) {
+                        maintain.updateXmlState(xmlState);
+                        console.log(`${jobname}: ${event.getBody().trim()}`);
+                    } else {
+                        console.log(`ERROR: ${jobname}: ${event.getBody().trim()}`)
+                    }
+                    break;
+                }
+                default: {
+                    console.log(jobname)
+                    console.log(event.getBody())
+                    break;
+                }
             }
-            break;
+        }
         default:
             ;
             // A new unhandled event has been received...

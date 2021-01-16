@@ -549,7 +549,7 @@ freeswitch. The answer looks like this:
         }
     },
     "globals": {
-        "hostname": "fcos.c8h10n4o2.news",
+        "hostname": "host.example.com",
         "local_ip_v4": "46.4.114.220",
         ...
     }
@@ -575,7 +575,7 @@ this:
             }
         },
         "globals": {
-            "hostname": "fcos.c8h10n4o2.news",
+            "hostname": "host.example.com",
             "local_ip_v4": "46.4.114.220",
             ...
 
