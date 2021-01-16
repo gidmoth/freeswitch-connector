@@ -44,10 +44,24 @@ const handle = (event, xmlState) => {
                 }
             }
         }
+        case 'CUSTOM': {
+            let mymsg = event.getHeader('Data')
+            switch (mymsg) {
+                case 'muteall': {
+                    console.log(mymsg)
+                    console.log(event.getHeader('Conference-Name'))
+                    break;
+                }
+                default: {
+                    break;
+                }
+
+            }
+        }
         default: {
-            console.log(eventName)
-            console.log(event.serialize('json'))
-            console.log(event.getBody())
+        //    console.log(eventName)
+        //    console.log(event.serialize('json'))
+        //    console.log(event.getBody())
             break;
         }
     }
