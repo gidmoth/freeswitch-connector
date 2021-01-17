@@ -39,6 +39,10 @@ const handle = (event, xmlState) => {
                     }
                     break;
                 }
+                case 'checkrecording': {
+                    console.log(event.serialize('json'))
+                    break;
+                }
                 default: {
                     // console.log(jobname)
                     // console.log(event.getBody())
@@ -62,7 +66,7 @@ const handle = (event, xmlState) => {
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    let filename = `${conference}-${new Date().toISOString()}.wav`
+                    let filename = `\${recordings_dir}/${conference}-${new Date().toISOString()}.wav`
                     record.startrec(conference, filename)
                     .then(answer => {
                         console.log(answer)
@@ -74,17 +78,35 @@ const handle = (event, xmlState) => {
                 }
                 case 'pauserecording': {
                     let conference = event.getHeader('Conference-Name')
-             
+                    record.pauserec(conference, 'all')
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 case 'resumerecording': {
                     let conference = event.getHeader('Conference-Name')
-             
+                    record.resumerec(conference, 'all')
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 case 'stoprecording': {
                     let conference = event.getHeader('Conference-Name')
-             
+                    record.stoprec(conference, 'all')
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 case 'checkrecording': {
