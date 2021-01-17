@@ -62,7 +62,7 @@ const handle = (event, xmlState) => {
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    let filename = `${conference}-${new Date().toString()}.wav`
+                    let filename = `${conference}-${new Date().toISOString()}.wav`
                     record.startrec(conference, filename)
                     .then(answer => {
                         console.log(answer)
