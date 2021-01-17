@@ -62,7 +62,7 @@ const handle = (event, xmlState) => {
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    let filename = `${conference}-${new Date()}.wav`
+                    let filename = `${conference}-${new Date().toString()}.wav`
                     record.startrec(conference, filename)
                     .then(answer => {
                         console.log(answer)
@@ -89,7 +89,13 @@ const handle = (event, xmlState) => {
                 }
                 case 'checkrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    console.log(event.serialize('json'))
+                    record.chekrec(conference)
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 default: {
