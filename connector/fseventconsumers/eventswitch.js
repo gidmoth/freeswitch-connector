@@ -39,8 +39,8 @@ const handle = (event, xmlState) => {
                     break;
                 }
                 default: {
-                    console.log(jobname)
-                    console.log(event.getBody())
+                    // console.log(jobname)
+                    // console.log(event.getBody())
                     break;
                 }
             }
@@ -57,6 +57,26 @@ const handle = (event, xmlState) => {
                     .catch(err => {
                         console.log(err)
                     })
+                    break;
+                }
+                case 'startrecording': {
+                    let conference = event.getHeader('Conference-Name')
+                    console.log(event.serialize('json'))
+                    break;
+                }
+                case 'pauserecording': {
+                    let conference = event.getHeader('Conference-Name')
+                    console.log(event.serialize('json'))
+                    break;
+                }
+                case 'resumerecording': {
+                    let conference = event.getHeader('Conference-Name')
+                    console.log(event.serialize('json'))
+                    break;
+                }
+                case 'stoprecording': {
+                    let conference = event.getHeader('Conference-Name')
+                    console.log(event.serialize('json'))
                     break;
                 }
                 default: {
