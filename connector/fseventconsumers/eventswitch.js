@@ -5,6 +5,8 @@
 const maintain = require('../maintainance');
 const muteall = require('../fseventusers/muteallfunc')
 const record  = require('../fseventusers/recordingfuncts')
+const freeswitchparams = require('../config').getConfig('freeswitch')
+const recpath = freeswitchparams.recordings
 
 const Event = {
     Channel: {
@@ -66,7 +68,7 @@ const handle = (event, xmlState) => {
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    let filename = `\${recordings_dir}/${conference}-${new Date().toISOString()}.wav`
+                    let filename = `${recpath}/${conference}-${new Date().toISOString()}.wav`
                     record.startrec(conference, filename)
                     .then(answer => {
                         console.log(answer)
@@ -78,9 +80,14 @@ const handle = (event, xmlState) => {
                 }
                 case 'pauserecording': {
                     let conference = event.getHeader('Conference-Name')
-                    record.pauserec(conference, 'all')
+                    record.chekrec(conference)
                     .then(answer => {
-                        console.log(answer)
+                        if (answer.startsWith('-ERR')) {
+                            console.log(`ERROR: conference ${conference} is not being recorded`)
+                        } else {
+                            let  file = answer.split(' ')[3]
+                            record.pauserec(conference, file)
+                        }
                     })
                     .catch(err => {
                         console.log(err)
@@ -89,9 +96,14 @@ const handle = (event, xmlState) => {
                 }
                 case 'resumerecording': {
                     let conference = event.getHeader('Conference-Name')
-                    record.resumerec(conference, 'all')
+                    record.chekrec(conference)
                     .then(answer => {
-                        console.log(answer)
+                        if (answer.startsWith('-ERR')) {
+                            console.log(`ERROR: conference ${conference} is not being recorded`)
+                        } else {
+                            let  file = answer.split(' ')[3]
+                            record.resumerec(conference, file)
+                        }
                     })
                     .catch(err => {
                         console.log(err)

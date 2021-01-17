@@ -6,7 +6,8 @@
     freeswitch: {
         ip: `${process.env.FSIP || '127.0.0.1'}`,
         port: `${process.env.FSPORT || '8021'}`,
-        pw: `${process.env.FSPW || 'ClueCon'}`
+        pw: `${process.env.FSPW || 'ClueCon'}`,
+        recordings: `${process.env.RECPATH || '/recordings'}`
     },
     xmldir: `${process.env.SWITCHCONF || '/etc-freeswitch'}`,
     confdir: `${process.env.SWITCHCONF || '/etc-freeswitch'}/dialplan/conferences`,

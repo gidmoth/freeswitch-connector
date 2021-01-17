@@ -44,7 +44,7 @@ const stoprec = (conference, file) => new Promise((resolve, reject) => {
     });
 });
 
-const chekrec = (conference, file) => new Promise((resolve, reject) => {
+const chekrec = (conference) => new Promise((resolve, reject) => {
     API.sendbgapi(`conference ${conference} recording check`)
     .then(answer => {
         resolve(answer);
