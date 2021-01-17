@@ -4,6 +4,7 @@
 
 const maintain = require('../maintainance');
 const muteall = require('../fseventusers/muteallfunc')
+const record  = require('../fseventusers/recordingfuncts')
 
 const Event = {
     Channel: {
@@ -61,20 +62,32 @@ const handle = (event, xmlState) => {
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
-                    console.log(event.serialize('json'))
+                    let filename = `${conference}-${new Date()}.wav`
+                    record.startrec(conference, filename)
+                    .then(answer => {
+                        console.log(answer)
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })
                     break;
                 }
                 case 'pauserecording': {
                     let conference = event.getHeader('Conference-Name')
-                    console.log(event.serialize('json'))
+             
                     break;
                 }
                 case 'resumerecording': {
                     let conference = event.getHeader('Conference-Name')
-                    console.log(event.serialize('json'))
+             
                     break;
                 }
                 case 'stoprecording': {
+                    let conference = event.getHeader('Conference-Name')
+             
+                    break;
+                }
+                case 'checkrecording': {
                     let conference = event.getHeader('Conference-Name')
                     console.log(event.serialize('json'))
                     break;
