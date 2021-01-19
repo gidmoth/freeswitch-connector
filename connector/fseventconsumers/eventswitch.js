@@ -7,6 +7,7 @@ const muteall = require('../fseventusers/muteallfunc')
 const record  = require('../fseventusers/recordingfuncts')
 const freeswitchparams = require('../config').getConfig('freeswitch')
 const recpath = freeswitchparams.recordings
+const say = require('./leasay')
 
 const Event = {
     Channel: {
@@ -16,7 +17,7 @@ const Event = {
     BACKGROUND_JOB: 'BACKGROUND_JOB'
 };
 
-const handle = (event, xmlState) => {
+const handle = (event, xmlState, liveState) => {
     let eventName = event.getHeader('Event-Name');
     switch (eventName) {
         case Event.Channel.CREATE: {
@@ -41,12 +42,45 @@ const handle = (event, xmlState) => {
                     }
                     break;
                 }
-                case 'recording': {
-                    console.log(event.serialize('json'))
-                    break;
+                case 'conference': {
+                    let subcommand = event.getHeader('Job-Command-Arg')
+                    switch (true) {
+                        case (subcommand.includes('recording start')): {
+                            let conference = event.getHeader('Conference-Name')
+                            let  file = event.getBody().split(' ')[3].trim()
+                            liveState.recstates[conference]  =  {}
+                            liveState.recstates[conference].state = 'running'
+                            liveState.recstates[conference].file = file
+                            say.leaSay(conference, 'start')
+                            console.log(JSON.stringify(liveState))
+                            break;
+                        }
+                        case (subcommand.includes('recording pause')): {
+                            let conference = event.getHeader('Conference-Name')
+                            liveState.recstates[conference].state = 'paused'
+                            say.leaSay(conference, 'pausing')
+                            break;
+                        }
+                        case (subcommand.includes('recording resume')): {
+                            let conference = event.getHeader('Conference-Name')
+                            liveState.recstates[conference].state = 'running'
+                            say.leaSay(conference, 'resume')
+                            break;
+                        }
+                        case (subcommand.includes('recording stop')): {
+                            let conference = event.getHeader('Conference-Name')
+                            delete liveState.recstates[conference]
+                            say.leaSay(conference, 'stop')
+                            break;
+                        }
+                        case (subcommand.includes('recording check')): {
+                            let conference = event.getHeader('Conference-Name')
+                            break;
+                        }
+                    }
                 }
                 default: {
-                    console.log(event.serialize('json'))
+                    //console.log(event.serialize('json'))
                     break;
                 }
             }

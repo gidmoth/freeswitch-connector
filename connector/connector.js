@@ -6,6 +6,7 @@ const fasticonf = require('./config').getConfig('fasti');
 const Monitor = require('./fseventconsumers/esmonitor.js');
 // the state will be the same objectinstance for the whole runtime
 const xmlState = {};
+const liveState = {};
 const maintain = require('./maintainance');
 const fs = require('fs');
 
@@ -19,9 +20,11 @@ xmlState.info = {
     }
 }
 
+liveState.recstates = {}
+
 // start monitoring fsevents, xmlState is needed for reacting on
 // certain events.
-Monitor.startMon(xmlState);
+Monitor.startMon(xmlState, liveState);
 
 // init/fill xmlState.
 maintain.updateXmlState(xmlState);
