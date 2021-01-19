@@ -4,7 +4,7 @@
 
 const maintain = require('../maintainance');
 const muteall = require('../fseventusers/muteallfunc')
-const record  = require('../fseventusers/recordingfuncts')
+const record = require('../fseventusers/recordingfuncts')
 const freeswitchparams = require('../config').getConfig('freeswitch')
 const recpath = freeswitchparams.recordings
 const say = require('./leasay')
@@ -47,17 +47,17 @@ const handle = (event, xmlState, liveState) => {
                     switch (true) {
                         case (subcommand.includes('recording start')): {
                             let conference = subcommand.split(' ')[0]
-                            let  file = event.getBody().split(' ')[3].trim()
-                            liveState.recstates[conference]  =  {}
+                            let file = event.getBody().split(' ')[3].trim()
+                            liveState.recstates[conference] = {}
                             liveState.recstates[conference].state = 'running'
                             liveState.recstates[conference].file = file
                             say.leaSay(conference, 'start')
-                            .then(answer => {
-                                console.log(answer)
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                             console.log(JSON.stringify(liveState))
                             break;
                         }
@@ -65,40 +65,72 @@ const handle = (event, xmlState, liveState) => {
                             let conference = subcommand.split(' ')[0]
                             liveState.recstates[conference].state = 'paused'
                             say.leaSay(conference, 'pausing')
-                            .then(answer => {
-                                console.log(answer)
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                             break;
                         }
                         case (subcommand.includes('recording resume')): {
                             let conference = subcommand.split(' ')[0]
                             liveState.recstates[conference].state = 'running'
                             say.leaSay(conference, 'resume')
-                            .then(answer => {
-                                console.log(answer)
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                             break;
                         }
                         case (subcommand.includes('recording stop')): {
                             let conference = subcommand.split(' ')[0]
                             delete liveState.recstates[conference]
                             say.leaSay(conference, 'stop')
-                            .then(answer => {
-                                console.log(answer)
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                             break;
                         }
                         case (subcommand.includes('recording check')): {
                             let conference = subcommand.split(' ')[0]
+                            if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                                switch (liveState.recstates[conference].state) {
+                                    case 'running': {
+                                        say.leaSay(conference, 'start')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                    case 'paused': {
+                                        say.leaSay(conference, 'pausing')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                }
+                                return;
+                            }
+                            say.leaSay(conference, 'norec')
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
                             break;
                         }
                     }
@@ -115,78 +147,153 @@ const handle = (event, xmlState, liveState) => {
                 case 'muteall': {
                     let conference = event.getHeader('Conference-Name')
                     muteall.run(conference)
-                    .then(answer => {
-                        console.log(answer)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 case 'startrecording': {
                     let conference = event.getHeader('Conference-Name')
+                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                        switch (liveState.recstates[conference].state) {
+                            case 'running': {
+                                say.leaSay(conference, 'already')
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'paused': {
+                                say.leaSay(conference, 'paused')
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                        }
+                        return;
+                    }
                     let filename = `${recpath}/${conference}-${new Date().toISOString()}.wav`
                     record.startrec(conference, filename)
-                    .then(answer => {
-                        console.log(answer)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 case 'pauserecording': {
                     let conference = event.getHeader('Conference-Name')
-                    record.chekrec(conference)
-                    .then(answer => {
-                        if (answer.startsWith('-ERR')) {
-                            console.log(`ERROR: conference ${conference} is not being recorded`)
-                        } else {
-                            let  file = answer.split(' ')[3]
-                            record.pauserec(conference, file)
+                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                        switch (liveState.recstates[conference].state) {
+                            case 'running': {
+                                record.pauserec(conference, liveState.recstates[conference].file)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'paused': {
+                                say.leaSay(conference, 'pausing')
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
                         }
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                        return;
+                    }
+                    say.leaSay(conference, 'norec')
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 case 'resumerecording': {
                     let conference = event.getHeader('Conference-Name')
-                    record.chekrec(conference)
-                    .then(answer => {
-                        if (answer.startsWith('-ERR')) {
-                            console.log(`ERROR: conference ${conference} is not being recorded`)
-                        } else {
-                            let  file = answer.split(' ')[3]
-                            record.resumerec(conference, file)
+                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                        switch (liveState.recstates[conference].state) {
+                            case 'paused': {
+                                record.resumerec(conference, liveState.recstates[conference].file)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'running': {
+                                say.leaSay(conference, 'already')
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
                         }
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                        return;
+                    }
+                    say.leaSay(conference, 'norec')
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 case 'stoprecording': {
                     let conference = event.getHeader('Conference-Name')
-                    record.stoprec(conference, 'all')
-                    .then(answer => {
-                        console.log(answer)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                        record.stoprec(conference, 'all')
+                            .then(answer => {
+                                console.log(answer)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
+                        return;
+                    }
+                    say.leaSay(conference, 'norec')
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 case 'checkrecording': {
                     let conference = event.getHeader('Conference-Name')
                     record.chekrec(conference)
-                    .then(answer => {
-                        console.log(answer)
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
+                        .then(answer => {
+                            console.log(answer)
+                        })
+                        .catch(err => {
+                            console.log(err)
+                        })
                     break;
                 }
                 default: {
@@ -196,9 +303,9 @@ const handle = (event, xmlState, liveState) => {
             }
         }
         default: {
-        //    console.log(eventName)
-        //    console.log(event.serialize('json'))
-        //    console.log(event.getBody())
+            //    console.log(eventName)
+            //    console.log(event.serialize('json'))
+            //    console.log(event.getBody())
             break;
         }
     }
