@@ -41,13 +41,12 @@ const handle = (event, xmlState) => {
                     }
                     break;
                 }
-                case 'checkrecording': {
+                case 'recording': {
                     console.log(event.serialize('json'))
                     break;
                 }
                 default: {
-                    // console.log(jobname)
-                    // console.log(event.getBody())
+                    console.log(event.serialize('json'))
                     break;
                 }
             }
