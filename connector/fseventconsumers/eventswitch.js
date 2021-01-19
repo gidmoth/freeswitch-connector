@@ -46,8 +46,7 @@ const handle = (event, xmlState, liveState) => {
                     let subcommand = event.getHeader('Job-Command-Arg')
                     switch (true) {
                         case (subcommand.includes('recording start')): {
-                            console.log(event.serialize('json'))
-                            let conference = event.getHeader('Conference-Name')
+                            let conference = subcommand.split(' ')[0]
                             let  file = event.getBody().split(' ')[3].trim()
                             liveState.recstates[conference]  =  {}
                             liveState.recstates[conference].state = 'running'
@@ -63,7 +62,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording pause')): {
-                            let conference = event.getHeader('Conference-Name')
+                            let conference = subcommand.split(' ')[0]
                             liveState.recstates[conference].state = 'paused'
                             say.leaSay(conference, 'pausing')
                             .then(answer => {
@@ -75,7 +74,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording resume')): {
-                            let conference = event.getHeader('Conference-Name')
+                            let conference = subcommand.split(' ')[0]
                             liveState.recstates[conference].state = 'running'
                             say.leaSay(conference, 'resume')
                             .then(answer => {
@@ -87,7 +86,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording stop')): {
-                            let conference = event.getHeader('Conference-Name')
+                            let conference = subcommand.split(' ')[0]
                             delete liveState.recstates[conference]
                             say.leaSay(conference, 'stop')
                             .then(answer => {
@@ -99,7 +98,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording check')): {
-                            let conference = event.getHeader('Conference-Name')
+                            let conference = subcommand.split(' ')[0]
                             break;
                         }
                     }
