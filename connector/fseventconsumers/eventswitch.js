@@ -46,12 +46,19 @@ const handle = (event, xmlState, liveState) => {
                     let subcommand = event.getHeader('Job-Command-Arg')
                     switch (true) {
                         case (subcommand.includes('recording start')): {
+                            console.log(event.serialize('json'))
                             let conference = event.getHeader('Conference-Name')
                             let  file = event.getBody().split(' ')[3].trim()
                             liveState.recstates[conference]  =  {}
                             liveState.recstates[conference].state = 'running'
                             liveState.recstates[conference].file = file
                             say.leaSay(conference, 'start')
+                            .then(answer => {
+                                console.log(answer)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
                             console.log(JSON.stringify(liveState))
                             break;
                         }
@@ -59,18 +66,36 @@ const handle = (event, xmlState, liveState) => {
                             let conference = event.getHeader('Conference-Name')
                             liveState.recstates[conference].state = 'paused'
                             say.leaSay(conference, 'pausing')
+                            .then(answer => {
+                                console.log(answer)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
                             break;
                         }
                         case (subcommand.includes('recording resume')): {
                             let conference = event.getHeader('Conference-Name')
                             liveState.recstates[conference].state = 'running'
                             say.leaSay(conference, 'resume')
+                            .then(answer => {
+                                console.log(answer)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
                             break;
                         }
                         case (subcommand.includes('recording stop')): {
                             let conference = event.getHeader('Conference-Name')
                             delete liveState.recstates[conference]
                             say.leaSay(conference, 'stop')
+                            .then(answer => {
+                                console.log(answer)
+                            })
+                            .catch(err => {
+                                console.log(err)
+                            })
                             break;
                         }
                         case (subcommand.includes('recording check')): {
