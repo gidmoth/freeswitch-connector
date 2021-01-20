@@ -26,4 +26,4 @@ async function recordingsroutes(fastify, options) {
 
 }
 
-exports.recordingsroutes = recordingsroutes
+module.exports = recordingsroutes
