@@ -36,19 +36,28 @@ async function recordingsroutes(fastify, options) {
     fastify.get('/api/recordings', async function (req, reply) {
         let answer = { op: 'api/recordings', files: [] }
         fs.readdirSync(fsConf.recordings).forEach(file => {
-            answer.files.push(file)            
+            answer.files.push(file)
         });
-        return  answer
+        return answer
+    })
+
+    fastify.get('/api/recordings/find/:string', async function (req, reply) {
+        let answer = { op: `api/recordings/find/${req.params.string}`, files: [] }
+        let matches = fs.readdirSync(fsConf.recordings).filter(name => {
+            return name.includes(req.params.string)
+        });
+        answer.files = matches
+        return answer
     })
 
     fastify.post('/api/recordings/del', { schema: recDelSchema }, async function (req, reply) {
         let answer = { op: 'api/recordings/del', done: [], failed: [] }
-        req.body.forEach(file =>  {
+        req.body.forEach(file => {
             try {
                 fs.unlinkSync(`${fsConf.recordings}/${file.file}`)
                 answer.done.push(file.file)
             } catch (error) {
-                answer.failed.push(file.file)       
+                answer.failed.push(file.file)
             }
         })
         return answer
