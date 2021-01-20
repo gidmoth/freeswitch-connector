@@ -44,14 +44,15 @@ async function recordingsroutes(fastify, options) {
     fastify.post('/api/recordings/del', { schema: recDelSchema }, async function (req, reply) {
         let answer = { op: 'api/recordings/del', done: [], failed: [] }
         req.body.forEach(file =>  {
-            fs.unlink(`${fsConf.recordings}/${file.file}`, (err)  => {
-                if (err) answer.failed.push(file.file)
+            try {
+                fs.unlinkSync(`${fsConf.recordings}/${file.file}`)
                 answer.done.push(file.file)
-            })
+            } catch (error) {
+                answer.failed.push(file.file)       
+            }
         })
         return answer
     })
-
 }
 
 module.exports = recordingsroutes
