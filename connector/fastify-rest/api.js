@@ -41,6 +41,8 @@ async function apiroutes (fastify, options) {
         fastify.register(require('./maintenance'))
         // load conference endpoints
         fastify.register(require('./conferences'))
+        // recordings endpoints
+        fastify.register(require('./recordings'))
     })
 }
 

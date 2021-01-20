@@ -20,7 +20,8 @@ ENV FSIP='127.0.0.1' \
     STATICPATH='/static' \
     FASTICERT='/etc-freeswitch/tls/fullchain.pem' \
     FASTIKEY='/etc-freeswitch/tls/privkey.pem' \
-    UCSOFTWARE='https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip'
+    UCSOFTWARE='https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip' \
+    RECPATH='/recordings'
 
 ENV CRYPTDOM example.com
 
