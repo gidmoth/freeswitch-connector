@@ -11,10 +11,10 @@ async function vcroutes(fastify, options) {
     })
 
     fastify.get('/phone/config.json', async function (req, reply) {
-        let id = req.user.id
-        let password = req.user.password
-        return { login: id,
-                password: password }
+        return { login: req.user.id,
+            password: req.user.password,
+            name: req.user.name,
+            email: req.user.email }
     })
 
     fastify.get('/phone', async function (req, reply) {
