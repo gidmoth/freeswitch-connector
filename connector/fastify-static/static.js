@@ -37,6 +37,7 @@ async function staticroutes(fastify, options) {
         // load provisioning endpoints
         fastify.register(require('./polycom'))
         fastify.register(require('./linphone'))
+        fastify.register(require('./phone'))
     })
 }
 
