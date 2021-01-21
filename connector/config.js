@@ -47,7 +47,8 @@
     provisioningpaths: {
         all: `${process.env.STATICPATH || '/static'}`,
         polycom: `${process.env.STATICPATH || '/static'}/polycom`,
-        linphone: `${process.env.STATICPATH || '/static'}/linphone`
+        linphone: `${process.env.STATICPATH || '/static'}/linphone`,
+        vertocom: `${process.env.STATICPATH || '/static'}/phone`
     }
  };
 
