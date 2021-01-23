@@ -53,8 +53,16 @@ async function polycomroutes(fastify, options) {
     })
 
     fastify.get('/polycom/:dir/:file', async function (req, reply) {
-        if (myCtx.includes(req.params.dir)){
-            return reply.sendFile(`${req.params.dir}/000000000000-directory.xml`)
+        if (myCtx.includes(req.params.dir)) {
+            return reply.sendFile(`${req.params.dir}/${req.params.file}`)
+        }
+        return { 'Question': 'Are you kidding me?' }
+    })
+
+    fastify.put('/polycom/:dir/:file', async function (req, reply) {
+        if (myCtx.includes(req.params.dir)) {
+            fs.writeFileSync(`${provpaths.polycom}/${req.params.dir}/${req.params.file}`, req.body)
+            return { 'written': `${req.params.file}` }
         }
         return { 'Question': 'Are you kidding me?' }
     })
