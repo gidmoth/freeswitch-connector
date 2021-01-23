@@ -47,7 +47,7 @@ getPolyDir = (confs) => {
     <item_list>
 `
   for (let conf of confs) {
-    dirxml += `        <item>
+    dirxml += `        <item server='yes'>
             <fn>${conf.name}</fn>
             <ln>${conf.type}</ln>
             <ct>${conf.num}</ct>
