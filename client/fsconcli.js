@@ -4,13 +4,73 @@
  * simple client to test freeswitch-connector
  */
 
-const conf = require('./clientconf').getConfig('client')
+let conf = {}
 const digfetch = require('digest-fetch')
 const path = require('path')
 const yargs = require('yargs')
 const fs = require('fs')
+const os = require('os')
 const inquirer = require("inquirer")
 
+const checkPath = (myopt) => {
+    let dir = path.parse(path.normalize(myopt)).dir
+    if (!(fs.existsSync(dir) || dir == '')) {
+        return false
+    }
+    return true
+}
+
+const checkFile = (myopt) => {
+    let file = path.normalize(myopt)
+    console.log(`thats checked: ${file}`)
+    if (!(fs.existsSync(file) || file == '')) {
+        return false
+    }
+    return true
+}
+
+const askConf = async () => {
+    const questions = [
+        {
+            name: 'url',
+            type: 'input',
+            message: 'Enter api url:'
+        },
+        {
+            name: 'uname',
+            type: 'input',
+            message: 'Enter username:',
+        },
+        {
+            name: 'pw',
+            type: 'input',
+            message: 'Enter password:',
+        }
+    ]
+    let answers = await inquirer.prompt(questions)
+    return answers
+}
+
+const chkReadConf = async () => {
+    if (!checkFile(`${os.homedir()}/.fsconcli.json`)) {
+        console.log('No config found, please enter')
+        let cnf = {}
+        let config = await askConf()
+        cnf.baseurl = config.url
+        cnf.user = config.uname
+        cnf.pw = config.pw
+        filejson = JSON.stringify(cnf)
+        fs.writeFileSync(`${os.homedir()}/.fsconcli.json`, filejson)
+        console.log(`written: ${os.homedir()}/.fsconcli.json`)
+        return cnf;
+    }
+    let config = JSON.parse(fs.readFileSync(`${os.homedir()}/.fsconcli.json`))
+    let cnf = {}
+    cnf.baseurl = config.baseurl
+    cnf.user = config.user
+    cnf.pw = config.pw
+    return cnf;
+}
 
 const stdinRead = () => new Promise((resolve, reject) => {
     let retval = '';
@@ -38,50 +98,50 @@ const argv = yargs
     .scriptName('fsconcli')
     .usage('Usage: $0 <command> [options]')
     .command('users',
-        'Show list of users, by default shows all users. Use \'users -h\' for a list of options.',
+        'Show list of users, by default shows all users. Use \'users -h\' for a list of options',
         (yargs) => {
             return yargs.option('id', {
-                describe: 'Narrow list by user id.',
+                describe: 'Narrow list by user id',
                 type: 'string',
                 nargs: 1
             }).option('name', {
-                describe: 'Narrow list by user name.',
+                describe: 'Narrow list by user name',
                 type: 'string',
                 nargs: 1
             }).option('context', {
-                describe: 'Narrow list by user context.',
+                describe: 'Narrow list by user context',
                 type: 'string',
                 nargs: 1
             }).option('polymac', {
-                describe: 'Narrow list by users polyphone mac.',
+                describe: 'Narrow list by users polyphone mac',
                 type: 'string',
                 nargs: 1
             }).option('email', {
-                describe: 'Narrow list by string matched to users emails.',
+                describe: 'Narrow list by string matched to users emails',
                 type: 'string',
                 nargs: 1
             }).option('match', {
-                describe: 'Narrow list by matching string to emails and names.',
+                describe: 'Narrow list by matching string to emails and names',
                 type: 'string',
                 nargs: 1
             })
         })
     .command('addusers [userarray]',
-        'Add users, takes json array of userobjects as arg.',
+        'Add users, takes json array of userobjects as arg',
         (yargs) => {
             return yargs.option('f', {
                 alias: 'file',
-                describe: 'Read userarray from file.',
+                describe: 'Read userarray from file',
                 type: 'string',
                 nargs: 1
             })
         })
     .command('modusers [userarray]',
-        'Modify users, takes json array of userobjects as arg.',
+        'Modify users, takes json array of userobjects as arg',
         (yargs) => {
             return yargs.option('f', {
                 alias: 'file',
-                describe: 'Read userarray from file.',
+                describe: 'Read userarray from file',
                 type: 'string',
                 nargs: 1
             })
@@ -89,28 +149,31 @@ const argv = yargs
     .option('i', {
         alias: 'intac',
         type: 'boolean',
-        describe: 'Be interactive.',
+        describe: 'Be interactive',
         default: false
     })
     .option('o', {
         nargs: 1,
         type: 'string',
-        describe: 'Output to named file.',
+        describe: 'Output to named file',
         alias: 'out'
     })
     .option('t', {
         type: 'boolean',
-        describe: 'Output text instead of json.',
+        describe: 'Output text instead of json',
         default: false,
         alias: 'text'
     })
     .help()
     .alias('help', 'h')
     .alias('version', 'v')
-    .demandCommand(1, 1, 'You need a command.', 'I can\'t handle more than 1 command')
+    .demandCommand(1, 1, 'You need a command', 'I can\'t handle more than 1 command')
     .argv;
 
-const client = new digfetch(conf.user, conf.pw)
+const getClient = (conf) => {
+    let client = new digfetch(conf.user, conf.pw)
+    return client
+}
 
 const getPostoptions = (body) => {
     return {
@@ -120,23 +183,6 @@ const getPostoptions = (body) => {
             'Content-Type': 'application/json'
         }
     }
-}
-
-const checkPath = (myopt) => {
-    let dir = path.parse(path.normalize(myopt)).dir
-    if (!(fs.existsSync(dir) || dir == '')) {
-        return false
-    }
-    return true
-}
-
-const checkFile = (myopt) => {
-    let file = path.normalize(myopt)
-    console.log(`thats checked: ${file}`)
-    if (!(fs.existsSync(file) || file == '')) {
-        return false
-    }
-    return true
 }
 
 const retTextUser = (usr) => {
@@ -152,7 +198,7 @@ const retTextUser = (usr) => {
     return text
 }
 
-const users = (argv) => new Promise((resolve, reject) => {
+const users = (argv, client) => new Promise((resolve, reject) => {
     let userreq = '/users'
     switch (true) {
         case argv.hasOwnProperty('id'):
@@ -232,7 +278,7 @@ const users = (argv) => new Promise((resolve, reject) => {
         })
 })
 
-const addusers = (text, postbody) => new Promise((resolve, reject) => {
+const addusers = (text, postbody, client) => new Promise((resolve, reject) => {
     client.fetch(`${conf.baseurl}/users/add`, getPostoptions(postbody))
         .then(resp => resp.text())
         .then(txt => {
@@ -278,7 +324,7 @@ const addusers = (text, postbody) => new Promise((resolve, reject) => {
         })
 })
 
-const modUsers = (text, postbody) => new Promise((resolve, reject) => {
+const modUsers = (text, postbody, client) => new Promise((resolve, reject) => {
     client.fetch(`${conf.baseurl}/users/mod`, getPostoptions(postbody))
         .then(resp => resp.text())
         .then(txt => {
@@ -392,7 +438,7 @@ const askUsers = async () => {
     return answers
 }
 
-const prepopulate = () => new Promise((resolve, reject) => {
+const prepopulate = (client) => new Promise((resolve, reject) => {
     inquirer.prompt([
         {
             name: 'id',
@@ -418,7 +464,7 @@ const prepopulate = () => new Promise((resolve, reject) => {
                     reject(err)
                 })
             if (usrans.users.length < 1 || usrans.users.length > 1) {
-                reject('User not found or not unique, try again.')
+                reject('User not found or not unique, try again')
             } else {
                 resolve({
                     quest: [
@@ -455,7 +501,7 @@ const prepopulate = () => new Promise((resolve, reject) => {
                         {
                             name: 'polymac',
                             type: 'input',
-                            message: 'Provision (none) or another polycom phone?',
+                            message: 'Provision \'none\' or another polycom phone?',
                             default: usrans.users[0].polymac
                         },
                         {
@@ -471,10 +517,10 @@ const prepopulate = () => new Promise((resolve, reject) => {
         })
 })
 
-const askModUsers = async (usrarr = []) => {
+const askModUsers = async (usrarr = [], client) => {
     let questions = []
     try {
-        questionsall = await prepopulate()
+        questionsall = await prepopulate(client)
         questions = questionsall.quest
     } catch (err) {
         console.log(err)
@@ -487,34 +533,39 @@ const askModUsers = async (usrarr = []) => {
 }
 
 async function runMe(argv) {
+    conf = await chkReadConf()
+    const client = getClient(conf)
     if (argv.i) {
         switch (argv._[0]) {
-            case 'addusers':
+            case 'addusers': {
                 let answers = await askAddUsers()
                 argv.userarray = JSON.stringify(answers)
                 break;
-            case 'modusers':
-                let manswers = await askModUsers()
+            }
+            case 'modusers': {
+                let manswers = await askModUsers([], client)
                 argv.userarray = JSON.stringify(manswers)
                 break;
-            case 'users':
+            }
+            case 'users': {
                 let uanswers = await askUsers()
                 if (uanswers.userfilter != 'all') {
                     argv[uanswers.userfilter] = uanswers.matchstring
                 }
                 break;
+            }
             default:
                 console.log('i want to be interactive')
         }
     }
     switch (argv._[0]) {
-        case 'users':
+        case 'users': {
             if (argv.o) {
                 if (!(checkPath(argv.o))) {
                     process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
-                users(argv)
+                users(argv, client)
                     .then(userlist => {
                         fs.writeFileSync(path.normalize(argv.o), userlist)
                         process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
@@ -522,14 +573,15 @@ async function runMe(argv) {
                     })
                     .catch(err => console.log(err))
             } else {
-                users(argv)
+                users(argv, client)
                     .then(userlist => {
                         process.stdout.write(userlist)
                     })
                     .catch(err => console.log(err))
             }
             break;
-        case 'addusers':
+        }
+        case 'addusers': {
             if (!process.stdin.isTTY && !argv.f && !argv.i) {
                 try {
                     argv.userarray = await stdinRead()
@@ -568,7 +620,7 @@ async function runMe(argv) {
                     process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
-                addusers(argv.t, postbody)
+                addusers(argv.t, postbody, client)
                     .then(answer => {
                         fs.writeFileSync(path.normalize(argv.o), answer)
                         process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
@@ -576,14 +628,15 @@ async function runMe(argv) {
                     })
                     .catch(err => console.log(err))
             } else {
-                addusers(argv.t, postbody)
+                addusers(argv.t, postbody, client)
                     .then(answer => {
                         process.stdout.write(answer)
                     })
                     .catch(err => console.log(err))
             }
             break;
-        case 'modusers':
+        }
+        case 'modusers': {
             if (!process.stdin.isTTY && !argv.f && !argv.i) {
                 try {
                     argv.userarray = await stdinRead()
@@ -622,7 +675,7 @@ async function runMe(argv) {
                     process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
                     return
                 }
-                modUsers(argv.t, postbodymod)
+                modUsers(argv.t, postbodymod, client)
                     .then(answer => {
                         fs.writeFileSync(path.normalize(argv.o), answer)
                         process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
@@ -630,13 +683,14 @@ async function runMe(argv) {
                     })
                     .catch(err => console.log(err))
             } else {
-                modUsers(argv.t, postbodymod)
+                modUsers(argv.t, postbodymod, client)
                     .then(answer => {
                         process.stdout.write(answer)
                     })
                     .catch(err => console.log(err))
             }
             break;
+        }
         default:
             ;
     }
