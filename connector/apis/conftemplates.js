@@ -14,15 +14,16 @@ const Provpaths = require('../config').getConfig('provisioningpaths')
 const strict = true
 const opts = { trim: true }
 
-const filterCustItems = (user, callback) => {
+const filterCustItems = (user) => {
   if (fs.existsSync(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))) {
+    let file = fs.readFileSync(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))
     let collector = ''
     let item = 0
-    let saxStream = sax.createStream(strict, opts)
-    saxStream.on('error', function (e) {
-      callback(err)
-    })
-    saxStream.on('opentag', function (tag) {
+    let parser = sax.parser(strict, opts)
+    parser.onerror = function (e) {
+      console.log(err)
+    }
+    parser.onopentag = function (tag) {
       if (tag.name == 'item') {
         if (!tag.attributes.hasOwnProperty('server')) {
           item = 1
@@ -33,13 +34,13 @@ const filterCustItems = (user, callback) => {
           collector += `<${tag.name}>`
         }
       }
-    })
-    saxStream.on('text', function (txt) {
+    }
+    parser.ontext = function (txt) {
       if (item == 1) {
         collector += `${txt}`
       }
-    })
-    saxStream.on('closetag', function (tag) {
+    }
+    parser.onclosetag = function (tag) {
       if (tag == 'item' && item == 1) {
         item = 0
         collector += `</${tag}>
@@ -50,14 +51,11 @@ const filterCustItems = (user, callback) => {
           `
         }
       }
-    })
-    saxStream.on('end', function () {
-      callback(null, collector)
-    })
-    fs.createReadStream(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))
-      .pipe(saxStream)
+    }
+    parser.write(file).close()
+    return collector
   } else {
-    callback(null, '')
+    return ''
   }
 }
 
@@ -100,13 +98,8 @@ const getPolyDir = (confs, user) => {
   let dirxml = `<directory>
     <item_list>
 `
-  filterCustItems(user, function(err, retval) {
-    if (err) {
-      console.log(err)
-    }
-    console.log(retval)
-  })
-
+  let cust = filterCustItems(user)
+  dirxml += cust
   for (let conf of confs) {
     dirxml += `        <item server='yes'>
             <fn>${conf.name}</fn>
