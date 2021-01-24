@@ -51,6 +51,7 @@ const filterCustItems = (user) => {
       }
     })
     saxStream.on('end', function () {
+      console.log(collector)
       return collector
     })
     fs.createReadStream(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))
@@ -99,7 +100,8 @@ getPolyDir = (confs, user) => {
   let dirxml = `<directory>
     <item_list>
 `
-  dirxml += filterCustItems(user)
+  let userconf = filterCustItems(user)
+  console.log(userconf)
   for (let conf of confs) {
     dirxml += `        <item server='yes'>
             <fn>${conf.name}</fn>
