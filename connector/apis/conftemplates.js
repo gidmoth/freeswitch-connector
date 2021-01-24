@@ -14,13 +14,13 @@ const Provpaths = require('../config').getConfig('provisioningpaths')
 const strict = true
 const opts = { trim: true }
 
-const filterCustItems = (user) => {
+const filterCustItems = (user, callback) => {
   if (fs.existsSync(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))) {
     let collector = ''
     let item = 0
     let saxStream = sax.createStream(strict, opts)
     saxStream.on('error', function (e) {
-      console.log(e)
+      callback(err)
     })
     saxStream.on('opentag', function (tag) {
       if (tag.name == 'item') {
@@ -52,13 +52,12 @@ const filterCustItems = (user) => {
       }
     })
     saxStream.on('end', function () {
-      console.log(collector)
-      return collector
+      callback(null, collector)
     })
     fs.createReadStream(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))
       .pipe(saxStream)
   } else {
-    return ''
+    callback(null, '')
   }
 }
 
@@ -101,7 +100,12 @@ getPolyDir = (confs, user) => {
   let dirxml = `<directory>
     <item_list>
 `
-  let userconf = filterCustItems(user)
+  let userconf = filterCustItems(user, function(err, retval) {
+    if (err) {
+      console.log(err)
+    }
+    return retval
+  })
   console.log(userconf)
   for (let conf of confs) {
     dirxml += `        <item server='yes'>
