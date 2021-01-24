@@ -36,18 +36,6 @@ const genPass = () => {
     })
 }
 
-const polyProvUser = (user, xmlState) => {
-    let masterfileXml = templates.getPolyMain(user, fastiConf.hostname)
-    let masterfileFile = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}.cfg`)
-    let allprovXml = templates.getPolyAll(user, fastiConf.hostname, xmlState.globals)
-    let allprovFile = path.join(Provpaths.polycom, `${user.polymac}/allprov.cfg`)
-    if (!(fs.existsSync(path.dirname(allprovFile)))) {
-        fs.mkdirSync(path.dirname(allprovFile))
-    }
-    fs.writeFileSync(masterfileFile, masterfileXml)
-    fs.writeFileSync(allprovFile, allprovXml)
-}
-
 const getConfArrays = (xmlState) => {
     let { apiallow, allow, disallow } = fastiConf
     let colls = {}
@@ -67,6 +55,22 @@ const getConfArrays = (xmlState) => {
         colls[fastiConf.apiallow].push(conf)
     }
     return colls
+}
+
+const polyProvUser = (user, xmlState) => {
+    let masterfileXml = templates.getPolyMain(user, fastiConf.hostname)
+    let masterfileFile = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}.cfg`)
+    let allprovXml = templates.getPolyAll(user, fastiConf.hostname, xmlState.globals)
+    let allprovFile = path.join(Provpaths.polycom, `${user.polymac}/allprov.cfg`)
+    if (!(fs.existsSync(path.dirname(allprovFile)))) {
+        fs.mkdirSync(path.dirname(allprovFile))
+    }
+    fs.writeFileSync(masterfileFile, masterfileXml)
+    fs.writeFileSync(allprovFile, allprovXml)
+    let confcols = getConfArrays(xmlState)
+    let dirxml = conftpl.getPolyDir(confcols[user.context], user)
+    let dirpath = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`)
+    fs.writeFileSync(dirpath, dirxml);
 }
 
 const linProvUser = (user, xmlState) => {
@@ -356,32 +360,32 @@ const reprovUsers = (xmlState) => new Promise((resolve, reject) => {
 // conference functions
 const buildPolyDir = (xmlState) => {
     for (let ctx of myCtx) {
-        if (!(fs.existsSync(path.join(Provpaths.polycom, `${ctx}`)))) {
-            fs.mkdirSync(path.join(Provpaths.polycom, `${ctx}`))
-        }
         let confcols = getConfArrays(xmlState)
         switch (ctx) {
-            case fastiConf.apiallow:
-                if (confcols[fastiConf.apiallow].length > 0) {
-                    let dirxml = conftpl.getPolyDir(confcols[fastiConf.apiallow])
-                    let dirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
+            case fastiConf.apiallow: {
+                for (let user of xmlState.users.filter(usr => usr.context == ctx && usr.polymac != 'none')) {
+                    let dirxml = conftpl.getPolyDir(confcols[fastiConf.apiallow], user)
+                    let dirpath = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`)
                     fs.writeFileSync(dirpath, dirxml);
                 }
                 break;
-            case fastiConf.allow:
-                if (confcols[fastiConf.allow].length > 0) {
-                    let bdirxml = conftpl.getPolyDir(confcols[fastiConf.allow])
-                    let bdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-                    fs.writeFileSync(bdirpath, bdirxml);
+            }
+            case fastiConf.allow: {
+                for (let user of xmlState.users.filter(usr => usr.context == ctx && usr.polymac != 'none')) {
+                    let dirxml = conftpl.getPolyDir(confcols[fastiConf.allow], user)
+                    let dirpath = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`)
+                    fs.writeFileSync(dirpath, dirxml);
                 }
                 break;
-            case fastiConf.disallow:
-                if (confcols[fastiConf.disallow].length > 0) {
-                    let cdirxml = conftpl.getPolyDir(confcols[fastiConf.disallow])
-                    let cdirpath = path.join(Provpaths.polycom, `${ctx}/000000000000-directory.xml`)
-                    fs.writeFileSync(cdirpath, cdirxml);
+            }
+            case fastiConf.disallow: {
+                for (let user of xmlState.users.filter(usr => usr.context == ctx && usr.polymac != 'none')) {
+                    let dirxml = conftpl.getPolyDir(confcols[fastiConf.disallow], user)
+                    let dirpath = path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`)
+                    fs.writeFileSync(dirpath, dirxml);
                 }
                 break;
+            }
             default:
                 ;
         }
@@ -558,11 +562,11 @@ const delConfs = (xmlState, conferences) => new Promise((resolve, reject) => {
     resolve(delconfs);
 });
 
-const rebuildContacts = (xmlState) => new Promise ((resolve, reject) => {
+const rebuildContacts = (xmlState) => new Promise((resolve, reject) => {
     if (xmlState == {}) {
         reject('xmlstate empty')
     }
-    let recon = { op: 'conferences/rebuildcontacts', done: ''}
+    let recon = { op: 'conferences/rebuildcontacts', done: '' }
     buildPolyDir(xmlState);
     for (let usr of xmlState.users) {
         linProvUser(usr, xmlState)

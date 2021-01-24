@@ -52,21 +52,6 @@ async function polycomroutes(fastify, options) {
         return reply.sendFile(`ucs/languages/${req.params.file}`)
     })
 
-    fastify.get('/polycom/:dir/:file', async function (req, reply) {
-        if (myCtx.includes(req.params.dir)) {
-            return reply.sendFile(`${req.params.dir}/${req.params.file}`)
-        }
-        return { 'Question': 'Are you kidding me?' }
-    })
-
-    fastify.put('/polycom/:dir/:file', async function (req, reply) {
-        if (myCtx.includes(req.params.dir)) {
-            fs.writeFileSync(`${provpaths.polycom}/${req.params.dir}/${req.params.file}`, req.body)
-            return { 'written': `${req.params.file}` }
-        }
-        return { 'Question': 'Are you kidding me?' }
-    })
-
     fastify.put('/polycom/:file', async function (req, reply) {
         let mac = req.user.polymac
         if (req.params.file.endsWith('-app.log')) {

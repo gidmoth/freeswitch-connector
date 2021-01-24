@@ -100,7 +100,7 @@ const getPolyMain = (user, hostname) => {
    MISC_FILES=""
    LOG_FILE_DIRECTORY=""
    OVERRIDES_DIRECTORY=""
-   CONTACTS_DIRECTORY="https://${user.name}:${user.password}@${hostname}/polycom/${user.context}"
+   CONTACTS_DIRECTORY=""
    LICENSE_DIRECTORY=""
    USER_PROFILES_DIRECTORY=""
    CALL_LISTS_DIRECTORY=""
