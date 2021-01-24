@@ -16,7 +16,6 @@ const opts = { trim: true }
 
 const filterCustItems = (user) => {
   if (fs.existsSync(path.join(Provpaths.polycom, `${user.polymac}/${user.polymac}-directory.xml`))) {
-    console.log('got file')
     let collector = ''
     let item = 0
     let saxStream = sax.createStream(strict, opts)
@@ -24,21 +23,23 @@ const filterCustItems = (user) => {
       console.log(e)
     })
     saxStream.on('opentag', function (tag) {
-      console.log(tag)
       if (tag.name == 'item') {
         if (!tag.attributes.hasOwnProperty('server')) {
           item = 1
           collector += `<${tag.name}>
-          `}
+          `
+        console.log(collector)}
       } else {
         if (item == 1) {
           collector += `<${tag.name}>`
+          console.log(collector)
         }
       }
     })
     saxStream.on('text', function (txt) {
       if (item == 1) {
         collector += `${txt}`
+        console.log(collector)
       }
     })
     saxStream.on('closetag', function (tag) {
@@ -46,10 +47,12 @@ const filterCustItems = (user) => {
         item = 0
         collector += `</${tag}>
                 `
+                console.log(collector)
       } else {
         if (item == 1) {
           collector += `</${tag}>
-          `}
+          `
+          console.log(collector)}
       }
     })
     saxStream.on('end', function () {
