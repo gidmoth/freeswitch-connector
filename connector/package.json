@@ -24,6 +24,7 @@
     "generate-password": "^1.5.1",
     "modesl": "^1.2.1",
     "passport-http": "^0.3.0",
+    "sax": "^1.2.4",
     "tar-fs": "^2.1.1"
   }
 }
