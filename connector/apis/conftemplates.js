@@ -100,23 +100,21 @@ getPolyDir = (confs, user) => {
   let dirxml = `<directory>
     <item_list>
 `
-  filterCustItems(user, function (err, retval) {
+  filterCustItems(user, function(err, retval) {
     if (err) {
       console.log(err)
     }
     console.log(retval)
-    for (let conf of confs) {
-      dirxml += `        <item server='yes'>
-              <fn>${conf.name}</fn>
-              <ln>${conf.type}</ln>
-              <ct>${conf.num}</ct>
-          </item>
-  `
-    }
-    dirxml += `    </item_list>
-  </directory>
-  `
   })
+
+  for (let conf of confs) {
+    dirxml += `        <item server='yes'>
+            <fn>${conf.name}</fn>
+            <ln>${conf.type}</ln>
+            <ct>${conf.num}</ct>
+        </item>
+`
+  }
   dirxml += `    </item_list>
 </directory>
 `
