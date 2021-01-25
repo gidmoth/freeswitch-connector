@@ -266,7 +266,12 @@ Schema:
         body: {
             type: 'array',
             items: {
-                type: 'string'
+                type: 'object',
+                properties: {
+                    id: { type: 'string' }
+                },
+                required: ['id'],
+                additionalProperties: false
             }
         }
     }
@@ -427,7 +432,8 @@ lists updated.
 Schema:
 
 ```
-$schema: 'http://json-schema.org/draft-07/schema#',
+{
+        $schema: 'http://json-schema.org/draft-07/schema#',
         $id: 'gidmoth/confDelSchema',
         body: {
             type: 'array',
@@ -440,6 +446,7 @@ $schema: 'http://json-schema.org/draft-07/schema#',
                 additionalProperties: false
             }
         }
+    }
 ```
 
 Deletes conferences by the num property, that is the number

@@ -38,7 +38,12 @@ async function userroutes(fastify, options) {
         body: {
             type: 'array',
             items: {
-                type: 'string'
+                type: 'object',
+                properties: {
+                    id: { type: 'string' }
+                },
+                required: ['id'],
+                additionalProperties: false
             }
         }
     }
@@ -180,7 +185,8 @@ async function userroutes(fastify, options) {
 
     // delete users
     fastify.post('/api/users/del', { schema: userDelSchema }, async function (req, reply) {
-        FsOps.delUsers(this.xmlState, req.body)
+        let list = req.body.map(usr => usr.id)
+        FsOps.delUsers(this.xmlState, list)
             .then(deletet => {
                 reply.send(deletet);
             })
