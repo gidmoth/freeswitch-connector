@@ -22,7 +22,6 @@ const checkPath = (myopt) => {
 
 const checkFile = (myopt) => {
     let file = path.normalize(myopt)
-    console.log(`thats checked: ${file}`)
     if (!(fs.existsSync(file) || file == '')) {
         return false
     }
@@ -34,35 +33,42 @@ const askConf = async () => {
         {
             name: 'url',
             type: 'input',
-            message: 'Enter api url:'
+            message: 'Enter api url:',
+            default: 'https://host.example.com/api'
         },
         {
             name: 'uname',
             type: 'input',
             message: 'Enter username:',
+            default: 'fooname'
         },
         {
             name: 'pw',
             type: 'input',
             message: 'Enter password:',
+            default: 'barpass'
         }
     ]
     let answers = await inquirer.prompt(questions)
     return answers
 }
 
-const chkReadConf = async () => {
+const writeReadConf = async () => {
+    console.log('Please enter config')
+    let cnf = {}
+    let config = await askConf()
+    cnf.baseurl = config.url
+    cnf.user = config.uname
+    cnf.pw = config.pw
+    filejson = JSON.stringify(cnf)
+    fs.writeFileSync(`${os.homedir()}/.fsconcli.json`, filejson)
+    console.log(`written: ${os.homedir()}/.fsconcli.json`)
+}
+
+const readConf = async () => {
     if (!checkFile(`${os.homedir()}/.fsconcli.json`)) {
-        console.log('No config found, please enter')
-        let cnf = {}
-        let config = await askConf()
-        cnf.baseurl = config.url
-        cnf.user = config.uname
-        cnf.pw = config.pw
-        filejson = JSON.stringify(cnf)
-        fs.writeFileSync(`${os.homedir()}/.fsconcli.json`, filejson)
-        console.log(`written: ${os.homedir()}/.fsconcli.json`)
-        return cnf;
+        console.log('Incomplete or no credentials provided, no config found.\nPlease provide credentials with -u, -p and -s or create a configfile with:\nfsconcli config < -i | -u -p -s >')
+        return { noconfig: true }
     }
     let config = JSON.parse(fs.readFileSync(`${os.homedir()}/.fsconcli.json`))
     let cnf = {}
@@ -97,6 +103,8 @@ const argv = yargs
     .strict()
     .scriptName('fsconcli')
     .usage('Usage: $0 <command> [options]')
+    .command('config',
+        'Write config file for fsconcli; after running this, subsequent calls don\'t need the -u, -p, and -s options anymore')
     .command('users',
         'Show list of users, by default shows all users. Use \'users -h\' for a list of options',
         (yargs) => {
@@ -163,6 +171,24 @@ const argv = yargs
         describe: 'Output text instead of json',
         default: false,
         alias: 'text'
+    })
+    .option('u', {
+        nargs: 1,
+        type: 'string',
+        describe: 'Your username to login',
+        alias: 'usr'
+    })
+    .option('p', {
+        nargs: 1,
+        type: 'string',
+        describe: 'Your password to login',
+        alias: 'pwd'
+    })
+    .option('s', {
+        nargs: 1,
+        type: 'string',
+        describe: 'The api server address to login',
+        alias: 'srv'
     })
     .help()
     .alias('help', 'h')
@@ -533,8 +559,28 @@ const askModUsers = async (usrarr = [], client) => {
 }
 
 async function runMe(argv) {
-    conf = await chkReadConf()
-    const client = getClient(conf)
+    let client = {}
+    if (!argv.u || !argv.p || !argv.s) {
+        if (argv._[0] !== 'config') {
+            conf = await readConf()
+            if (conf.noconfig) {
+                return;
+            }
+        }
+        if (argv._[0] == 'config') {
+            if (argv.i) {
+                conf = { noconfig: true }
+            } else {
+                console.log('Incomplete or no credentials provided,\nprovide credentials with -u, -p and -s\nor use -i to make me ask for credentials')
+                return;
+            }
+        }
+    } else {
+        conf = { baseurl: argv.s, user: argv.u, pw: argv.p }
+    }
+    if (!conf.noconfig) {
+        client = getClient(conf)
+    }
     if (argv.i) {
         switch (argv._[0]) {
             case 'addusers': {
@@ -554,11 +600,25 @@ async function runMe(argv) {
                 }
                 break;
             }
+            case 'config': {
+                await writeReadConf()
+                return;
+            }
             default:
                 console.log('i want to be interactive')
         }
     }
     switch (argv._[0]) {
+        case 'config': {
+            let cnf = {}
+            cnf.baseurl = argv.s
+            cnf.user = argv.u
+            cnf.pw = argv.p
+            filejson = JSON.stringify(cnf)
+            fs.writeFileSync(`${os.homedir()}/.fsconcli.json`, filejson)
+            console.log(`written: ${os.homedir()}/.fsconcli.json`)
+            return;
+        }
         case 'users': {
             if (argv.o) {
                 if (!(checkPath(argv.o))) {
