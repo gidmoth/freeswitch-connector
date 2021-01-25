@@ -355,7 +355,9 @@ with contacts by a file besides it's whole configuration. So all Linphone
 provisioning is rebuilt by this opertation. (The alternative: calculate
 all provisioning for Linphone when requested, would be even more expensive,
 since provisioning should be more often requested than changes in the contacts
-take place.)
+take place.) The polycoms are special in directory-provisioning too, so there
+is the need to write a file for every phone, change it, but leave the individual
+entries therein intact.
 
 Also: due to the concept of connector, it would be a hack to ensure consistency of
 the contacts if this operation was done automatically after each
