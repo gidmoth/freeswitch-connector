@@ -7,6 +7,7 @@ const fsDir = require('../config').getConfig('xmldir');
 const Provpaths = require('../config').getConfig('provisioningpaths');
 const statDir = Provpaths.all;
 const reloadxml = require('../fseventusers/reloadxml')
+const path = require('path')
 
 //helper
 const runReload = async (xmlState) => {
