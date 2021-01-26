@@ -597,6 +597,12 @@ So It's also for testing changes in the
 [Templates](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/apis/templates.js)
 or by hand, and being able to restore with the following endpoint.
 
+The answer looks like this:
+
+`{ op: 'store/directory', done: '', failed: '' }`
+
+Although this operation should never fail.
+
 #### `GET: /api/restore/[directory|dialplan|conferences|freeswitch]`
 
 Restores the respective directory in `/etc-freeswitch` from a previously
@@ -606,6 +612,12 @@ from informations gathered through the eventsocket.
 
 If you do this, don't forget to run `/api/users/reprov` afterwards, or the
 provisioningfiles may be inconsistent with the contents of your directory.
+
+The answer looks like this:
+
+`{ op: 'restore/directory', done: '', failed: '' }`
+
+Restoring fails if it could not find the tarball.
 
 #### `GET: /api/info`
 
