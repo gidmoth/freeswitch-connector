@@ -21,7 +21,7 @@ const filterCustItems = (user) => {
     let item = 0
     let parser = sax.parser(strict, opts)
     parser.onerror = function (e) {
-      console.log(err)
+      console.log(e)
     }
     parser.onopentag = function (tag) {
       if (tag.name == 'item') {
