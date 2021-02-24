@@ -154,6 +154,16 @@ const argv = yargs
                 nargs: 1
             })
         })
+    .command('delusers [userarray]',
+        'Delete users, takes json array of userids as arg',
+        (yargs) => {
+            return yargs.option('f', {
+                alias: 'file',
+                describe: 'Read useridarray from file',
+                type: 'string',
+                nargs: 1
+            })
+        })
     .option('i', {
         alias: 'intac',
         type: 'boolean',
@@ -306,6 +316,52 @@ const users = (argv, client) => new Promise((resolve, reject) => {
 
 const addusers = (text, postbody, client) => new Promise((resolve, reject) => {
     client.fetch(`${conf.baseurl}/users/add`, getPostoptions(postbody))
+        .then(resp => resp.text())
+        .then(txt => {
+            try {
+                let data = JSON.parse(txt)
+                if (text) {
+                    let txtdata = ''
+                    txtdata += `Called: ${conf.baseurl}/${data.op}` + '\n\n'
+                    txtdata += 'Done:\n----\n'
+                    if (data.done.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.done) {
+                            txtdata += retTextUser(usr)
+                        }
+                        txtdata += ']\n\n'
+                    }
+                    txtdata += 'Failed:\n------\n'
+                    if (data.failed.length < 1) {
+                        txtdata += '[]\n\n'
+                    } else {
+                        txtdata += '[\n'
+                        for (let usr of data.failed) {
+                            txtdata += `  ERROR: ${usr.error}` + '\n'
+                            for (let [key, value] of Object.entries(usr.user)) {
+                                txtdata += `    ${key}: ${value}` + '\n'
+                            }
+                        }
+                        txtdata += ']\n'
+                    }
+                    resolve(txtdata)
+                }
+                resolve(JSON.stringify(data))
+            } catch (err) {
+                let data = txt
+                resolve(`ERROR: ${data}`)
+            }
+        })
+        .catch(err => {
+            console.log(err)
+            reject(err)
+        })
+})
+
+const delUsers = (text, postbody, client) => new Promise((resolve, reject) => {
+    client.fetch(`${conf.baseurl}/users/del`, getPostoptions(postbody))
         .then(resp => resp.text())
         .then(txt => {
             try {
@@ -550,12 +606,73 @@ const askModUsers = async (usrarr = [], client) => {
         questions = questionsall.quest
     } catch (err) {
         console.log(err)
-        return askModUsers(usrarr)
+        return askModUsers(usrarr, client)
     }
     let { again, ...answers } = await inquirer.prompt(questions)
     answers.id = questionsall.id
     let newusers = [...usrarr, answers]
-    return again ? askModUsers(newusers) : newusers
+    return again ? askModUsers(newusers, client) : newusers
+}
+
+const delpopulate = (client) => new Promise((resolve, reject) => {
+    inquirer.prompt([
+        {
+            name: 'id',
+            type: 'input',
+            message: 'input userid:'
+        }
+    ])
+        .then(async (answer) => {
+            let usrans = {}
+            await client.fetch(`${conf.baseurl}/users/byid/${answer.id}`)
+                .then(resp => resp.text())
+                .then(txt => {
+                    try {
+                        let data = JSON.parse(txt)
+                        usrans = data
+                    } catch (err) {
+                        let data = txt
+                        console.log(`ERROR: ${data}`)
+                    }
+                })
+                .catch(err => {
+                    console.log(err)
+                    reject(err)
+                })
+            if (usrans.users.length < 1 || usrans.users.length > 1) {
+                reject('User not found or not unique, try again')
+            } else {
+                process.stdout.write('  User:\n')
+                process.stdout.write(retTextUser(usrans.users[0]))
+                process.stdout.write('  staged for deletion\n')
+                resolve({
+                    quest: [
+                        {
+                            name: 'again',
+                            type: 'confirm',
+                            message: 'Delete another user?',
+                            default: false
+                        }
+                    ],
+                    id: usrans.users[0].id
+                })
+            }
+        })
+})
+
+const askDelUsers = async (usrarr = [], client) => {
+    let questions = []
+    try {
+        questionsall = await delpopulate(client)
+        questions = questionsall.quest
+    } catch (err) {
+        console.log(err)
+        return askDelUsers(usrarr, client)
+    }
+    let { again, ...answers } = await inquirer.prompt(questions)
+    answers.id = questionsall.id
+    let delusers = [...usrarr, answers]
+    return again ? askDelUsers(delusers, client) : delusers
 }
 
 async function runMe(argv) {
@@ -591,6 +708,11 @@ async function runMe(argv) {
             case 'modusers': {
                 let manswers = await askModUsers([], client)
                 argv.userarray = JSON.stringify(manswers)
+                break;
+            }
+            case 'delusers': {
+                let answers = await askDelUsers([], client)
+                argv.userarray = JSON.stringify(answers)
                 break;
             }
             case 'users': {
@@ -744,6 +866,61 @@ async function runMe(argv) {
                     .catch(err => console.log(err))
             } else {
                 modUsers(argv.t, postbodymod, client)
+                    .then(answer => {
+                        process.stdout.write(answer)
+                    })
+                    .catch(err => console.log(err))
+            }
+            break;
+        }
+        case 'delusers': {
+            if (!process.stdin.isTTY && !argv.f && !argv.i) {
+                try {
+                    argv.userarray = await stdinRead()
+                } catch (err) {
+                    console.log(err)
+                    return
+                }
+            }
+            if (process.stdin.isTTY && !argv.f && !argv.i && !argv.userarray) {
+                process.stdout.write(`The ${argv._[0]} command needs an usridarray.` + '\n')
+                process.stdout.write(`You can provide it as JSON by either means:` + '\n\n')
+                process.stdout.write(`  - interactive, use the -i flag` + '\n')
+                process.stdout.write(`  - pipe to stdin` + '\n')
+                process.stdout.write(`  - read from file, use the -f flag` + '\n')
+                process.stdout.write(`  - as argument on invocation` + '\n\n')
+                process.stdout.write(`For format information see here:` + '\n')
+                process.stdout.write(`https://github.com/gidmoth/freeswitch-connector#post-apiusersdel` + '\n')
+                return
+            }
+            if (argv.f) {
+                if (!(checkFile(argv.f))) {
+                    process.stdout.write(`ERROR: can't find ${argv.f}` + '\n')
+                    return
+                } else {
+                    try {
+                        argv.userarray = await fileRead(path.normalize(argv.f))
+                    } catch (err) {
+                        console.log(err)
+                        return
+                    }
+                }
+            }
+            let postbodymod = JSON.parse(argv.userarray)
+            if (argv.o) {
+                if (!(checkPath(argv.o))) {
+                    process.stdout.write(`ERROR: no path to ${argv.o}` + '\n')
+                    return
+                }
+                delUsers(argv.t, postbodymod, client)
+                    .then(answer => {
+                        fs.writeFileSync(path.normalize(argv.o), answer)
+                        process.stdout.write(`written: ${path.normalize(argv.o)}` + '\n')
+                        return
+                    })
+                    .catch(err => console.log(err))
+            } else {
+                delUsers(argv.t, postbodymod, client)
                     .then(answer => {
                         process.stdout.write(answer)
                     })
