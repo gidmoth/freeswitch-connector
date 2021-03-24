@@ -427,7 +427,7 @@ Remember to run `GET: /api/conferences/rebuildcontacts` after
 changes to conferences, if you wish the provisioned contacts
 lists updated.
 
-#### `POST: /api/conference/del`
+#### `POST: /api/conferences/del`
 
 Schema:
 
