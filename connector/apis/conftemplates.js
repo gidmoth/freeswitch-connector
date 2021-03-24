@@ -69,7 +69,7 @@ const getConfFile = (conf) => {
             <!-- force codec for all conferees -->
             <action application="set" data="codec_string=G722"/>
             <action application="answer"/>
-            <action application="conference" data="${conf.name}@${conf.type}+\${conpin}+flags{\${conf_flags}}"/>
+            <action application="conference" data="${conf.name}@${conf.type}++flags{\${conf_flags}}"/>
         </condition>
     </extension>
 </include>
@@ -100,12 +100,21 @@ const getPolyDir = (confs, user) => {
 `
   let cust = filterCustItems(user)
   dirxml += cust
+  let shortdials = [
+    'Verlag 1',
+    'Verlag 2'
+  ]
   for (let conf of confs) {
     dirxml += `        <item server='yes'>
             <fn>${conf.name}</fn>
             <ln>${conf.type}</ln>
             <ct>${conf.num}</ct>
-        </item>
+`
+    if (shortdials.includes(conf.name)) {
+      dirxml += `            <sd>${shortdials.indexOf(conf.name) + 1}</sd>
+`
+    }
+    dirxml += `        </item>
 `
   }
   dirxml += `    </item_list>

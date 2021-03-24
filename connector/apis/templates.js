@@ -5,15 +5,18 @@
 const fastiConf = require('../config').getConfig('fasti');
 
 const getUserFile = (user) => {
-    let conferenceFlags = ''
-    switch (user.context) {
-        case fastiConf.apiallow:
-            conferenceFlags = 'moderator|mute-detect';
-            break;
-        default:
-            conferenceFlags = 'mute-detect';
-    }
-    return `<include>
+  let conferenceFlags = ''
+  switch (user.context) {
+    case fastiConf.apiallow:
+      conferenceFlags = 'moderator|mute-detect|mute';
+      break;
+    case fastiConf.allow:
+      conferenceFlags = 'moderator|mute-detect|mute';
+      break;
+    default:
+      conferenceFlags = 'mute-detect|mute';
+  }
+  return `<include>
     <user id="${user.id}">
       <params>
         <param name="password" value="${user.password}"/>
@@ -93,7 +96,7 @@ ${mycontacts}
 }
 
 const getPolyMain = (user, hostname) => {
-    return `<?xml version="1.0" standalone="yes"?>
+  return `<?xml version="1.0" standalone="yes"?>
 <APPLICATION
    APP_FILE_PATH="https://${user.name}:${user.password}@${hostname}/polycom/sip.ld"
    CONFIG_FILES="https://${user.name}:${user.password}@${hostname}/polycom/allprov.cfg"
@@ -119,11 +122,16 @@ const getPolyAll = (user, hostname, globals) => {
       reg.1.displayName="${user.name}"
       reg.1.server.1.address="${hostname}"
       reg.1.server.1.port="${globals.internal_tls_port}"
-      reg.1.label="testhase"
+      reg.1.label="${hostname.split('.')[0]}"
       reg.1.type="private"
       reg.1.server.1.transport="TLS"
       tcpIpApp.sntp.address="europe.pool.ntp.org"
-      tcpIpApp.sntp.address.overrideDHCP="1"
+      tcpIpApp.sntp.add<ress.overrideDHCP="1"
+      tcpIpApp.sntp.gmtOffset="3600"
+      tcpIpApp.sntp.daylightSavings.start.month="3"
+      tcpIpApp.sntp.daylightSavings.start.dayOfWeek.lastInMonth="1"
+      tcpIpApp.sntp.daylightSavings.stop.month="10"
+      tcpIpApp.sntp.daylightSavings.stop.dayOfWeek.lastInMonth="1"
       voIpProt.SIP.specialEvent.checkSync.alwaysReboot="1"
       voIpProt.SIP.serverFeatureControl.cf="0"
       voIpProt.SIP.serverFeatureControl.dnd="0"
@@ -137,8 +145,10 @@ const getPolyAll = (user, hostname, globals) => {
       sec.srtp.offer.HMAC_SHA1_80="0"
       sec.srtp.resumeWithNewKey="0"
       device.set="1"
+      voice.codecPref.G722="1"
+      voice.codecPref.G711_A="2"
+      voice.codecPref.G711_Mu="3"
       voice.codecPref.G729_AB="0"
-      voice.codecPref.G711_A="0"
       device.prov.redunAttemptLimit.set="1"
       device.prov.redunAttemptLimit="1"
       device.prov.serverName.set="1"
@@ -147,6 +157,9 @@ const getPolyAll = (user, hostname, globals) => {
       device.prov.serverType="HTTPS"
       device.prov.ztpEnabled.set="1"
       device.prov.ztpEnabled="0"
+      bg.hiRes.color.selection="3,2"
+      bg.hiRes.gray.selection="3,2"
+      bg.medRes.gray.selection="3,2"
     />
   </PHONE_CONFIG>
 `
