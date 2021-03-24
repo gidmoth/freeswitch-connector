@@ -516,7 +516,7 @@ the moderator-controls in `conference.conf.xml`. Connector will track the custom
 events provided by these controls, and make freeswitch do recordings
 accordingly. You will also need to setup a volume for the recordings, look
 at the
-[config.js](https://github.com/gidmoth/freeswitch-connector/blob/main/connector/config.js)
+[config.js](https://github.com/gidmoth/freeswitch-connector/connector/config.js)
 and at the Dockerfile (the ENV therein) in the example-freeswitch. As of now,
 connector and freeswitch need to mount the recordings-volume on the same path,
 but this is easily changable by adding a new variable to config.js.
