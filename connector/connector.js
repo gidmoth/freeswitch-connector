@@ -6,7 +6,8 @@ const fasticonf = require('./config').getConfig('fasti');
 const Monitor = require('./fseventconsumers/esmonitor.js');
 // the state will be the same objectinstance for the whole runtime
 const xmlState = {};
-const liveState = {};
+const liveConst = require('./livestate')
+const liveState = new liveConst
 const maintain = require('./maintainance');
 const fs = require('fs');
 
@@ -40,6 +41,9 @@ const fastify = require ('fastify')({
 
 // pass xmlState to fastify instance
 fastify.decorate('xmlState', xmlState)
+
+// pass liveState to fastify instance
+fastify.decorate('liveState', liveState)
 
 // register api endpionts
 fastify.register(require('./fastify-rest/api'))
