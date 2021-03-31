@@ -101,8 +101,8 @@ const getPolyDir = (confs, user) => {
   let cust = filterCustItems(user)
   dirxml += cust
   let shortdials = [
-    'Verlag 1',
-    'Verlag 2'
+    'Verlag_1',
+    'Verlag_2'
   ]
   for (let conf of confs) {
     dirxml += `        <item server='yes'>
