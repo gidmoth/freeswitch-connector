@@ -44,6 +44,7 @@ const handle = (event, xmlState, liveState) => {
                 }
                 case 'conference': {
                     let subcommand = event.getHeader('Job-Command-Arg')
+                    console.log(event.serialize('json'))
                     switch (true) {
                         case (subcommand.includes('recording start')): {
                             let conference = subcommand.split(' ')[0]
