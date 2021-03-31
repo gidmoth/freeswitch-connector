@@ -157,6 +157,7 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 case 'startrecording': {
+                    console.log(event.serialize('json'))
                     let conference = event.getHeader('Conference-Name')
                     if (liveState.recstates.hasOwnProperty(`${conference}`)) {
                         switch (liveState.recstates[conference].state) {
