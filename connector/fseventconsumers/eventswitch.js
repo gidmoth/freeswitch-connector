@@ -44,7 +44,6 @@ const handle = (event, xmlState, liveState) => {
                 }
                 case 'conference': {
                     let subcommand = event.getHeader('Job-Command-Arg')
-                    console.log(event.serialize('json'))
                     switch (true) {
                         case (subcommand.includes('recording start')): {
                             let conference = subcommand.split(' ')[0]
@@ -59,7 +58,6 @@ const handle = (event, xmlState, liveState) => {
                                 .catch(err => {
                                     console.log(err)
                                 })
-                            console.log(JSON.stringify(liveState))
                             break;
                         }
                         case (subcommand.includes('recording pause')): {
@@ -137,7 +135,7 @@ const handle = (event, xmlState, liveState) => {
                     }
                 }
                 default: {
-                    //console.log(event.serialize('json'))
+                    console.log(event.serialize('json'))
                     break;
                 }
             }
@@ -299,6 +297,7 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 default: {
+                    console.log(event.serialize('json'))
                     break;
                 }
 
