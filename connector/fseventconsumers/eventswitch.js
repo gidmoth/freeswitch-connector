@@ -8,6 +8,7 @@ const record = require('../fseventusers/recordingfuncts')
 const freeswitchparams = require('../config').getConfig('freeswitch')
 const recpath = freeswitchparams.recordings
 const say = require('./leasay')
+const Parsers = require('./switchParsers')
 
 const Event = {
     Channel: {
@@ -132,10 +133,16 @@ const handle = (event, xmlState, liveState) => {
                                 })
                             break;
                         }
+                        case (subcommand == 'json_list'): {
+                            liveState.conferences = Parsers.listParse(JSON.parse(event.getBody()))
+                            console.log(JSON.stringify(liveState.conferences))
+                            break;
+                        }
                     }
+                    break;
                 }
                 default: {
-                    console.log(event.serialize('json'))
+                    // console.log(event.serialize('json'))
                     break;
                 }
             }
@@ -155,7 +162,6 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 case 'startrecording': {
-                    console.log(event.serialize('json'))
                     let conference = event.getHeader('Conference-Name')
                     if (liveState.recstates.hasOwnProperty(`${conference}`)) {
                         switch (liveState.recstates[conference].state) {
@@ -297,11 +303,12 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 default: {
-                    console.log(event.serialize('json'))
+                    // console.log(event.serialize('json'))
                     break;
                 }
 
             }
+            break;
         }
         default: {
             //    console.log(eventName)
