@@ -98,6 +98,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording check')): {
+                            console.log(event.serialize('json'))
                             let conference = subcommand.split(' ')[0]
                             if (liveState.recstates.hasOwnProperty(`${conference}`)) {
                                 switch (liveState.recstates[conference].state) {
@@ -148,167 +149,176 @@ const handle = (event, xmlState, liveState) => {
             }
         }
         case 'CUSTOM': {
-            let mymsg = event.getHeader('Data')
-            switch (mymsg) {
-                case 'muteall': {
-                    let conference = event.getHeader('Conference-Name')
-                    muteall.run(conference)
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    break;
-                }
-                case 'startrecording': {
-                    let conference = event.getHeader('Conference-Name')
-                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
-                        switch (liveState.recstates[conference].state) {
-                            case 'running': {
-                                say.leaSay(conference, 'already')
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
-                            }
-                            case 'paused': {
-                                say.leaSay(conference, 'paused')
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
-                            }
+            // console.log(event.serialize('json'))
+            switch (event.getHeader('Event-Subclass')) {
+                case 'conference::maintenance': {
+                    let mymsg = event.getHeader('Data')
+                    switch (mymsg) {
+                        case 'muteall': {
+                            let conference = event.getHeader('Conference-Name')
+                            muteall.run(conference)
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
                         }
-                        return;
-                    }
-                    let filename = `${recpath}/${conference}-${new Date().toISOString()}.wav`
-                    record.startrec(conference, filename)
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    break;
-                }
-                case 'pauserecording': {
-                    let conference = event.getHeader('Conference-Name')
-                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
-                        switch (liveState.recstates[conference].state) {
-                            case 'running': {
-                                record.pauserec(conference, liveState.recstates[conference].file)
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
+                        case 'startrecording': {
+                            let conference = event.getHeader('Conference-Name')
+                            if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                                switch (liveState.recstates[conference].state) {
+                                    case 'running': {
+                                        say.leaSay(conference, 'already')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                    case 'paused': {
+                                        say.leaSay(conference, 'paused')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                }
+                                return;
                             }
-                            case 'paused': {
-                                say.leaSay(conference, 'pausing')
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
-                            }
+                            let filename = `${recpath}/${conference}-${new Date().toISOString()}.wav`
+                            record.startrec(conference, filename)
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
                         }
-                        return;
-                    }
-                    say.leaSay(conference, 'norec')
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    break;
-                }
-                case 'resumerecording': {
-                    let conference = event.getHeader('Conference-Name')
-                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
-                        switch (liveState.recstates[conference].state) {
-                            case 'paused': {
-                                record.resumerec(conference, liveState.recstates[conference].file)
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
+                        case 'pauserecording': {
+                            let conference = event.getHeader('Conference-Name')
+                            if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                                switch (liveState.recstates[conference].state) {
+                                    case 'running': {
+                                        record.pauserec(conference, liveState.recstates[conference].file)
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                    case 'paused': {
+                                        say.leaSay(conference, 'pausing')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                }
+                                return;
                             }
-                            case 'running': {
-                                say.leaSay(conference, 'already')
-                                    .then(answer => {
-                                        console.log(answer)
-                                    })
-                                    .catch(err => {
-                                        console.log(err)
-                                    })
-                                break;
-                            }
+                            say.leaSay(conference, 'norec')
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
                         }
-                        return;
+                        case 'resumerecording': {
+                            let conference = event.getHeader('Conference-Name')
+                            if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                                switch (liveState.recstates[conference].state) {
+                                    case 'paused': {
+                                        record.resumerec(conference, liveState.recstates[conference].file)
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                    case 'running': {
+                                        say.leaSay(conference, 'already')
+                                            .then(answer => {
+                                                console.log(answer)
+                                            })
+                                            .catch(err => {
+                                                console.log(err)
+                                            })
+                                        break;
+                                    }
+                                }
+                                return;
+                            }
+                            say.leaSay(conference, 'norec')
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
+                        }
+                        case 'stoprecording': {
+                            let conference = event.getHeader('Conference-Name')
+                            if (liveState.recstates.hasOwnProperty(`${conference}`)) {
+                                record.stoprec(conference, 'all')
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                return;
+                            }
+                            say.leaSay(conference, 'norec')
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
+                        }
+                        case 'checkrecording': {
+                            let conference = event.getHeader('Conference-Name')
+                            record.chekrec(conference)
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
+                        }
+                        default: {
+                            // console.log(event.serialize('json'))
+                            break;
+                        }
                     }
-                    say.leaSay(conference, 'norec')
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    break;
-                }
-                case 'stoprecording': {
-                    let conference = event.getHeader('Conference-Name')
-                    if (liveState.recstates.hasOwnProperty(`${conference}`)) {
-                        record.stoprec(conference, 'all')
-                            .then(answer => {
-                                console.log(answer)
-                            })
-                            .catch(err => {
-                                console.log(err)
-                            })
-                        return;
-                    }
-                    say.leaSay(conference, 'norec')
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
-                    break;
-                }
-                case 'checkrecording': {
-                    let conference = event.getHeader('Conference-Name')
-                    record.chekrec(conference)
-                        .then(answer => {
-                            console.log(answer)
-                        })
-                        .catch(err => {
-                            console.log(err)
-                        })
                     break;
                 }
                 default: {
                     // console.log(event.serialize('json'))
                     break;
                 }
-
             }
-            break;
+
         }
         default: {
             //    console.log(eventName)

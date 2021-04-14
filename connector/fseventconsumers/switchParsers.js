@@ -25,12 +25,28 @@ const getFloor = (memarr) => {
     return memObj(memarr[posi])
 }
 
+const getRecstate = (allmemarr) => {
+    let retval = {}
+    let recnode = allmemarr.filter(mem => mem.type == 'recording_node')
+    if (recnode.length > 0) {
+        if (recnode[0].hasOwnProperty('status')) {
+            retval.status = recnode[0].status
+        } else {
+            retval.status = 'running'
+        }
+        retval.file = recnode[0].record_path
+    } else {
+        retval.status = 'norec'
+    }
+    return retval;
+}
+
 const listParse = (list) => {
     let conferences = []
     list.forEach(conf => {
         conferences.push({
             name: conf.conference_name,
-            recording: conf.recording,
+            recording: getRecstate(conf.members),
             floor: getFloor(conf.members.filter(mem => mem.type == 'caller')),
             members: getMems(conf.members.filter(mem => mem.type == 'caller'))
         })
