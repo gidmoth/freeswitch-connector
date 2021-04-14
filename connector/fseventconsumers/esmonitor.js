@@ -13,7 +13,7 @@ const startMon = (xmlState, liveState) => {
         connection.on(Conn.Event.RECEIVED, event => {
             // A new FreeSWITCH event has been received!
             Eswitch.handle(event, xmlState, liveState);
-        });
+        })
     })
     .catch(error => {
         // An error connecting to FreeSWITCH occurred!

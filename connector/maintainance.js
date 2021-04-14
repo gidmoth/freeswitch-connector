@@ -4,6 +4,7 @@
 
 const getXmlState = require('./xmlimport/getxmlstate');
 const getFilestate = require('./filestate/filesets');
+const API = require('./apis/esapi');
 
 function statelog(xmlState) {
     console.log(`
@@ -35,20 +36,23 @@ next publicconference:  ${[...xmlState.availConfNums.public][0]}
 `);
 }
 
+
 function updateXmlState(xmlState) {
     getXmlState.getGlobals(xmlState)
-    .then(xmlState => getXmlState.getUsers(xmlState))
-    .then(xmlState => getXmlState.getConfTypes(xmlState))
-    .then(xmlState => getXmlState.getConferences(xmlState))
-    .then(xmlState => {
-        getFilestate.getAvaiUsers(xmlState);
-        getFilestate.getAvaiConfs(xmlState);
-        xmlState.info.maintainance.lastrun = new Date();
-        statelog(xmlState);
-    })
-    .catch(error => {
-        console.log(error);
-    });
+        .then(xmlState => getXmlState.getUsers(xmlState))
+        .then(xmlState => getXmlState.getConfTypes(xmlState))
+        .then(xmlState => getXmlState.getConferences(xmlState))
+        .then(xmlState => {
+            getFilestate.getAvaiUsers(xmlState);
+            getFilestate.getAvaiConfs(xmlState);
+            xmlState.info.maintainance.lastrun = new Date();
+            statelog(xmlState);
+        })
+        .catch(error => {
+            console.log(error);
+        });
 }
+
+
 
 exports.updateXmlState = updateXmlState;

@@ -31,12 +31,12 @@ Monitor.startMon(xmlState, liveState);
 maintain.updateXmlState(xmlState);
 
 // init fastify for rest and static interface
-const fastify = require ('fastify')({
+const fastify = require('fastify')({
     logger: true,
     https: {
         key: fs.readFileSync(fasticonf.key),
         cert: fs.readFileSync(fasticonf.cert)
-    }   
+    }
 })
 
 // pass xmlState to fastify instance

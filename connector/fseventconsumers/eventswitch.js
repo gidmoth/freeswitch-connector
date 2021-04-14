@@ -44,6 +44,7 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 case 'conference': {
+                    // console.log(event.serialize('json'))
                     let subcommand = event.getHeader('Job-Command-Arg')
                     switch (true) {
                         case (subcommand.includes('recording start')): {
@@ -98,7 +99,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand.includes('recording check')): {
-                            console.log(event.serialize('json'))
+                            // console.log(event.serialize('json'))
                             let conference = subcommand.split(' ')[0]
                             if (liveState.recstates.hasOwnProperty(`${conference}`)) {
                                 switch (liveState.recstates[conference].state) {
@@ -135,6 +136,7 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         case (subcommand == 'json_list'): {
+                            // console.log(event.getBody())
                             liveState.conferences = Parsers.listParse(JSON.parse(event.getBody()))
                             console.log(JSON.stringify(liveState.conferences))
                             break;
@@ -307,7 +309,8 @@ const handle = (event, xmlState, liveState) => {
                             break;
                         }
                         default: {
-                            // console.log(event.serialize('json'))
+                            let conference = event.getHeader('Conference-Name')
+                            console.log(event.serialize('json'))
                             break;
                         }
                     }

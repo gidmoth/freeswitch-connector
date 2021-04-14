@@ -41,13 +41,22 @@ const getRecstate = (allmemarr) => {
     return retval;
 }
 
+const getLastJoin = (memarr) => {
+    let ljoin = memarr.reduce((prev, curr) => (prev.join_time < curr.join_time) ? prev : curr, Infinity)
+    return memObj(ljoin)
+}
+
 const listParse = (list) => {
     let conferences = []
     list.forEach(conf => {
         conferences.push({
             name: conf.conference_name,
             recording: getRecstate(conf.members),
+            locked: conf.locked,
             floor: getFloor(conf.members.filter(mem => mem.type == 'caller')),
+            lastjoin: getLastJoin(conf.members.filter(mem => mem.type == 'caller')),
+            lastleave: {},
+            memcount: conf.member_count,
             members: getMems(conf.members.filter(mem => mem.type == 'caller'))
         })
     });
