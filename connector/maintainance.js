@@ -4,7 +4,6 @@
 
 const getXmlState = require('./xmlimport/getxmlstate');
 const getFilestate = require('./filestate/filesets');
-const API = require('./apis/esapi');
 
 function statelog(xmlState) {
     console.log(`

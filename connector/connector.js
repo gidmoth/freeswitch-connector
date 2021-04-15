@@ -10,6 +10,7 @@ const liveConst = require('./livestate')
 const liveState = new liveConst
 const maintain = require('./maintainance');
 const fs = require('fs');
+const liveInit = require('./fseventusers/initlivestate')
 
 xmlState.info = {
     reloadxml: {
@@ -29,6 +30,9 @@ Monitor.startMon(xmlState, liveState);
 
 // init/fill xmlState.
 maintain.updateXmlState(xmlState);
+
+// init livestate
+liveInit.run(liveState)
 
 // init fastify for rest and static interface
 const fastify = require('fastify')({
@@ -60,5 +64,3 @@ fastify.listen(fasticonf.port, fasticonf.ip, function (err, address) {
     }
     fastify.log.info(`server listening on ${address}`)
 })
-
-
