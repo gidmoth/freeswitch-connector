@@ -55,6 +55,9 @@ fastify.register(require('./fastify-rest/api'))
 // register static endpoints
 fastify.register(require('./fastify-static/static'))
 
+// register live endpoint
+fastify.register(require('./fastify-socket/livePoint'))
+
 
 // start fastify
 fastify.listen(fasticonf.port, fasticonf.ip, function (err, address) {
