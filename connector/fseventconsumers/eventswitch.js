@@ -139,6 +139,7 @@ const handle = (event, xmlState, liveState) => {
                             // console.log(event.getBody())
                             liveState.conferences = Parsers.listParse(JSON.parse(event.getBody()))
                             console.log(JSON.stringify(liveState.conferences))
+                            liveState.emit('newLiveState', 'now')
                             break;
                         }
                     }
