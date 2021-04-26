@@ -75,7 +75,7 @@ async function liveroutes(fastify, options) {
             conn.socket.send(`got message: ${message}`)
         })
 
-        fastify.liveState.on('newLiveState', data => {
+        fastify.liveState.on('newLiveState', () => {
             fastify.websocketServer.clients.forEach(client => {
                 if (client.readyState === 1) {
                     client.send(JSON.stringify(fastify.liveState.conferences))

@@ -3,6 +3,10 @@
  */
 
 
+function genArrayFilter(arr, aname) {
+    return arr.filter(item => item.attrib_name == aname)[0].attrib_value;
+}
+
 const memObj = (mem) => {
     return {
         name: mem.caller_id_name,
@@ -63,4 +67,28 @@ const listParse = (list) => {
     return conferences
 }
 
+const addMemParse = (evn) => {
+    return {
+        name: evn.getHeader('Caller-Caller-ID-Name'),
+        id: evn.getHeader('Caller-Username'),
+        confid: evn.getHeader('Member-ID'),
+        mute: (evn.getHeader('Speak') === 'false') ? true : false
+    }
+}
+
+const addConfParse = (evn) => {
+    return {
+        name: evn.getHeader('Conference-Name'),
+        recording: {status: 'norec'},
+        locked: false,
+        floor: {},
+        lastjoin: {},
+        lastleave: {},
+        memcount: +(evn.getHeader('Conference-Size')),
+        members: []
+    }
+}
+
 exports.listParse = listParse;
+exports.addMemParse = addMemParse;
+exports.addConfParse = addConfParse;

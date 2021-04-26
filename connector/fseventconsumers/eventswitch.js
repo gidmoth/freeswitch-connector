@@ -139,7 +139,7 @@ const handle = (event, xmlState, liveState) => {
                             // console.log(event.getBody())
                             liveState.conferences = Parsers.listParse(JSON.parse(event.getBody()))
                             console.log(JSON.stringify(liveState.conferences))
-                            liveState.emit('newLiveState', 'now')
+                            liveState.emit('newLiveState')
                             break;
                         }
                     }
@@ -311,6 +311,24 @@ const handle = (event, xmlState, liveState) => {
                         }
                         default: {
                             let conference = event.getHeader('Conference-Name')
+                            switch (event.getHeader('Action')) {
+                                case 'conference-create': {
+                                    let conf = Parsers.addConfParse(event)
+                                    liveState.conferences.push(conf)
+                                    break;
+                                }
+                                case 'add-member': {
+                                    let mem = Parsers.addMemParse(event)
+                                    let posi = liveState.conferences.findIndex(conf => conf.name === conference)
+                                    liveState.conferences[posi].members.push(mem)
+                                    liveState.conferences[posi].lastjoin = mem
+                                    liveState.conferences[posi].memcount++
+                                    
+                                    console.log('new Member:')
+                                    console.log(JSON.stringify(liveState.conferences))
+                                    break;
+                                }
+                            }
                             console.log(event.serialize('json'))
                             break;
                         }
