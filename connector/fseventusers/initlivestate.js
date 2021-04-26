@@ -7,11 +7,15 @@
  const Parsers = require('../fseventconsumers/switchParsers')
 
  const run = (liveState) => new Promise((resolve, reject) => {
-     console.log('now sending request')
      API.sendbgapi('conference json_list')
      .then(answer => {
          liveState.conferences = Parsers.listParse(JSON.parse(answer))
-         console.log(liveState.conferences)
+         console.log('\n')
+         console.log('======= NEW LIVESTATE: =======\n')
+         console.log('JSON State:\n==========\n')
+         console.log(JSON.stringify(liveState.conferences))
+         console.log('\n')
+         resolve()
      })
      .catch(error => {
          reject(error);
