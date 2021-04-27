@@ -135,6 +135,15 @@ const handle = (event, xmlState, liveState) => {
                                 })
                             break;
                         }
+                        case (subcommand.includes('mute all')): {
+                            let conference = subcommand.split(' ')[0]
+                            let posi = liveState.conferences.findIndex(conf => conf.name === conference)
+                            liveState.conferences[posi].members.forEach(mem => {
+                                mem.mute = true
+                            });
+                            liveState.emit('muteAll', conference)
+                            break;
+                        }
                         case (subcommand == 'json_list'): {
                             // console.log(event.getBody())
                             liveState.conferences = Parsers.listParse(JSON.parse(event.getBody()))
@@ -323,13 +332,47 @@ const handle = (event, xmlState, liveState) => {
                                     liveState.conferences[posi].members.push(mem)
                                     liveState.conferences[posi].lastjoin = mem
                                     liveState.conferences[posi].memcount++
-                                    
-                                    console.log('new Member:')
-                                    console.log(JSON.stringify(liveState.conferences))
+                                    if (liveState.conferences[posi].memcount === 1) {
+                                        liveState.emit('newConference', liveState.conferences[posi])
+                                    } else {
+                                        liveState.emit('newMember', conference, mem)
+                                    }
+                                    break;
+                                }
+                                case 'floor-change': {
+                                    if (event.getHeader('New-ID') === 'none') {
+                                        return;
+                                    }
+                                    let mem = Parsers.addMemParse(event)
+                                    let posi = liveState.conferences.findIndex(conf => conf.name === conference)
+                                    liveState.conferences[posi].floor = mem
+                                    liveState.emit('floorchange', conference, mem)
+                                    break;
+                                }
+                                case 'unmute-member': {
+                                    let posi = liveState.conferences.findIndex(conf => conf.name === conference)
+                                    let memid = event.getHeader('Caller-Username')
+                                    let idx = liveState.conferences[posi].members
+                                        .findIndex(mem => mem.id === memid)
+                                    liveState.conferences[posi].members[idx].mute = false
+                                    liveState.emit('unmute', conference, memid)
+                                    break;
+                                }
+                                case 'mute-member': {
+                                    let posi = liveState.conferences.findIndex(conf => conf.name === conference)
+                                    let memid = event.getHeader('Caller-Username')
+                                    let idx = liveState.conferences[posi].members
+                                        .findIndex(mem => mem.id === memid)
+                                    liveState.conferences[posi].members[idx].mute = true
+                                    liveState.emit('mute', conference, memid)
+                                    break;
+                                }
+                                default: {
+                                    console.log(event.serialize('json'))
                                     break;
                                 }
                             }
-                            console.log(event.serialize('json'))
+                            // console.log(event.serialize('json'))
                             break;
                         }
                     }
