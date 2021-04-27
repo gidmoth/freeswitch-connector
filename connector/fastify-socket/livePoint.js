@@ -148,6 +148,54 @@ async function liveroutes(fastify, options) {
                 }
             })
         })
+
+        fastify.liveState.on('recStop', (conf) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"recStop","conference":"${conf}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('recResume', (conf, file) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"recResume","conference":"${conf}","file":"${file}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('recPause', (conf, file) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"recPause","conference":"${conf}","file":"${file}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('recStart', (conf, file) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"recStart","conference":"${conf}","file":"${file}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('delConference', (conf) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"delConference","conference":"${conf}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('delMember', (conf, memid) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"delMember","conference":"${conf}","data":"${memid}"}`)
+                }
+            })
+        })
     })
 }
 

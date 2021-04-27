@@ -22,7 +22,7 @@ xmlState.info = {
     }
 }
 
-liveState.recstates = {}
+liveState.conferences = []
 
 // start monitoring fsevents, xmlState is needed for reacting on
 // certain events.
