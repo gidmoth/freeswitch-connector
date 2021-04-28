@@ -362,7 +362,7 @@ const handle = (event, xmlState, liveState) => {
                                     let idx = liveState.conferences[posi].members
                                         .findIndex(mem => mem.id === memid)
                                     liveState.conferences[posi].members[idx].mute = false
-                                    if (liveState.conferences[posi].members[idx] === liveState.conferences[posi].floor) {
+                                    if (liveState.conferences[posi].members[idx].id === liveState.conferences[posi].floor.id) {
                                         liveState.conferences[posi].floor.mute = false
                                     }
                                     liveState.emit('unmute', conference, memid)
@@ -373,7 +373,7 @@ const handle = (event, xmlState, liveState) => {
                                     let idx = liveState.conferences[posi].members
                                         .findIndex(mem => mem.id === memid)
                                     liveState.conferences[posi].members[idx].mute = true
-                                    if (liveState.conferences[posi].members[idx] === liveState.conferences[posi].floor) {
+                                    if (liveState.conferences[posi].members[idx].id === liveState.conferences[posi].floor.id) {
                                         liveState.conferences[posi].floor.mute = true
                                     }
                                     liveState.emit('mute', conference, memid)
@@ -397,6 +397,16 @@ const handle = (event, xmlState, liveState) => {
                                     } else {
                                         liveState.emit('delMember', conference, memid)
                                     }
+                                    break;
+                                }
+                                case 'lock': {
+                                    liveState.conferences[posi].locked = true
+                                    liveState.emit('lock', conference)
+                                    break;
+                                }
+                                case 'unlock': {
+                                    liveState.conferences[posi].locked = false
+                                    liveState.emit('unlock', conference)
                                     break;
                                 }
                                 default: {

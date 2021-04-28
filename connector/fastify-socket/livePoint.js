@@ -4,6 +4,7 @@
 
 
 const fastiConf = require('../config').getConfig('fasti');
+const confCtrl = require('../fseventusers/confctrlfuncts');
 
 function noop() { }
 
@@ -15,7 +16,7 @@ function checkCreds(cstring, arr) {
     let user = arr.filter(usr => { return usr.name === `${cstring.split(':')[0]}` })[0]
     if (user !== undefined
         && user.password === `${cstring.split(':')[1]}`
-        && user.context === fastiConf.apiallow) { 
+        && user.context === fastiConf.apiallow) {
         return true
     }
     return false
@@ -31,32 +32,22 @@ async function liveroutes(fastify, options) {
 
     fastify.addHook('onRequest', (conn, repl, done) => {
         if (conn.query.login === undefined) {
-            console.log('got wrong query!')
             conn.socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
             conn.socket.destroy()
             return repl.send('Unauthorized')
         }
-        if (! checkCreds(conn.query.login, fastify.xmlState.users)) {
-            console.log('got wrong creds!')
+        if (!checkCreds(conn.query.login, fastify.xmlState.users)) {
             conn.socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
             conn.socket.destroy()
             return repl.send('Unauthorized')
         }
-        console.log('yay, login!')
         done()
     })
 
     fastify.get('/api/live', { websocket: true }, (conn, req) => {
-
-
-        //        console.log(JSON.stringify(req.query))
-
         conn.socket.on('open', heartbeat)
-
         conn.socket.on('pong', heartbeat)
-
         const interval = setInterval(() => {
-            //            console.log(`my clients: ${fastify.websocketServer.clients.size}`)
             fastify.websocketServer.clients.forEach(sock => {
                 if (sock.isAlive === false) {
                     console.log('destroying unresponsive client')
@@ -72,7 +63,7 @@ async function liveroutes(fastify, options) {
         })
 
         conn.socket.on('message', message => {
-            try  {
+            try {
                 let msg = JSON.parse(message)
                 if (msg.req === undefined) {
                     conn.socket.send(`{"error":"wrong protocol"}`)
@@ -83,8 +74,47 @@ async function liveroutes(fastify, options) {
                         conn.socket.send(`{"reply":"init","data":${JSON.stringify(fastify.liveState.conferences)}}`)
                         break
                     }
+                    case 'exec': {
+                        if (msg.conference === undefined) {
+                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            return
+                        }
+                        if (msg.call === undefined) {
+                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            return
+                        }
+                        let conference = msg.conference
+                        let call = msg.call
+                        switch (call) {
+                            case 'lock': {
+                                confCtrl.confLock(conference)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
+                            case 'unlock': {
+                                confCtrl.confUnlock(conference)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
+                            default: {
+                                conn.socket.send(`{"error":"wrong protocol"}`)
+                                return
+                            }
+                        }
+                        break
+                    }
                     default: {
-                        console.log(JSON.stringify(msg))
+                        conn.socket.send(`{"error":"wrong protocol"}`)
                         break
                     }
                 }
@@ -193,6 +223,22 @@ async function liveroutes(fastify, options) {
             fastify.websocketServer.clients.forEach(client => {
                 if (client.readyState === 1) {
                     client.send(`{"event":"delMember","conference":"${conf}","data":"${memid}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('lock', (conf) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"lock","conference":"${conf}"}`)
+                }
+            })
+        })
+
+        fastify.liveState.on('unlock', (conf) => {
+            fastify.websocketServer.clients.forEach(client => {
+                if (client.readyState === 1) {
+                    client.send(`{"event":"unlock","conference":"${conf}"}`)
                 }
             })
         })
