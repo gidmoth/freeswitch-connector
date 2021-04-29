@@ -3,9 +3,6 @@
  */
 
 
-function genArrayFilter(arr, aname) {
-    return arr.filter(item => item.attrib_name == aname)[0].attrib_value;
-}
 
 const memObj = (mem) => {
     return {

@@ -9,6 +9,7 @@ const freeswitchparams = require('../config').getConfig('freeswitch')
 const recpath = freeswitchparams.recordings
 const say = require('./leasay')
 const Parsers = require('./switchParsers')
+const confCtrl = require('../fseventusers/confctrlfuncts');
 
 const Event = {
     Channel: {
@@ -139,7 +140,7 @@ const handle = (event, xmlState, liveState) => {
                             liveState.conferences[posi].members.forEach(mem => {
                                 mem.mute = true
                             });
-                            if (liveState.conferences[posi].floor !== {}) {
+                            if (liveState.conferences[posi].floor.mute !== undefined) {
                                 liveState.conferences[posi].floor.mute = true
                             }
                             liveState.emit('muteAll', conference)
@@ -321,6 +322,26 @@ const handle = (event, xmlState, liveState) => {
                         }
                         case 'checkrecording': {
                             record.chekrec(conference)
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
+                        }
+                        case 'conferenceunlock': {
+                            confCtrl.confUnlock(conference)
+                                .then(answer => {
+                                    console.log(answer)
+                                })
+                                .catch(err => {
+                                    console.log(err)
+                                })
+                            break;
+                        }
+                        case 'conferencelock': {
+                            confCtrl.confLock(conference)
                                 .then(answer => {
                                     console.log(answer)
                                 })

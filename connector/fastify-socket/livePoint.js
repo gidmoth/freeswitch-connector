@@ -106,6 +106,7 @@ async function liveroutes(fastify, options) {
                                     })
                                 break;
                             }
+                            
                             default: {
                                 conn.socket.send(`{"error":"wrong protocol"}`)
                                 return
