@@ -5,6 +5,10 @@
 
 const fastiConf = require('../config').getConfig('fasti');
 const confCtrl = require('../fseventusers/confctrlfuncts');
+const record = require('../fseventusers/recordingfuncts')
+const freeswitchparams = require('../config').getConfig('freeswitch')
+const recpath = freeswitchparams.recordings
+const muteall = require('../fseventusers/muteallfunc')
 
 function noop() { }
 
@@ -106,7 +110,127 @@ async function liveroutes(fastify, options) {
                                     })
                                 break;
                             }
-                            
+                            case 'startrec': {
+                                let filename = `${recpath}/${conference}-${new Date().toISOString()}.wav`
+                                record.startrec(conference, filename)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'pauserec': {
+                                let posi = fastify.liveState.conferences.findIndex(conf => conf.name === conference)
+                                let filename = fastify.liveState.conferences[posi].recording.file
+                                record.pauserec(conference, filename)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'resumerec': {
+                                let posi = fastify.liveState.conferences.findIndex(conf => conf.name === conference)
+                                let filename = fastify.liveState.conferences[posi].recording.file
+                                record.resumerec(conference, filename)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'stoprec': {
+                                let posi = fastify.liveState.conferences.findIndex(conf => conf.name === conference)
+                                let filename = fastify.liveState.conferences[posi].recording.file
+                                record.stoprec(conference, filename)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'muteall': {
+                                muteall.run(conference)
+                                    .then(answer => {
+                                        console.log(answer)
+                                    })
+                                    .catch(err => {
+                                        console.log(err)
+                                    })
+                                break;
+                            }
+                            case 'kickall': {
+                                confCtrl.confKickAll(conference)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
+                            default: {
+                                conn.socket.send(`{"error":"wrong protocol"}`)
+                                return
+                            }
+                        }
+                        break
+                    }
+                    case 'memexec': {
+                        if (msg.conference === undefined) {
+                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            return
+                        }
+                        if (msg.call === undefined) {
+                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            return
+                        }
+                        if (msg.member === undefined) {
+                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            return
+                        }
+                        let conference = msg.conference
+                        let call = msg.call
+                        let member = msg.member
+                        switch (call) {
+                            case 'kick': {
+                                confCtrl.confKickMem(conference, member)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
+                            case 'mute': {
+                                confCtrl.confMuteMem(conference, member)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
+                            case 'unmute': {
+                                confCtrl.confUnmuteMem(conference, member)
+                                    .then(ans => {
+                                        console.log(ans)
+                                    })
+                                    .catch(err => {
+                                        conn.socket.send(`{"error":"${err}"}`)
+                                    })
+                                break;
+                            }
                             default: {
                                 conn.socket.send(`{"error":"wrong protocol"}`)
                                 return
@@ -120,6 +244,7 @@ async function liveroutes(fastify, options) {
                     }
                 }
             } catch (e) {
+                //console.log(e)
                 conn.socket.send(`{"error":"wrong format"}`)
             }
         })
