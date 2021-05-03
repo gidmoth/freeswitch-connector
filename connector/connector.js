@@ -11,7 +11,7 @@ const liveState = new liveConst
 const maintain = require('./maintainance');
 const fs = require('fs');
 const liveInit = require('./fseventusers/initlivestate')
-const heapdump = require('./HeapDump')
+//const heapdump = require('./HeapDump')
 
 xmlState.info = {
     reloadxml: {
@@ -26,7 +26,7 @@ xmlState.info = {
 liveState.conferences = []
 
 // start heapdumper for leakchecks
-heapdump.init('/dumps')
+//heapdump.init('/dumps')
 
 // start monitoring fsevents, xmlState is needed for reacting on
 // certain events.
