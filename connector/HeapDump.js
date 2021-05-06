@@ -47,7 +47,7 @@
   */
  function saveHeapSnapshot(snapshot, datadir) {
      var buffer = '';
-     var stamp = Date.now();
+     var stamp = new Date().toISOString();
      snapshot.serialize(
          function iterator(data, length) {
              buffer += data;

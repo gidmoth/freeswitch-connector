@@ -1,5 +1,9 @@
 # freeswitch-connector
 
+**WARNING: This is under developement  at the moment:**
+**The README is outdated. Please use only  if you understand**
+**the code. This Warning will disapear as soon as that changes.**
+
 This is a somewhat special purpose interface to freeswitch.
 It is designed to use freeswitch as a conference
 system, but the concept is very expandibele.

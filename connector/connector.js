@@ -53,6 +53,14 @@ fastify.decorate('xmlState', xmlState)
 // pass liveState to fastify instance
 fastify.decorate('liveState', liveState)
 
+// cors for local frontend dev -- remove if not needed
+fastify.register(require('fastify-cors'), {
+    origin: true,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+})
+
 // register api endpionts
 fastify.register(require('./fastify-rest/api'))
 

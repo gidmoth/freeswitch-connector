@@ -6,10 +6,11 @@ const provpaths = require('../config').getConfig('provisioningpaths')
 
 async function vcroutes(fastify, options) {
     fastify.register(require('fastify-static'), {
-        root: provpaths.vertocom
+        root: provpaths.vertocom,
+        serve: false
     })
 
-    fastify.get('/config.json', async function (req, reply) {
+/*     fastify.get('/config.json', async function (req, reply) {
         return { login: req.user.id,
             password: req.user.password,
             name: req.user.name,
@@ -18,7 +19,7 @@ async function vcroutes(fastify, options) {
 
     fastify.get('/', async function (req, reply) {
         return reply.sendFile('index.html')
-    })
+    }) */
 }
 
 module.exports = vcroutes
