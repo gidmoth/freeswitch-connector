@@ -10,16 +10,13 @@ async function vcroutes(fastify, options) {
         serve: false
     })
 
-/*     fastify.get('/config.json', async function (req, reply) {
-        return { login: req.user.id,
-            password: req.user.password,
-            name: req.user.name,
-            email: req.user.email }
+    fastify.get('/userinfo', async function (req, reply) {
+        return req.user
     })
 
     fastify.get('/', async function (req, reply) {
         return reply.sendFile('index.html')
-    }) */
+    })
 }
 
 module.exports = vcroutes
