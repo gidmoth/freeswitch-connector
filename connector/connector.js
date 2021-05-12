@@ -24,6 +24,13 @@ xmlState.info = {
 }
 
 liveState.conferences = []
+liveState.registrations = []
+liveState.on('newListener', () => {
+    console.log('got new listener')
+})
+liveState.on('removeListener', () => {
+    console.log('removed listener')
+})
 
 // start heapdumper for leakchecks
 //heapdump.init('/dumps')
