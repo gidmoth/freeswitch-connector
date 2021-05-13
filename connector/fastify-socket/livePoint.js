@@ -81,7 +81,6 @@ async function liveroutes(fastify, options) {
     })
 
     fastify.liveState.on('unmute', (conf, memid) => {
-        console.log(`unmuteclients: ${fastify.websocketServer.clients.size}`)
         fastify.websocketServer.clients.forEach(client => {
             if (client.readyState === 1) {
                 client.send(`{"event":"unmute","conference":"${conf}","data":"${memid}"}`)
@@ -90,7 +89,6 @@ async function liveroutes(fastify, options) {
     })
 
     fastify.liveState.on('mute', (conf, memid) => {
-        console.log(`muteclients: ${fastify.websocketServer.clients.size}`)
         fastify.websocketServer.clients.forEach(client => {
             if (client.readyState === 1) {
                 client.send(`{"event":"mute","conference":"${conf}","data":"${memid}"}`)
@@ -192,21 +190,21 @@ async function liveroutes(fastify, options) {
             try {
                 let msg = JSON.parse(message)
                 if (msg.req === undefined) {
-                    conn.socket.send(`{"error":"wrong protocol"}`)
+                    conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                     return
                 }
                 switch (msg.req) {
                     case 'init': {
-                        conn.socket.send(`{"reply":"init","data":${JSON.stringify(fastify.liveState.conferences)}}`)
+                        conn.socket.send(`{"event":"reply","reply":"init","data":${JSON.stringify(fastify.liveState.conferences)}}`)
                         break
                     }
                     case 'exec': {
                         if (msg.conference === undefined) {
-                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                             return
                         }
                         if (msg.call === undefined) {
-                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                             return
                         }
                         let conference = msg.conference
@@ -218,7 +216,7 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
@@ -228,7 +226,7 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
@@ -295,12 +293,12 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
                             default: {
-                                conn.socket.send(`{"error":"wrong protocol"}`)
+                                conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                                 return
                             }
                         }
@@ -308,15 +306,15 @@ async function liveroutes(fastify, options) {
                     }
                     case 'memexec': {
                         if (msg.conference === undefined) {
-                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                             return
                         }
                         if (msg.call === undefined) {
-                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                             return
                         }
                         if (msg.member === undefined) {
-                            conn.socket.send(`{"error":"wrong protocol"}`)
+                            conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                             return
                         }
                         let conference = msg.conference
@@ -329,7 +327,7 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
@@ -339,7 +337,7 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
@@ -349,25 +347,25 @@ async function liveroutes(fastify, options) {
                                         console.log(ans)
                                     })
                                     .catch(err => {
-                                        conn.socket.send(`{"error":"${err}"}`)
+                                        conn.socket.send(`{"event":"error","error":"${err}"}`)
                                     })
                                 break;
                             }
                             default: {
-                                conn.socket.send(`{"error":"wrong protocol"}`)
+                                conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                                 return
                             }
                         }
                         break
                     }
                     default: {
-                        conn.socket.send(`{"error":"wrong protocol"}`)
+                        conn.socket.send(`{"event":"error","error":"wrong protocol"}`)
                         break
                     }
                 }
             } catch (e) {
                 //console.log(e)
-                conn.socket.send(`{"error":"wrong format"}`)
+                conn.socket.send(`{"event":"error","error":"wrong format"}`)
             }
         })
     })

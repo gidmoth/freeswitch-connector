@@ -386,7 +386,6 @@ const handle = (event, xmlState, liveState) => {
                                     if (liveState.conferences[posi].members[idx].id === liveState.conferences[posi].floor.id) {
                                         liveState.conferences[posi].floor.mute = false
                                     }
-                                    console.log(`got ${liveState.listenerCount('unmute')} unmute listeners`)
                                     liveState.emit('unmute', conference, memid)
                                     break;
                                 }
@@ -398,7 +397,6 @@ const handle = (event, xmlState, liveState) => {
                                     if (liveState.conferences[posi].members[idx].id === liveState.conferences[posi].floor.id) {
                                         liveState.conferences[posi].floor.mute = true
                                     }
-                                    console.log(`got ${liveState.listenerCount('mute')} mute listeners`)
                                     liveState.emit('mute', conference, memid)
                                     break;
                                 }
