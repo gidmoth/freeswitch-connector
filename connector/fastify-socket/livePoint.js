@@ -34,6 +34,21 @@ async function liveroutes(fastify, options) {
         }
     })
 
+    const interval = setInterval(() => {
+        fastify.websocketServer.clients.forEach(sock => {
+            if (sock.isAlive === false) {
+                console.log('destroying unresponsive client')
+                return sock.terminate()
+            }
+            sock.isAlive = false
+            sock.ping(noop)
+        })
+    }, 30000)
+
+    /* fastify.websocketServer.on('close', () => {
+        clearInterval(interval)
+    }) */
+
     fastify.addHook('onRequest', (conn, repl, done) => {
         if (conn.query.login === undefined) {
             conn.socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n')
@@ -171,20 +186,6 @@ async function liveroutes(fastify, options) {
     fastify.get('/api/live', { websocket: true }, (conn, req) => {
         conn.socket.on('open', heartbeat)
         conn.socket.on('pong', heartbeat)
-        const interval = setInterval(() => {
-            fastify.websocketServer.clients.forEach(sock => {
-                if (sock.isAlive === false) {
-                    console.log('destroying unresponsive client')
-                    return sock.terminate()
-                }
-                sock.isAlive = false
-                sock.ping(noop)
-            })
-        }, 30000)
-
-        fastify.websocketServer.on('close', () => {
-            clearInterval(interval)
-        })
 
         conn.socket.on('message', message => {
             try {
