@@ -11,7 +11,10 @@ async function vcroutes(fastify, options) {
     })
 
     fastify.get('/userinfo', async function (req, reply) {
-        return req.user
+        let rsp =  req.user
+        rsp.wss_binding = fastify.xmlState.globals.wss_binding
+        rsp.internal_tls_port = fastify.xmlState.globals.internal_tls_port
+        return rsp
     })
 
     fastify.get('/', async function (req, reply) {
