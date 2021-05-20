@@ -20,6 +20,10 @@ async function vcroutes(fastify, options) {
     fastify.get('/', async function (req, reply) {
         return reply.sendFile('index.html')
     })
+
+    fastify.get('/poster.png', async function (req, reply) {
+        return reply.sendFile('poster.png')
+    })
 }
 
 module.exports = vcroutes
