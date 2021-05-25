@@ -126,7 +126,7 @@ const getPolyAll = (user, hostname, globals) => {
       reg.1.type="private"
       reg.1.server.1.transport="TLS"
       tcpIpApp.sntp.address="europe.pool.ntp.org"
-      tcpIpApp.sntp.add<ress.overrideDHCP="1"
+      tcpIpApp.sntp.address.overrideDHCP="1"
       tcpIpApp.sntp.gmtOffset="3600"
       tcpIpApp.sntp.daylightSavings.start.month="3"
       tcpIpApp.sntp.daylightSavings.start.dayOfWeek.lastInMonth="1"
