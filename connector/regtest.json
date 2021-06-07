@@ -1,0 +1,29 @@
+{
+    "row_count": 2,
+    "rows": [
+        {
+            "reg_user": "20002",
+            "realm": "gsphone.c8h10n4o2.gs",
+            "token": "31465454-60ca48d3-2e6003a6@192.168.178.6",
+            "url": "sofia/internal/sip:20002@192.168.178.6:47971;transport=tls;fs_nat=yes;fs_path=sip%3A20002%4077.7.170.104%3A47971%3Btransport%3Dtls",
+            "expires": "1623060020",
+            "network_ip": "77.7.170.104",
+            "network_port": "47971",
+            "network_proto": "tls",
+            "hostname": "gsphone.c8h10n4o2.gs",
+            "metadata": ""
+        },
+        {
+            "reg_user": "21000",
+            "realm": "gsphone.c8h10n4o2.gs",
+            "token": "92f8c62-cb1d5837-215308@192.168.178.10",
+            "url": "sofia/internal/sip:21000@192.168.178.10:34526;transport=tls;fs_nat=yes;fs_path=sip%3A21000%4077.7.170.104%3A34526%3Btransport%3Dtls",
+            "expires": "1623060023",
+            "network_ip": "77.7.170.104",
+            "network_port": "34526",
+            "network_proto": "tls",
+            "hostname": "gsphone.c8h10n4o2.gs",
+            "metadata": ""
+        }
+    ]
+}

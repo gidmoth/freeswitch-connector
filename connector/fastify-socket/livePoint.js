@@ -183,6 +183,22 @@ async function liveroutes(fastify, options) {
         })
     })
 
+    fastify.liveState.on('addReg', (usr) => {
+        fastify.websocketServer.clients.forEach(client => {
+            if (client.readyState === 1) {
+                client.send(`{"event":"addReg","user":"${usr}"}`)
+            }
+        })
+    })
+
+    fastify.liveState.on('delReg', (usr) => {
+        fastify.websocketServer.clients.forEach(client => {
+            if (client.readyState === 1) {
+                client.send(`{"event":"delReg","user":"${usr}"}`)
+            }
+        })
+    })
+
     fastify.get('/api/live', { websocket: true }, (conn, req) => {
         conn.socket.on('open', heartbeat)
         conn.socket.on('pong', heartbeat)
@@ -197,6 +213,10 @@ async function liveroutes(fastify, options) {
                 switch (msg.req) {
                     case 'init': {
                         conn.socket.send(`{"event":"reply","reply":"init","data":${JSON.stringify(fastify.liveState.conferences)}}`)
+                        break
+                    }
+                    case 'initreg': {
+                        conn.socket.send(`{"event":"reply","reply":"initreg","data":${JSON.stringify(fastify.liveState.registrations)}}`)
                         break
                     }
                     case 'exec': {

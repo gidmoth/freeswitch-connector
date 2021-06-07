@@ -86,6 +86,20 @@ const addConfParse = (evn) => {
     }
 }
 
+const regParse = (reglist) => {
+    let regreturn = []
+    if (reglist.row_count ===  0) {
+        return regreturn
+    } else {
+        reglist.rows.forEach(row => {
+            regreturn.push(row.reg_user)
+        })
+        return regreturn
+    }
+
+}
+
 exports.listParse = listParse;
 exports.addMemParse = addMemParse;
 exports.addConfParse = addConfParse;
+exports.regParse  = regParse;

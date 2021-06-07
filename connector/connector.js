@@ -44,6 +44,7 @@ maintain.updateXmlState(xmlState);
 
 // init livestate
 liveInit.run(liveState)
+liveInit.runreg(liveState)
 
 // init fastify for rest and static interface
 const fastify = require('fastify')({
