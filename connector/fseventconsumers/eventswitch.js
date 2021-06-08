@@ -442,20 +442,26 @@ const handle = (event, xmlState, liveState) => {
                     break;
                 }
                 case  'sofia::register':  {
+                    // console.log(event.serialize('json'))
                     let name = event.getHeader('from-user')
                     liveState.registrations.push(name)
                     liveState.emit('addReg', name)
                     break;
                 }
                 case 'sofia::unregister': {
+                    //console.log(event.serialize('json'))
                     let name = event.getHeader('from-user')
                     let idx = liveState.registrations.indexOf(name)
                     liveState.registrations.splice(idx, 1)
                     liveState.emit('delReg', name)
                     break
                 }
+                case  'sofia::expire': {
+                    //console.log(event.serialize('json'))
+                    break
+                }
                 default: {
-                    console.log(event.serialize('json'))
+                    //console.log(event.serialize('json'))
                     break;
                 }
             }
