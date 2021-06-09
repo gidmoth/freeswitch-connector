@@ -115,7 +115,12 @@ async function maitainroutes(fastify, options) {
 
     fastify.get('/api/info/state', async function (req, reply) {
         let answer = { op: 'info/state' }
-        answer.state = this.xmlState
+        answer.state = {}
+        answer.state.users = this.xmlState.users
+        answer.state.info = this.xmlState.info
+        answer.state.globals = this.xmlState.globals
+        answer.state.conferences = this.xmlState.conferences
+        answer.state.conferencetypes = this.xmlState.conferencetypes
         return answer
     })
 }

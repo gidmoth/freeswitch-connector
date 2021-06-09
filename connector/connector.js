@@ -5,9 +5,10 @@
 const fasticonf = require('./config').getConfig('fasti');
 const Monitor = require('./fseventconsumers/esmonitor.js');
 // the state will be the same objectinstance for the whole runtime
-const xmlState = {};
+// const xmlState = {};
 const liveConst = require('./livestate')
 const liveState = new liveConst
+const xmlState = new liveConst
 const maintain = require('./maintainance');
 const fs = require('fs');
 const liveInit = require('./fseventusers/initlivestate')

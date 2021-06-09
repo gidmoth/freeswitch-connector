@@ -46,6 +46,7 @@ function updateXmlState(xmlState) {
             getFilestate.getAvaiConfs(xmlState);
             xmlState.info.maintainance.lastrun = new Date();
             statelog(xmlState);
+            xmlState.emit('newXML')
         })
         .catch(error => {
             console.log(error);

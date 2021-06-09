@@ -63,6 +63,14 @@ async function liveroutes(fastify, options) {
         done()
     })
 
+    fastify.xmlState.on('newXML', () => {
+        fastify.websocketServer.clients.forEach(client => {
+            if (client.readyState === 1) {
+                client.send(`{"event":"newXML"}`)
+            }
+        })
+    })
+
     fastify.liveState.on('newLiveState', () => {
         fastify.websocketServer.clients.forEach(client => {
             if (client.readyState === 1) {
