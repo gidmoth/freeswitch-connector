@@ -443,21 +443,32 @@ const handle = (event, xmlState, liveState) => {
                 }
                 case  'sofia::register':  {
                     // console.log(event.serialize('json'))
-                    let name = event.getHeader('from-user')
-                    liveState.registrations.push(name)
-                    liveState.emit('addReg', name)
+                    let regid = event.getHeader('call-id')
+                    if (liveState.registrations.findIndex(user => user.regid === regid) !== -1) {
+                        return
+                    }
+                    let user = {}
+                    user.id = event.getHeader('from-user')
+                    user.regid = regid
+                    user.sipcon = `${event.getHeader('network-ip')}:${event.getHeader('network_port')}`
+                    liveState.registrations.push(user)
+                    liveState.emit('addReg', user)
                     break;
                 }
                 case 'sofia::unregister': {
                     //console.log(event.serialize('json'))
-                    let name = event.getHeader('from-user')
-                    let idx = liveState.registrations.indexOf(name)
-                    liveState.registrations.splice(idx, 1)
-                    liveState.emit('delReg', name)
+                    let regid = event.getHeader('call-id')
+                    let regidx = liveState.registrations.findIndex(user => user.regid === regid)
+                    liveState.emit('delReg', liveState.registrations[regidx])
+                    liveState.registrations.splice(regidx, 1)
                     break
                 }
                 case  'sofia::expire': {
                     //console.log(event.serialize('json'))
+                    let regid = event.getHeader('call-id')
+                    let regidx = liveState.registrations.findIndex(user => user.regid === regid)
+                    liveState.emit('delReg', liveState.registrations[regidx])
+                    liveState.registrations.splice(regidx, 1)
                     break
                 }
                 default: {

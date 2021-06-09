@@ -92,7 +92,11 @@ const regParse = (reglist) => {
         return regreturn
     } else {
         reglist.rows.forEach(row => {
-            regreturn.push(row.reg_user)
+            let usr = {}
+            usr.id = row.reg_user
+            usr.regid = row.token
+            usr.sipcon = `${row.network_ip}:${row.network_port}`
+            regreturn.push(usr)
         })
         return regreturn
     }
