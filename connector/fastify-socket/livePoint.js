@@ -186,7 +186,7 @@ async function liveroutes(fastify, options) {
     fastify.liveState.on('addReg', (usr) => {
         fastify.websocketServer.clients.forEach(client => {
             if (client.readyState === 1) {
-                client.send(`{"event":"addReg","user":"${usr}"}`)
+                client.send(`{"event":"addReg","user":${JSON.stringify(usr)}}`)
             }
         })
     })
@@ -194,7 +194,7 @@ async function liveroutes(fastify, options) {
     fastify.liveState.on('delReg', (usr) => {
         fastify.websocketServer.clients.forEach(client => {
             if (client.readyState === 1) {
-                client.send(`{"event":"delReg","user":"${usr}"}`)
+                client.send(`{"event":"delReg","user":${JSON.stringify(usr)}}`)
             }
         })
     })

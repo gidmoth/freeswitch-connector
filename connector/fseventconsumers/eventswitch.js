@@ -450,7 +450,7 @@ const handle = (event, xmlState, liveState) => {
                     let user = {}
                     user.id = event.getHeader('from-user')
                     user.regid = regid
-                    user.sipcon = `${event.getHeader('network-ip')}:${event.getHeader('network_port')}`
+                    user.sipcon = `${event.getHeader('network-ip')}:${event.getHeader('network-port')}`
                     liveState.registrations.push(user)
                     liveState.emit('addReg', user)
                     break;
