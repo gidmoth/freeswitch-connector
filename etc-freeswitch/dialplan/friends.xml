@@ -1,0 +1,55 @@
+<include>
+  <context name="friends">
+
+    <extension name="enable_srtp" continue="true">
+      <condition field="destination_number" expression=".*">
+        <action application="set" data="rtp_secure_media=optional"/>
+        <!-- export to b-leg! -->
+        <action application="export" data="rtp_secure_media=optional"/>
+      </condition>
+    </extension>
+
+    <extension name="friendusers_extension">
+      <condition field="destination_number" expression="^(21[0-9][0-9][0-9])$">
+        <action application="export" data="dialed_extension=$1"/>
+        <!-- export a-legs proposed codecs to b-leg as acceptet codecs -->
+        <!-- see profile for "inherit_codec=true", should avoid transcoding -->
+        <!-- assume: there is a shared codec-->
+        <!-- <action application="export" data="codec_string='${ep_codec_string}'"/> -->
+        <action application="set" data="hangup_after_bridge=true"/>
+        <!-- ucs 4.0.15  doesn't support stun, so no bypassing :-( -->
+        <!-- <action application="set" data="bypass_media=true"/> -->
+        <!-- old bridge, no calling all registered endpoints -->
+        <!-- <action application="bridge" data="user/${dialed_extension}@${domain_name}"/> -->
+        <!-- new bridge, use contact function, call all endpoints registered -->
+        <action application="bridge" data="${sofia_contact(${dialed_extension})}"/>
+      </condition>
+    </extension>
+
+    <extension name="teamusers">
+      <condition field="destination_number" expression="^(20[0-9][0-9][0-9])$">
+        <action application="transfer" data="$1 XML team"/>
+      </condition>
+    </extension>
+
+    <extension name="publicusers">
+      <condition field="destination_number" expression="^(22[0-9][0-9][0-9])$">
+        <action application="transfer" data="$1 XML public"/>
+      </condition>
+    </extension>
+
+    <extension name="friends_conferences">
+      <condition field="destination_number" expression="^(31[0-9][0-9][0-9])$">
+        <action application="transfer" data="$1 XML team"/>
+      </condition>
+    </extension>
+
+    <extension name="public_conferences">
+      <condition field="destination_number" expression="^(32[0-9][0-9][0-9])$">
+        <action application="transfer" data="$1 XML team"/>
+      </condition>
+    </extension>
+
+
+  </context>
+</include>

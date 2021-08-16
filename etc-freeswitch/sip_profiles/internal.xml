@@ -1,0 +1,60 @@
+<profile name="internal">
+  <settings>
+    <param name="auth-calls" value="true"/>
+    <param name="apply-nat-acl" value="nat.auto"/>
+
+    <param name="tls-version" value="$${sip_tls_version}"/>
+    <param name="tls" value="$${internal_ssl_enable}"/>
+    <param name="tls-sip-port" value="$${internal_tls_port}"/>
+    <param name="tls-bind-params" value="transport=tls"/>
+    <!-- Set to true to not bind on the normal sip-port but only on the TLS port -->
+    <param name="tls-only" value="$${internal_tls_only}"/>
+    <!-- Verify the date on TLS certificates -->
+    <param name="tls-verify-date" value="false"/>
+    <!-- TLS verify policy, when registering/inviting gateways with other servers (outbound) or handling inbound registration/invite requests how should we verify their certificate -->
+    <!-- set to 'in' to only verify incoming connections, 'out' to only verify outgoing connections, 'all' to verify all connections, also 'subjects_in', 'subjects_out' and 'subjects_all' for subject validation. Multiple policies can be split with a '|' pipe -->
+    <param name="tls-verify-policy" value="none"/>
+    <!-- Certificate max verify depth to use for validating peer TLS certificates when the verify policy is not none -->
+    <param name="tls-verify-depth" value="2"/>
+    <!-- If the tls-verify-policy is set to subjects_all or subjects_in this sets which subjects are allowed, multiple subjects can be split with a '|' pipe -->
+    <param name="tls-verify-in-subjects" value=""/>
+    <!-- TLS ciphers default: ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH  -->
+    <param name="tls-ciphers" value="$${sip_tls_ciphers}"/> 
+
+    <param name="debug" value="0"/>
+    <param name="sip-trace" value="yes"/>
+
+    <param name="dialplan" value="XML"/>
+    <param name="context" value="public"/>
+    <param name="codec-prefs" value="$${global_codec_prefs}"/>
+
+    <!-- late negotiation for setting codec by conference -->
+    <!-- the negotiation will take place when leg A is answered -->
+    <!-- for conferences: in the dialplan -->
+    <param name="inbound-late-negotiation" value="true"/>
+
+    <!-- to avoid transcoding as far as possible -->
+    <!-- since late-negotiation is on, b-leg will -->
+    <!-- negotiate first, than that will be offered -->
+    <!-- to a-leg, transcoding when a-leg does not -->
+    <!-- support it. Takes effect on bridging without -->
+    <!-- answering -->
+    <action application="set" data="inherit_codec=true"/>
+
+    <!-- bind to websocket port -->
+    <param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
+    <param name="ext-sip-ip" value="$${external_sip_ip}"/>
+    <param name="wss-binding" value="$${wss_binding}"/>
+
+    <param name="rtp-ip" value="$${local_ip_v4}"/>
+    <param name="sip-ip" value="$${local_ip_v4}"/>
+    <param name="sip-port" value="$${internal_sip_port}"/>
+    <!-- listen to outband dtmf -->
+    <param name="liberal-dtmf" value="true"/>
+    <!-- track multiple registrations by contact field, init contact for dialplan -->
+    <!-- doesn't work unfortunately! -->
+    <param name="multiple-registrations" value="true"/>
+    <!-- flush/delete regs by call-id -->
+    <!-- <param name="inbound-use-callid-as-uuid" value="true"/> -->
+  </settings>
+</profile>

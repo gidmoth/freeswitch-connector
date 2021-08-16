@@ -1,0 +1,19 @@
+<include>
+    <user id="20000">
+      <params>
+        <param name="password" value="napw"/>
+        <param name="vm-password" value="20000"/>
+      </params>
+      <variables>
+        <variable name="user_context" value="team"/>
+        <variable name="effective_caller_id_name" value="defaultuser"/>
+        <variable name="effective_caller_id_number" value="20000"/>
+        <variable name="outbound_caller_id_name" value="$${outbound_caller_name}"/>
+        <variable name="outbound_caller_id_number" value="$${outbound_caller_id}"/>
+        <variable name="verto_dvar_email" value="foo@bar.baz"/>
+        <variable name="polymac" value="none"/>
+        <variable name="conf_flags" value="moderator|mute-detect|mute"/>
+        <variable name="conpin" value="$${modconpin}"/>
+      </variables>
+    </user>
+</include>

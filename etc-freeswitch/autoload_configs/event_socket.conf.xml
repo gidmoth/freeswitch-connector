@@ -1,0 +1,8 @@
+<configuration name="event_socket.conf" description="Socket Client">
+  <settings>
+    <param name="nat-map" value="false"/>
+    <param name="listen-ip" value="$${es_listen_ip}"/>
+    <param name="listen-port" value="$${es_listen_port}"/>
+    <param name="password" value="$${es_pw}"/>
+  </settings>
+</configuration>

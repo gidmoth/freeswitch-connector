@@ -1,0 +1,90 @@
+<configuration name="conference.conf" description="Audio Conference">
+
+  <caller-controls>
+    <group name="default">
+      <control action="mute" digits="0"/>
+      <control action="deaf mute" digits="*"/>
+      <control action="energy up" digits="9"/>
+      <control action="energy equ" digits="8"/>
+      <control action="energy dn" digits="7"/>
+      <control action="vol talk up" digits="3"/>
+      <control action="vol talk zero" digits="2"/>
+      <control action="vol talk dn" digits="1"/>
+      <control action="vol listen up" digits="6"/>
+      <control action="vol listen zero" digits="5"/>
+      <control action="vol listen dn" digits="4"/>
+      <control action="hangup" digits="#"/>
+    </group>
+    <group name="moderators">
+      <control action="mute" digits="0"/>
+      <control action="event" digits="*" data="muteall"/>
+      <control action="energy up" digits="9"/>
+      <control action="energy equ" digits="8"/>
+      <control action="event" digits="7" data="conferenceunlock"/>
+      <control action="event" digits="3" data="resumerecording"/>
+      <control action="event" digits="2" data="pauserecording"/>
+      <control action="event" digits="1" data="startrecording"/>
+      <control action="event" digits="6" data="conferencelock"/>
+      <control action="event" digits="5" data="checkrecording"/>
+      <control action="event" digits="4" data="stoprecording"/>
+      <control action="hangup" digits="#"/>
+    </group>
+  </caller-controls>
+
+  <profiles>
+    <profile name="16kHz-novideo">
+      <param name="domain" value="$${domain}"/>
+      <param name="rate" value="16000"/>
+      <param name="interval" value="20"/>
+      <param name="energy-level" value="0"/>
+      <param name="comfort-noise" value="true"/>
+      <param name="pin-retries" value="3"/>
+      <param name="suppress-events" value="start-talking,stop-talking"/>
+      <param name="pin-sound" value="conference/conf-pin.wav"/>
+      <param name="bad-pin-sound" value="conference/conf-bad-pin.wav"/>
+      <!-- <param name="muted-sound" value="conference/conf-muted.wav"/> -->
+      <param name="unmuted-sound" value="conference/conf-unmuted.wav"/>
+      <param name="alone-sound" value="conference/conf-alone.wav"/>
+      <param name="mute-detect-sound" value="conference/conf-muted.wav"/>
+      <param name="moderator-controls" value="moderators"/>
+      <!-- <param name="moh-sound" value="$${hold_music}"/> -->
+      <!-- <param name="enter-sound" value="tone_stream://%(200,0,500,600,700)"/> -->
+      <!-- <param name="exit-sound" value="tone_stream://%(500,0,300,200,100,50,25)"/> -->
+      <param name="kicked-sound" value="conference/conf-kicked.wav"/>
+      <param name="locked-sound" value="conference/conf-locked.wav"/>
+      <param name="is-locked-sound" value="conference/conf-is-locked.wav"/>
+      <param name="is-unlocked-sound" value="conference/conf-is-unlocked.wav"/>
+      <param name="conference-flags" value="livearray-json-status|json-events|livearray-sync"/>
+      <!-- <param name="member-flags" value="mute-detect"/> -->
+    </profile>
+    <profile name="48kHz-video">
+      <param name="domain" value="$${domain}"/>
+      <param name="rate" value="48000"/>
+      <param name="interval" value="20"/>
+      <param name="energy-level" value="0"/>
+      <param name="comfort-noise" value="true"/>
+      <param name="pin-retries" value="3"/>
+      <param name="suppress-events" value="start-talking,stop-talking"/>
+      <param name="pin-sound" value="conference/conf-pin.wav"/>
+      <param name="bad-pin-sound" value="conference/conf-bad-pin.wav"/>
+      <!-- <param name="muted-sound" value="conference/conf-muted.wav"/> -->
+      <param name="unmuted-sound" value="conference/conf-unmuted.wav"/>
+      <param name="alone-sound" value="conference/conf-alone.wav"/>
+      <param name="mute-detect-sound" value="conference/conf-muted.wav"/>
+      <param name="moderator-controls" value="moderators"/>
+      <!-- <param name="moh-sound" value="$${hold_music}"/> -->
+      <!-- <param name="enter-sound" value="tone_stream://%(200,0,500,600,700)"/> -->
+      <!-- <param name="exit-sound" value="tone_stream://%(500,0,300,200,100,50,25)"/> -->
+      <param name="kicked-sound" value="conference/conf-kicked.wav"/>
+      <param name="locked-sound" value="conference/conf-locked.wav"/>
+      <param name="is-locked-sound" value="conference/conf-is-locked.wav"/>
+      <param name="is-unlocked-sound" value="conference/conf-is-unlocked.wav"/>
+      <param name="conference-flags" value="livearray-json-status|json-events|livearray-sync|minimize-video-encoding"/>
+      <!-- <param name="member-flags" value="mute-detect"/> -->
+      <param name="video-mode" value="passthrough"/>
+      <!-- <param name="video-canvas-size" value="1920x1080"/> -->
+      <param name="video-codec-bandwidth" value="auto"/>
+      <param name="video-fps" value="15"/>
+    </profile>
+  </profiles>
+</configuration>

@@ -1,0 +1,34 @@
+<include>
+  <domain name="$${domain}">
+
+    <params>
+      <param name="dial-string" value="{^^:sip_invite_domain=${dialed_domain}:presence_id=${dialed_user}@${dialed_domain}}${sofia_contact(*/${dialed_user}@${dialed_domain})},${verto_contact(${dialed_user}@${dialed_domain})}"/>
+      <!-- These are required for Verto to function properly -->
+      <param name="jsonrpc-allowed-methods" value="verto"/>
+      <param name="jsonrpc-allowed-event-channels" value="demo,conference,presence"/>
+    </params>
+
+    <groups>
+
+      <group name="team">
+	      <users>
+	        <X-PRE-PROCESS cmd="include" data="team/*.xml"/>
+        </users>
+      </group>
+
+      <group name="friends">
+	      <users>
+	        <X-PRE-PROCESS cmd="include" data="friends/*.xml"/>
+        </users>
+      </group>
+
+      <group name="public">
+	      <users>
+	        <X-PRE-PROCESS cmd="include" data="public/*.xml"/>
+        </users>
+      </group>
+
+    </groups>
+
+  </domain>
+</include>
