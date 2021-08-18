@@ -11,7 +11,7 @@
     <param name="loglevel" value="debug"/>
 
     <!-- RTP port range -->
-    <param name="rtp-start-port" value="16384"/>
-    <param name="rtp-end-port" value="32768"/>
+    <param name="rtp-start-port" value="$${rtp_start_port}"/>
+    <param name="rtp-end-port" value="$${rtp_end_port}"/>
   </settings>
 </configuration>

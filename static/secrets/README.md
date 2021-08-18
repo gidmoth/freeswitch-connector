@@ -1,4 +1,4 @@
-# key here is for evtl. session secret
+# key here is for session secret
 
 will be populatet by entrypoint. See:
 
