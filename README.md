@@ -42,4 +42,126 @@ As the name suggests freeswitch-connector also tries to help to connect to frees
 
 team and friends users get some of the conference controls provided through connectors WebSocket server through the dtmf they can send with their phones. And the provisioning includes a directory of all conferences for them to use.
 
+## Installation
 
+### OCI Container / Docker
+
+The following examples use podman as a container build/runtime. You can safely replace all occurraces of `podman` with `docker` if you use docker instead.
+
+You can either use this repository to build your own OCI Image:
+
+```
+git clone https://github.com/gidmoth/freeswitch-connector
+cd freeswitch-connector
+podman build -t myname/fscon:local .
+```
+
+Or you can use the image from docker.io. The latest tag is `0.0.8`:
+
+```
+podman pull docker.io/gidmoth/fscon:0.0.8
+```
+
+Either way, this will result in your local imagestore containing a copy of a single image containing everything needed to run freeswitch-connector and its example-client. If you choose to run the parts separately or want to create your own client, please refer to the rest of the docs and/or modify the Dockerfile as you want it.
+
+#### Configuration
+
+The container from this image should be configured by environment variables. A default set of the configurable variables is built into the image and those are meant to be overwritten during container creation. [This script](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/03-localvars.sh), which gets called by the entrypoint, will generate a `vars.xml` for freeswitch from the environment, and [this](https://github.com/gidmoth/connector/blob/main/config.js) will use the environment to provide values for the connector middleware.
+
+The script to generate the `vars.xml` will also genarate an empty file in `/etc/freeswitch` with the name `localvars`. If you want to overwrite `vars.xml` later on, just delete this file and start the container with the updated environment, `vars.xml` will only be overwritten if `localvars` is not found. The `config.js` for connector does not require such a workaround since it can reference the shell environment directly.
+
+The hard part is TLS, so it gets it's own section; see below. For the following example it is assumed that you use letsencrypt and your `privkey.pem` and `fullchain.pem` are ready to use in a volume named `certbot_etc-letsencrypt` under the path `/live/host.example.com`. Using mostly the default values, and assuming your fqdn is `host.example.com`, you could then start your container with a service file like this:
+
+```
+[Unit]
+Description=freeswitch-connector
+Wants=network.target
+After=network-online.target
+
+[Service]
+ExecStartPre=-/usr/bin/podman rm fscon
+ExecStart=/usr/bin/podman run \
+	--env CRYPTDOM=host.example.com \
+	--env DOMAIN_NAME=host.example.com \
+	--env DOMAIN=host.example.com \
+	--env INTERNAL_TLS_ONLY=true \
+	--env CONHOSTNAME=host.example.com \
+	-v certbot_etc-letsencrypt:/etc-letsencrypt \
+	--name=fscon \
+	--network=host \
+	gidmoth/fscon:0.0.8
+ExecStop=/usr/bin/podman stop fscon
+ExecStopPost=/usr/bin/podman rm fscon
+
+[Install]
+WantedBy=multi-user.target default.target
+```
+
+Host networking is recommended: the freeswitch install in the image is by no means prepared to handle NAT.
+
+For a reference to all available environment variables and ther default values please look into the [Dockerfile](https://github.com/gidmoth/freeswitch-connector/blob/main/Dockerfile). 
+
+##### TLS
+
+Among the scripts `entrypoint.sh` will source by default is [`02-letsencrypt-cert-load.sh`](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/02-letsencrypt-cert-load.sh). That's an example script to use a key / cert pair from letsencrypt for freeswitchs tls on SIP and WebSocket. As you can see, it also references an environment variable, `$CRYPTDOM`, and uses it to build the path where it expects the files from letsencrypt to be present. Since certificates need updating from time to time the example script employs the same logic as the script for `vars.xml` for updating. In case you use letsencrypt you could use this script unmodified as follows.
+
+First, get your key / cert pair from letsencrypt and put them in a named volume in your container runtime:
+
+```
+podman run --rm -it --name certbot \
+  --volume=certbot_var-lib-letsencrypt:/var/lib/letsencrypt \
+  --volume=certbot_etc-letsencrypt:/etc/letsencrypt \
+  certbot/certbot certonly --manual --preferred-challenges=dns \
+  --email foo@bar.baz \
+  --server https://acme-v02.api.letsencrypt.org/directory \
+  --agree-tos \
+  -d host.example.com
+```
+
+You'll have to run this interactively since the domain-verification requires your input, also you want to copypaste the verification-code to form the right dns entry for your domain, here: `host.example.com`. You should give your real email address here to get notified when your cert expires. When that happens simply run the same command to get a renewed cert.
+
+Second, mount the same named volume to the freeswitch-connector container, and set the `$CRYPTDOM` variable to the name of your domain (to get the path right). This may look like so:
+
+```
+podman run \
+	--env CRYPTDOM=host.example.com \
+	--env DOMAIN_NAME=host.example.com \
+	--env DOMAIN=host.example.com \
+	--env INTERNAL_TLS_ONLY=true \
+	--env CONHOSTNAME=host.example.com \
+	-v certbot_etc-letsencrypt:/etc-letsencrypt \
+	--name=fscon \
+	--network=host \
+	gidmoth/fscon:0.0.8
+```
+
+Connector, as configured in the provided Image, will use the same directory as freeswitch to get his key / cert pair, so there's no extra attention required.
+
+To recopy a renewed / changed certificate from letsencrypt, just remove `/etc/freeswitch/workingcerts` and restart the container, the [example script](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/02-letsencrypt-cert-load.sh) will run again.
+
+If you use another certificate authority it may be harder. First, you should disable the example-script:
+
+`mv 02-letsencrypt-cert-load.sh 02-letsencrypt-cert-load.sh.disabled`
+
+What you'll have to do then is to ensure freeswitch and connector find the right files for their TLS in `/etc/freeswitch/tls`. I had success with a key / cert from comodo after downloading the intermediate signing cert doing the following:
+
+First, copy your key to `/etc/freeswitch/tls/privkey.pem`
+
+In my case, my cert was named `host_example_com.crt`. The intermediates were named `SectigoRSADomainValidationSecureServerCA.crt`, and `USERTrustRSAAAACA.crt`, and the comodo root was named `AAACertificateServices.crt`.
+
+I copied all to `/etc/freeswitch/tls` and did the following:
+
+```
+cat host_example_com.crt SectigoRSADomainValidationSecureServerCA.crt USERTrustRSAAAACA.crt > chain.pem
+cp host_example_com.crt cert.pem
+cat chain.pem AAACertificateServices.crt > fullchain.pem
+cat cert.pem  privkey.pem fullchain.pem > wss.pem
+cat fullchain.pem privkey.pem  >  agent.pem
+cat chain.pem  > cafile.pem
+```
+
+That worked for me. Please consult the freeswitch docs for further information.
+
+### Bare metal
+
+TODO

@@ -40,8 +40,8 @@ FROM node:16
 # connector, fsconcli
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
-    && git clone https://github.com/gidmoth/connector.git \
-    && git clone https://github.com/gidmoth/fsconcli.git \
+    && git clone --depth 1 https://github.com/gidmoth/connector.git \
+    && git clone --depth 1 https://github.com/gidmoth/fsconcli.git \
     && cd connector && npm install \
     && cd /fsconcli && npm install && npm run build \
     && mkdir /recordings && cd / \
