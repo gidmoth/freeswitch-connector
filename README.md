@@ -99,7 +99,22 @@ WantedBy=multi-user.target default.target
 
 Host networking is recommended: the freeswitch install in the image is by no means prepared to handle NAT.
 
-For a reference to all available environment variables and ther default values please look into the [Dockerfile](https://github.com/gidmoth/freeswitch-connector/blob/main/Dockerfile). 
+For a reference to all available environment variables and their default values please look into the [Dockerfile](https://github.com/gidmoth/freeswitch-connector/blob/main/Dockerfile).
+
+Normally you would also want to keep `/etc/freeswitch` in a volume, as well as `/static` and `/recordings`, which contain things you don't want to be lost on every restart. So you should also mount those as named volumes like so in your service file:
+
+```
+ExecStart=/usr/bin/podman run \
+	...
+	-v certbot_etc-letsencrypt:/etc-letsencrypt \
+    -v fscon_etc-freeswitch:/etc/freeswitch \
+    -v fscon_static:/static \
+    -v fscon_recordings:/recordings \
+	...
+	gidmoth/fscon:0.0.8
+```
+
+Now you can navigate to your new conference system in the browser. The default user is `defaultuser` and his pw is `napw`. If you want to change this before startup please do so in the [directory file](https://github.com/gidmoth/freeswitch-connector/blob/main/etc-freeswitch/directory/team/20000.xml) before building the container. To change after startup you should create a new user in the team context, login as the new user, and then delete the defaultuser. Doing it another way will probably lock you out of your new system.
 
 ##### TLS
 
