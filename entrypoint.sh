@@ -3,8 +3,9 @@ set -e
 
 if [ "$1" = 'fscon' ]; then
 
-    chown -R freeswitch:freeswitch /etc/freeswitch
-    chown -R freeswitch:freeswitch /var/{run,lib}/freeswitch
+    # only if you use the freeswitch user
+    #chown -R freeswitch:freeswitch /etc/freeswitch
+    #chown -R freeswitch:freeswitch /var/{run,lib}/freeswitch
     
     if [ -d /entrypoint.d ]; then
         for f in /entrypoint.d/*.sh; do

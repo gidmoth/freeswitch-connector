@@ -96,7 +96,7 @@ then
 </include>
 EOF
   touch /etc/freeswitch/localvars
-  chown freeswitch /etc/freeswitch/vars.xml
+  #chown freeswitch /etc/freeswitch/vars.xml
   echo "VARS LOCALIZED"
 else
   echo "VARS NOT TOUCHED"

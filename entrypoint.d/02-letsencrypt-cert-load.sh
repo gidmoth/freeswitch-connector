@@ -16,7 +16,7 @@ then
   # cat chain.pem ca.pem > cafile.pem
   cd /
   touch /etc/freeswitch/workingcerts
-  chown -R freeswitch:freeswitch /etc/freeswitch/tls
+  #chown -R freeswitch:freeswitch /etc/freeswitch/tls
   echo "UPDATED CERTS"
 else
   echo "CERTS NOT UPDATED"

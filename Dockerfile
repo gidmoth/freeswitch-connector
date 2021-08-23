@@ -1,10 +1,10 @@
-FROM debian:10
+# start building minimal fs archive
+FROM debian:10 as fsbuilder
 
-## Installation
-# Some convenience-tools, freeswitch 1.10, node
+# freeswitch 1.10
+COPY make_min_archive.sh /
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    gnupg2 wget lsb-release ca-certificates locales curl git build-essential \
-    && curl -fsSL https://deb.nodesource.com/setup_16.x | bash - \
+    gnupg2 wget lsb-release ca-certificates locales curl git \
     && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
     && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" > /etc/apt/sources.list.d/freeswitch.list \
     && echo "deb-src http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" >> /etc/apt/sources.list.d/freeswitch.list \
@@ -31,22 +31,39 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     freeswitch-sounds-en-us-callie \
     freeswitch-mod-event-socket \
     freeswitch-mod-rtc \
-    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
-    && rm -rf /etc/freeswitch \
+    && chmod +x /make_min_archive.sh \
+    && /make_min_archive.sh 
+
+# run in new debian, alpine doesn't work unfortunately
+FROM node:16
+
+# connector, fsconcli
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
     && git clone https://github.com/gidmoth/connector.git \
     && git clone https://github.com/gidmoth/fsconcli.git \
-    && mkdir /recordings \
-    && apt-get install -y nodejs \
+    && cd connector && npm install \
+    && cd /fsconcli && npm install && npm run build \
+    && mkdir /recordings && cd / \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-## copy files/scripts
-COPY entrypoint.sh /
-# entypoint deps
-COPY entrypoint.d /entrypoint.d/
-# freeswitch config
-COPY etc-freeswitch /etc/freeswitch/
-# directories for connector
+# static folders
 COPY static /static/
+
+#fsconcli
+RUN cp -r /fsconcli/build/* /static/phone/ \
+    && rm -rf /fsconcli
+
+#freeswitch
+COPY --from=fsbuilder /freeswitch_img.tar.gz /
+RUN tar -xzf /freeswitch_img.tar.gz
+RUN rm -rf /etc/freeswitch /freeswitch_img.tar.gz
+
+# copy files/scripts
+COPY entrypoint.sh /
+COPY entrypoint.d /entrypoint.d/
+COPY etc-freeswitch /etc/freeswitch/
+
 # sounds for recording cotrol
 COPY custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
 COPY custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
@@ -99,19 +116,10 @@ ENV DEFAULT_PASSWORD='napw' \
     RECPATH='/recordings' \
     CRYPTDOM='host.example.com'
 
-# install node deps for connector and fsconcli
-RUN cd /connector && npm install \
-    && cd /fsconcli && npm install \
-    # build example client
-    && npm run build \
-    # copy binclient to deployment dir
-    && cp -r build/* /static/phone && cd / \
-    && rm -rf /fsconcli
-
-## get the modes an permissions right
+# get the modes an permissions right
 RUN chmod +x /entrypoint.sh
 
-## Ports
+# Ports
 # Open the container up to the world. Normaly you should run this
 # with host networking, so it should not be needed. Only informational.
 # tls sip
