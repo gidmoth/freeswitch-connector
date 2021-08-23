@@ -140,13 +140,9 @@ Second, mount the same named volume to the freeswitch-connector container, and s
 ```
 podman run \
 	--env CRYPTDOM=host.example.com \
-	--env DOMAIN_NAME=host.example.com \
-	--env DOMAIN=host.example.com \
-	--env INTERNAL_TLS_ONLY=true \
-	--env CONHOSTNAME=host.example.com \
+    ...
 	-v certbot_etc-letsencrypt:/etc-letsencrypt \
-	--name=fscon \
-	--network=host \
+	...
 	gidmoth/fscon:0.0.8
 ```
 
