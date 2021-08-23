@@ -56,6 +56,7 @@ RUN cp -r /fsconcli/build/* /static/phone/ \
 
 #freeswitch
 COPY --from=fsbuilder /freeswitch_img.tar.gz /
+COPY --from=fsbuilder /usr/share/freeswitch/sounds/en/us/callie /usr/share/freeswitch/sounds/en/us/callie/
 RUN tar -xzf /freeswitch_img.tar.gz
 RUN rm -rf /etc/freeswitch /freeswitch_img.tar.gz
 
