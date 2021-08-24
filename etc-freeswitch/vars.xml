@@ -1,9 +1,7 @@
 <include>
 
   <!--
-      The following variables are set dynamically - calculated if possible by freeswitch - and
-      are available to the config as $${variable}.  You can see their calculated value via fs_cli
-      by entering eval $${variable}
+      The following variables are set dynamically:
 
       hostname
       local_ip_v4
@@ -40,12 +38,12 @@
   <X-PRE-PROCESS cmd="set" data="sound_prefix=$${sounds_dir}/en/us/callie"/>
 
   <!-- Fallbackdomainsetting -->
-  <X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/>
+  <X-PRE-PROCESS cmd="set" data="domain=host.example.com"/>
   <X-PRE-PROCESS cmd="set" data="domain_name=$${domain}"/>
 
   <!-- Codecprefs -->
-  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
-  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=OPUS,G722,PCMU,PCMA,H264,VP8"/>
+  <X-PRE-PROCESS cmd="set" data="global_codec_prefs=OPUS,G722,H264,VP8"/>
+  <X-PRE-PROCESS cmd="set" data="outbound_codec_prefs=OPUS,G722,H264,VP8"/>
 
   <!-- external_rtp_ip -->
   <X-PRE-PROCESS cmd="set" data="external_rtp_ip=$${local_ip_v4}"/>
@@ -54,7 +52,7 @@
   <X-PRE-PROCESS cmd="set" data="external_sip_ip=$${local_ip_v4}"/>
 
   <!-- NOTE: CHANGE THIS BEFORE USE -->
-  <X-PRE-PROCESS cmd="set" data="xml_rpc_password=f8c8448b-0c87-4662-ae49-6a4153d87199"/>
+  <X-PRE-PROCESS cmd="set" data="xml_rpc_password=napw"/>
 
   <X-PRE-PROCESS cmd="set" data="internal_sip_port=5060"/>
   <X-PRE-PROCESS cmd="set" data="external_sip_port=5080"/>
@@ -66,12 +64,28 @@
   <X-PRE-PROCESS cmd="set" data="external_tls_port=3381"/>
   <X-PRE-PROCESS cmd="set" data="external_ssl_enable=false"/>
   <X-PRE-PROCESS cmd="set" data="sip_tls_ciphers=ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH"/>
-
-  <!-- some defaults -->
-  <X-PRE-PROCESS cmd="set" data="outbound_caller_name=FreeSWITCH"/>
-  <X-PRE-PROCESS cmd="set" data="outbound_caller_id=0000000000"/>
+  <X-PRE-PROCESS cmd="set" data="internal_tls_only=false"/>
 
   <!--verto defaults -->
-  <X-PRE-PROCESS cmd="set" data="verto_bindlocal_port=8082"/>
+  <X-PRE-PROCESS cmd="set" data="verto_bindlocal_port="/>
+
+  <!-- esl defaults -->
+  <X-PRE-PROCESS cmd="set" data="es_listen_ip=127.0.0.1"/>
+  <X-PRE-PROCESS cmd="set" data="es_listen_port=8021"/>
+  <X-PRE-PROCESS cmd="set" data="es_pw=ClueCon"/>
+
+  <!-- conference pins -->
+  <X-PRE-PROCESS cmd="set" data="defconpin=0815"/>
+  <X-PRE-PROCESS cmd="set" data="modconpin=2357"/>
+
+  <!-- recordings directory -->
+  <X-PRE-PROCESS cmd="set" data="recordings_dir=/recordings"/>
+
+  <!-- wss binding for sofia -->
+  <X-PRE-PROCESS cmd="set" data="wss_binding=:7443"/>
+
+  <!-- rtp port rnage -->
+  <X-PRE-PROCESS cmd="set" data="rtp_start_port=16384"/>
+  <X-PRE-PROCESS cmd="set" data="rtp_end_port=32768"/>
 
 </include>

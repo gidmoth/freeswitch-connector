@@ -1,9 +1,5 @@
 # freeswitch-connector
 
-**WARNING: This is under developement  at the moment:**
-**The README is outdated. Please use only  if you understand**
-**the code. This Warning will disapear as soon as that changes.**
-
 ## About
 
 This project aims to build an easy to setup and use conference system with freeswitch as a backend. It spreads through this repository, the [connector repository](https://github.com/gidmoth/connector) and the repository for an example web client, [fsconcli](https://github.com/gidmoth/fsconcli).
@@ -64,6 +60,8 @@ podman pull docker.io/gidmoth/fscon:0.0.8
 
 Either way, this will result in your local imagestore containing a copy of a single image containing everything needed to run freeswitch-connector and its example-client. If you choose to run the parts separately or want to create your own client, please refer to the rest of the docs and/or modify the Dockerfile as you want it.
 
+Building the Image on your own is of cause recommended if you want to modify the entrypoint scripts. Especially to care for TLS this may be necessary. (see below)
+
 #### Configuration
 
 The container from this image should be configured by environment variables. A default set of the configurable variables is built into the image and those are meant to be overwritten during container creation. [This script](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/03-localvars.sh), which gets called by the entrypoint, will generate a `vars.xml` for freeswitch from the environment, and [this](https://github.com/gidmoth/connector/blob/main/config.js) will use the environment to provide values for the connector middleware.
@@ -81,15 +79,15 @@ After=network-online.target
 [Service]
 ExecStartPre=-/usr/bin/podman rm fscon
 ExecStart=/usr/bin/podman run \
-	--env CRYPTDOM=host.example.com \
-	--env DOMAIN_NAME=host.example.com \
-	--env DOMAIN=host.example.com \
-	--env INTERNAL_TLS_ONLY=true \
-	--env CONHOSTNAME=host.example.com \
-	-v certbot_etc-letsencrypt:/etc-letsencrypt \
-	--name=fscon \
-	--network=host \
-	gidmoth/fscon:0.0.8
+    --env CRYPTDOM=host.example.com \
+    --env DOMAIN_NAME=host.example.com \
+    --env DOMAIN=host.example.com \
+    --env INTERNAL_TLS_ONLY=true \
+    --env CONHOSTNAME=host.example.com \
+    -v certbot_etc-letsencrypt:/etc-letsencrypt \
+    --name=fscon \
+    --network=host \
+    gidmoth/fscon:0.0.8
 ExecStop=/usr/bin/podman stop fscon
 ExecStopPost=/usr/bin/podman rm fscon
 
@@ -97,30 +95,32 @@ ExecStopPost=/usr/bin/podman rm fscon
 WantedBy=multi-user.target default.target
 ```
 
-Host networking is recommended: the freeswitch install in the image is by no means prepared to handle NAT.
+Host networking is recommended: the freeswitch install in the image is by no means prepared to handle NAT. The TLS key / cert pair will be used by freeswitch as well as by connector, please look at the [entrypoint script](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/02-letsencrypt-cert-load.sh) to see whalt will be done with the contents of the named volume `certbot_etc-letsencrypt`. You should edit/replace the script if you choose to provide your secrets another way.
 
-For a reference to all available environment variables and their default values please look into the [Dockerfile](https://github.com/gidmoth/freeswitch-connector/blob/main/Dockerfile).
+For a reference to all available environment variables and their default values please look into the [Dockerfile](https://github.com/gidmoth/freeswitch-connector/blob/main/Dockerfile) and the [config-script](https://github.com/gidmoth/connector/blob/main/config.js) of connector.
+
+The [main entrypoint script](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.sh) will start freeswitch, than wait for 30 seconds before it starts connector. That's to be sure freeswitch is up and reachable before connector tries. If freeswitch needs longer on your platform, it may be to small to run a conference system. But don't wonder about the pause in case you track the logs on startup.
 
 Normally you would also want to keep `/etc/freeswitch` in a volume, as well as `/static` and `/recordings`, which contain things you don't want to be lost on every restart. So you should also mount those as named volumes like so in your service file:
 
 ```
 ExecStart=/usr/bin/podman run \
-	...
-	-v certbot_etc-letsencrypt:/etc-letsencrypt \
+    ...
+    -v certbot_etc-letsencrypt:/etc-letsencrypt \
     -v fscon_etc-freeswitch:/etc/freeswitch \
     -v fscon_static:/static \
     -v fscon_recordings:/recordings \
-	...
-	gidmoth/fscon:0.0.8
+    ...
+    gidmoth/fscon:0.0.8
 ```
 
-Now you can navigate to your new conference system in the browser. The default user is `defaultuser` and his pw is `napw`. If you want to change this before startup please do so in the [directory file](https://github.com/gidmoth/freeswitch-connector/blob/main/etc-freeswitch/directory/team/20000.xml) before building the container. To change after startup you should create a new user in the team context, login as the new user, and then delete the defaultuser. Doing it another way will probably lock you out of your new system.
+Now you can navigate to your new conference system in the browser; firefox is the only tested with the example client. The default user is `defaultuser` and his pw is `napw`. If you want to change this before startup please do so in the [directory file](https://github.com/gidmoth/freeswitch-connector/blob/main/etc-freeswitch/directory/team/20000.xml) before building/starting the container. E.g. you could first run it with `bash` as the `CMD`, but a volume for `/etc/freeswitch` already bound, and then edit the file before you run the service. To change after startup with the example client you should create a new user in the team context, login as the new user, and then delete the defaultuser. Doing it another way will probably lock you out of your new system.
 
-##### TLS
+#### TLS
 
-Among the scripts `entrypoint.sh` will source by default is [`02-letsencrypt-cert-load.sh`](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/02-letsencrypt-cert-load.sh). That's an example script to use a key / cert pair from letsencrypt for freeswitchs tls on SIP and WebSocket. As you can see, it also references an environment variable, `$CRYPTDOM`, and uses it to build the path where it expects the files from letsencrypt to be present. Since certificates need updating from time to time the example script employs the same logic as the script for `vars.xml` for updating. In case you use letsencrypt you could use this script unmodified as follows.
+Among the scripts `entrypoint.sh` will source by default is [`02-letsencrypt-cert-load.sh`](https://github.com/gidmoth/freeswitch-connector/blob/main/entrypoint.d/02-letsencrypt-cert-load.sh). That's an example script to use a key / cert pair from letsencrypt for freeswitchs tls on SIP and WebSocket, as well as place the files where connector expects them for its TLS. As you can see, it also references an environment variable, `$CRYPTDOM`, and uses it to build the path where it expects the files from letsencrypt to be present. Since certificates need updating from time to time the example script employs the same logic as the script for `vars.xml` for updating. Every time it runs it checks for the presence of a file `/etc/freeswitch/workingcerts` and does the rest only if the file is not present. If so, it will write the file on conclusion. So to run it again with renewed secrets just delete the file. In case you use letsencrypt you could use this script unmodified as follows.
 
-First, get your key / cert pair from letsencrypt and put them in a named volume in your container runtime:
+First, get your key / cert pair from letsencrypt and put them in a named volume in your container runtime. The easiest way is to use the official [certbot image](https://hub.docker.com/r/certbot/certbot/):
 
 ```
 podman run --rm -it --name certbot \
@@ -133,17 +133,17 @@ podman run --rm -it --name certbot \
   -d host.example.com
 ```
 
-You'll have to run this interactively since the domain-verification requires your input, also you want to copypaste the verification-code to form the right dns entry for your domain, here: `host.example.com`. You should give your real email address here to get notified when your cert expires. When that happens simply run the same command to get a renewed cert.
+You'll have to run this interactively since the domain-verification requires your input, also you want to copypaste the verification-code to form the right dns entry for your domain, here: `host.example.com`. You should give your real email address here to get notified when your cert expires. When that happens simply run the same command again to get a renewed cert.
 
 Second, mount the same named volume to the freeswitch-connector container, and set the `$CRYPTDOM` variable to the name of your domain (to get the path right). This may look like so:
 
 ```
 podman run \
-	--env CRYPTDOM=host.example.com \
+    --env CRYPTDOM=host.example.com \
     ...
-	-v certbot_etc-letsencrypt:/etc-letsencrypt \
-	...
-	gidmoth/fscon:0.0.8
+    -v certbot_etc-letsencrypt:/etc-letsencrypt \
+    ...
+    gidmoth/fscon:0.0.8
 ```
 
 Connector, as configured in the provided Image, will use the same directory as freeswitch to get his key / cert pair, so there's no extra attention required.
@@ -154,7 +154,7 @@ If you use another certificate authority it may be harder. First, you should dis
 
 `mv 02-letsencrypt-cert-load.sh 02-letsencrypt-cert-load.sh.disabled`
 
-What you'll have to do then is to ensure freeswitch and connector find the right files for their TLS in `/etc/freeswitch/tls`. I had success with a key / cert from comodo after downloading the intermediate signing cert doing the following:
+What you'll have to do then is to ensure freeswitch and connector find the right files for their TLS in `/etc/freeswitch/tls`. I had success with a key / cert from comodo after downloading the intermediate signing certs doing the following:
 
 First, copy your key to `/etc/freeswitch/tls/privkey.pem`
 
@@ -171,8 +171,145 @@ cat fullchain.pem privkey.pem  >  agent.pem
 cat chain.pem  > cafile.pem
 ```
 
-That worked for me. Please consult the freeswitch docs for further information.
+That worked for me. Please consult the freeswitch docs for further information. If you find a way that works in your case you could then write an entrypoint script to do that automatically for you further on.
 
-### Bare metal
+### Bare metal / qemu-kvm
 
-TODO
+Since the freeswitch team advices to use Debian (their highly optimized c-code relies on very specific libraries) you should use that too, if it is passible. The following assumes Debian, but you can shurely adjust it to other distros. I didn't get connector to work with alpine, although freeswitch might have worked. The reason is that fastify doesn't support http digest auth out of the box and therefore connector depends on some plugins for that. These include a dependency on libsodium, which isn't necessary for digest auth, but it doesn't work on alpine anyways.
+
+You could run freeswitch and connector on different hosts, and eaven host your client on jet another host, but that's not covered here.
+
+To install on bare metal, first install freeswitch and some convenience tools:
+
+```
+apt-get update && apt-get install -y --no-install-recommends \
+    gnupg2 wget lsb-release ca-certificates locales curl git unzip \
+    && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
+    && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" > /etc/apt/sources.list.d/freeswitch.list \
+    && echo "deb-src http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" >> /etc/apt/sources.list.d/freeswitch.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    freeswitch \
+    freeswitch-mod-commands \
+    freeswitch-mod-conference \
+    freeswitch-mod-dptools \
+    freeswitch-mod-voicemail \
+    freeswitch-mod-dialplan-xml \
+    freeswitch-mod-loopback \
+    freeswitch-mod-sofia \
+    freeswitch-mod-local-stream \
+    freeswitch-mod-native-file \
+    freeswitch-mod-sndfile \
+    freeswitch-mod-tone-stream \
+    freeswitch-mod-console \
+    freeswitch-mod-say-en \
+    freeswitch-init \
+    freeswitch-lang-en \
+    freeswitch-timezones \
+    freeswitch-meta-codecs \
+    freeswitch-music \
+    freeswitch-sounds-en-us-callie \
+    freeswitch-mod-event-socket \
+    freeswitch-mod-rtc
+```
+
+This will also install a user and group called freeswitch and a service file in `/usr/lib/systemd/system/freeswitch.service`. The service file contains information on how to edit the service in itself. It's not necesary for the following but depending on your preferences you would do so now.
+
+We just enable the service:
+
+```
+systemctl enable freeswitch.service
+```
+
+Install nodejs 16:
+
+```
+curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
+apt-get install -y nodejs
+```
+
+Now clone connector and the example client, and install their dependencies. Also build the example client:
+
+```
+git clone https://github.com/gidmoth/connector.git
+git clone https://github.com/gidmoth/fsconcli.git
+cd connector && npm install && \
+cd ../fsconcli && npm install && npm run build && \
+cd ~
+```
+
+You also want to clone this reopsitory to get the required freeswitch config:
+
+```
+git clone https://github.com/gidmoth/freeswitch-connector.git
+```
+
+Remove freeswitchs default config and copy the provided one:
+
+```
+rm -rf /etc/freeswitch/*
+cp -r freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
+```
+
+Now you must edit freeswitchs `vars.xml` to suite your environment. Please refer to the freeswitch docs for details.
+
+After that, edit `~/connector/config.js` to fit to freeswitchs `vars.xml`. You could also leave it as is, and adjst it in your service file by setting the environment which gets evaluated by these statements: ``${process.env.SOMETHING || 'something'}`` -- it depends on your preferences. The following chooses the latter method.
+
+You also need the static directory hierarchy for connector to work. I choose to put it into the root of my system, as well as connector itself:
+
+```
+cp -r ~/freeswitch-connector/static /
+mv ~/connector /
+```
+
+The next thing is to generate a secret for the auth-plugin to work, and download the ucsoftware to provision to polycoms if you wish so, as well as genarate a directory for recordings:
+
+```
+/connector/node_modules/.bin/secure-session-gen-key > /static/secrets/secret-key
+cd /static/polycom/ucs && \
+curl -O https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip && \
+unzip Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip && \
+cd ~ && mkdir /recordings
+```
+
+Now copy the built client to the right static folder:
+
+```
+cp fsconcli/build/* /static/phone
+```
+
+The installed freeswitch service will care to chown freeswitchs files. If you don't want to run connector as root, you should now chown the required files / folders to the respective user. Since the freeswitch install already provided us with a suitable user, we use that:
+
+```
+chown -R freeswitch:freeswitch /static /connector /recordings
+```
+
+Now you can create a service-file like this:
+
+```
+[Unit]
+Description=freeswitch-connector middleware
+After=network.target freeswitch.service
+
+[Service]
+User=freeswitch
+Group=freeswitch
+ExecStartPre=/usr/bin/sleep 30
+ExecStart=/usr/bin/node /connector/connector.js
+
+[Install]
+WantedBy=multi-user.target
+```
+
+The sleep is to wait for freeswitch to be ready.
+
+For TLS setup please refer to the respective section in the description for the containeer install. It's just the same on bare metal.
+
+Copy the service file to `/etc/systemd/system/connector.service`, enable it and start freeswitch, then connector:
+
+```
+cp connector.service /etc/systemd/system/connector.service && \
+systemctl start freeswitch.service && \
+systemctl start connector.service
+```
+
+Now it should run. Connect you browser to https://host.example.com. For Information on default user and pass refer to the Container section of this readme.
