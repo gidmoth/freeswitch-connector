@@ -68,7 +68,7 @@ fi
 
 # install freeswitch and some convenience tools
 apt-get update && apt-get install -y --no-install-recommends \
-    gnupg2 wget lsb-release ca-certificates locales curl git unzip \
+    gnupg2 wget lsb-release ca-certificates locales curl unzip \
     && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
     && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" > /etc/apt/sources.list.d/freeswitch.list \
     && echo "deb-src http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" >> /etc/apt/sources.list.d/freeswitch.list \
@@ -96,6 +96,9 @@ apt-get update && apt-get install -y --no-install-recommends \
     freeswitch-mod-event-socket \
     freeswitch-mod-rtc
 
+# stop freeswitch service
+systemctl stop freeswitch.service
+
 # Install nodejs
 curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs
@@ -108,16 +111,14 @@ cd /connector && npm install
 cd ~ && git clone https://github.com/gidmoth/fsconcli.git
 cd ~/fsconcli && npm install && npm run build
 
-# clone freeswitch-connector
-cd ~ && git clone https://github.com/gidmoth/freeswitch-connector.git
-
 # remove freeswitchs defaults and use provided
+cd ~
 rm -rf /etc/freeswitch/*
-cp -r freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
+cp -r ~/freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
 
 # copy custom sounds
-cp freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
-cp freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
+cp ~/freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
+cp ~/freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
 
 # generate vars.xml according to env:
 cat << EOF > /etc/freeswitch/vars.xml
@@ -217,6 +218,10 @@ EOF
 # copy static folders
 cp -r ~/freeswitch-connector/static /
 
+# copy custom sounds
+cp ~/freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
+cp ~/freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
+
 # generate secret, download ucs and create recordingsdir
 /connector/node_modules/.bin/secure-session-gen-key > /static/secrets/secret-key
 cd /static/polycom/ucs && \
@@ -237,6 +242,7 @@ Description=freeswitch-connector middleware
 After=network.target freeswitch.service
 
 [Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
 Environment=FSIP=$FSIP
 Environment=FSPORT=$FSPORT
 Environment=FSPW=$FSPW
@@ -259,6 +265,5 @@ ExecStart=/usr/bin/node /connector/connector.js
 WantedBy=multi-user.target
 EOF
 
-# enable services
-systemctl enable freeswitch.service
+# enable service
 systemctl enable connector.service
