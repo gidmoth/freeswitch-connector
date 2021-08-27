@@ -115,6 +115,10 @@ cd ~ && git clone https://github.com/gidmoth/freeswitch-connector.git
 rm -rf /etc/freeswitch/*
 cp -r freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
 
+# copy custom sounds
+cp freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
+cp freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
+
 # generate vars.xml according to env:
 cat << EOF > /etc/freeswitch/vars.xml
 <include>
