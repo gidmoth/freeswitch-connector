@@ -321,7 +321,7 @@ ExecStart=/usr/bin/node /connector/connector.js
 WantedBy=multi-user.target
 ```
 
-The sleep is to wait for freeswitch to be ready.
+The `sleep` is to wait for freeswitch to be ready. The `AmbientCapabilities` are only required when you want to listen on a low port, like 443 in the example. Arbitrary ports higher than 1024 don't require those Caps.
 
 For TLS setup please refer to the [respective section in the description for the containeer install](https://github.com/gidmoth/freeswitch-connector#tls). It's just the same on bare metal.
 
