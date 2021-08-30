@@ -253,7 +253,7 @@ cp -r freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
 Copy the custom sounds to get audible feedback for the recording controls:
 
 ```
-cp freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
+cp freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/t
 cp freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
 ```
 
@@ -334,3 +334,13 @@ systemctl start connector.service
 ```
 
 Now it should run. Connect you browser to https://host.example.com. For Information on default user and pass refer to the [Container section](https://github.com/gidmoth/freeswitch-connector#configuration) of this readme.
+
+#### Installscript
+
+For convenience you could also just use the [installscript.sh](https://github.com/gidmoth/freeswitch-connector/blob/main/installscript.sh) from this repository.
+
+It does just the same as described above, but is somewhat more elegant since you can configure all your localisations as vars at the beginning, and the script will create freeswitchs `vars.xml` and the `connector.service` file from that.
+
+## Usage
+
+TODO
