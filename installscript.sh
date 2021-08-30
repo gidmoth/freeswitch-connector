@@ -99,6 +99,14 @@ apt-get update && apt-get install -y --no-install-recommends \
 # stop freeswitch service
 systemctl stop freeswitch.service
 
+## create customization to run in foreground
+#mkdir /etc/systemd/system/freeswitch.service.d
+#cat << EOF > /etc/systemd/system/freeswitch.service.d/10-foreground.conf
+#[Service]
+#ExecStart=
+#ExecStart=/usr/bin/freeswitch -u \${USER} -g \${GROUP} \${DAEMON_OPTS}
+#EOF
+
 # Install nodejs
 curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs

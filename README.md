@@ -212,12 +212,12 @@ apt-get update && apt-get install -y --no-install-recommends \
     freeswitch-mod-rtc
 ```
 
-This will also install a user and group called freeswitch and a service file in `/usr/lib/systemd/system/freeswitch.service`. The service file contains information on how to edit the service in itself. It's not necesary for the following but depending on your preferences you would do so now.
+This will also install a user and group called freeswitch and a service file in `/usr/lib/systemd/system/freeswitch.service`. The service file contains information on how to edit the service in itself. Depending on your preferences you should do so or not.
 
-We just enable the service:
+To be sure we just stop the service first:
 
 ```
-systemctl enable freeswitch.service
+systemctl stop freeswitch.service
 ```
 
 Install nodejs 16:
@@ -248,6 +248,13 @@ Remove freeswitchs default config and copy the provided one:
 ```
 rm -rf /etc/freeswitch/*
 cp -r freeswitch-connector/etc-freeswitch/* /etc/freeswitch/
+```
+
+Copy the custom sounds to get audible feedback for the recording controls:
+
+```
+cp freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
+cp freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
 ```
 
 Now you must edit freeswitchs `vars.xml` to suite your environment. Please refer to the freeswitch docs for details.
@@ -291,6 +298,20 @@ Description=freeswitch-connector middleware
 After=network.target freeswitch.service
 
 [Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+Environment=FSIP=127.0.0.1
+Environment=FSPORT=8021
+Environment=FSPW=ClueCon
+Environment=SWITCHCONF=/etc/freeswitch
+Environment=NODE_ENV=production
+Environment=FASTIPORT=443
+Environment=FASTIIP=0.0.0.0
+Environment=CONHOSTNAME=host.example.com
+Environment=STATICPATH=/static
+Environment=FASTICERT=/etc/freeswitch/tls/fullchain.pem
+Environment=FASTIKEY=/etc/freeswitch/tls/privkey.pem
+Environment=UCSOFTWARE=//downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip
+Environment=RECPATH=/recordings
 User=freeswitch
 Group=freeswitch
 ExecStartPre=/usr/bin/sleep 30
@@ -302,7 +323,7 @@ WantedBy=multi-user.target
 
 The sleep is to wait for freeswitch to be ready.
 
-For TLS setup please refer to the respective section in the description for the containeer install. It's just the same on bare metal.
+For TLS setup please refer to the [respective section in the description for the containeer install](https://github.com/gidmoth/freeswitch-connector#tls). It's just the same on bare metal.
 
 Copy the service file to `/etc/systemd/system/connector.service`, enable it and start freeswitch, then connector:
 
@@ -312,4 +333,4 @@ systemctl start freeswitch.service && \
 systemctl start connector.service
 ```
 
-Now it should run. Connect you browser to https://host.example.com. For Information on default user and pass refer to the Container section of this readme.
+Now it should run. Connect you browser to https://host.example.com. For Information on default user and pass refer to the [Container section](https://github.com/gidmoth/freeswitch-connector#configuration) of this readme.
