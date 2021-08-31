@@ -343,4 +343,6 @@ It does just the same as described above, but is somewhat more elegant since you
 
 ## Usage
 
-TODO
+If you just want to use the api of connector it is documentet directly in the README [there](https://github.com/gidmoth/connector).
+
+More docs: TODO
