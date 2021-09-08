@@ -4,13 +4,13 @@
 # This script will not run if that is not the case.
 
 # Set to 'true' if done localizing the following block
-LOCALIZED='false'
+LOCALIZED='true'
 
 # Localize to suite your environment
 DEFAULT_PASSWORD='napw'
 SOUND_PREFIX='$${sounds_dir}/en/us/callie'
-DOMAIN='host.example.com'
-DOMAIN_NAME='$${domain}'
+DOMAIN='gsphone.c8h10n4o2.gs'
+DOMAIN_NAME='gsphone.c8h10n4o2.gs'
 GLOBAL_CODEC_PREFS='OPUS,G722,H264,VP8'
 OUTBOUND_CODEC_PREFS='OPUS,G722,H264,VP8'
 EXTERNAL_RTP_IP='$${local_ip_v4}'
@@ -24,7 +24,7 @@ INTERNAL_SSL_ENABLE='true'
 EXTERNAL_TLS_PORT='3381'
 EXTERNAL_SSL_ENABLE='false'
 SIP_TLS_CIPHERS='ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'
-INTERNAL_TLS_ONLY='false'
+INTERNAL_TLS_ONLY='true'
 ES_LISTEN_IP='127.0.0.1'
 ES_LISTEN_PORT='8021'
 ES_PW='ClueCon'
@@ -42,14 +42,14 @@ SWITCHCONF='/etc/freeswitch'
 NODE_ENV='production'
 FASTIPORT='443'
 FASTIIP='0.0.0.0'
-CONHOSTNAME='host.example.com'
+CONHOSTNAME='gsphone.c8h10n4o2.gs'
 STATICPATH='/static'
 FASTICERT='/etc/freeswitch/tls/fullchain.pem'
 FASTIKEY='/etc/freeswitch/tls/privkey.pem'
 UCSOFTWARE='https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip'
 RECPATH='/recordings'
 # For TLS
-CRYPTDOM='host.example.com'
+CRYPTDOM='gsphone.c8h10n4o2.gs'
 
 # Print help if not localized
 if [ $LOCALIZED != 'true' ]
@@ -224,6 +224,7 @@ cat << EOF > /etc/freeswitch/vars.xml
 EOF
 
 # copy static folders
+mkdir -p $STATICPATH
 cp -r ~/freeswitch-connector/static/* ${STATICPATH}
 
 # copy custom sounds
