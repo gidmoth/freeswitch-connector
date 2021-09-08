@@ -112,11 +112,11 @@ curl -fsSL https://deb.nodesource.com/setup_16.x | bash -
 apt-get install -y nodejs
 
 # install connector
-cd / && git clone https://github.com/gidmoth/connector.git
+cd / && git clone -b gsc https://github.com/gidmoth/connector.git
 cd /connector && npm install
 
 # download and build fsconcli
-cd ~ && git clone https://github.com/gidmoth/fsconcli.git
+cd ~ && git clone -b gsc https://github.com/gidmoth/fsconcli.git
 cd ~/fsconcli && npm install && npm run build
 
 # remove freeswitchs defaults and use provided
@@ -224,24 +224,24 @@ cat << EOF > /etc/freeswitch/vars.xml
 EOF
 
 # copy static folders
-cp -r ~/freeswitch-connector/static /
+cp -r ~/freeswitch-connector/static/* ${STATICPATH}
 
 # copy custom sounds
 cp ~/freeswitch-connector/custom-sounds/48kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/48000/
 cp ~/freeswitch-connector/custom-sounds/16kHz/* /usr/share/freeswitch/sounds/en/us/callie/conference/16000/
 
 # generate secret, download ucs and create recordingsdir
-/connector/node_modules/.bin/secure-session-gen-key > /static/secrets/secret-key
+/connector/node_modules/.bin/secure-session-gen-key > ${STATICPATH}/secrets/secret-key
 cd /static/polycom/ucs && \
-curl -O https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip && \
-unzip Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip && \
-cd ~ && mkdir /recordings
+curl -O $UCSOFTWARE && \
+unzip ./*.zip && \
+cd ~ && mkdir -p $RECPATH
 
 # copy client
 cp -r  ~/fsconcli/build/* /static/phone
 
 # chown all to freeswitch
-chown -R freeswitch:freeswitch /static /connector /recordings
+chown -R freeswitch:freeswitch $STATICPATH /connector $RECPATH
 
 # generate connector service
 cat << EOF > /etc/systemd/system/connector.service
