@@ -57,7 +57,7 @@
       <param name="locked-sound" value="conference/conf-locked.wav"/>
       <param name="is-locked-sound" value="conference/conf-is-locked.wav"/>
       <param name="is-unlocked-sound" value="conference/conf-is-unlocked.wav"/>
-      <param name="conference-flags" value="livearray-json-status|json-events|livearray-sync"/>
+      <!-- <param name="conference-flags" value="livearray-json-status|json-events|livearray-sync"/> -->
       <!-- <param name="member-flags" value="mute-detect"/> -->
     </profile>
     <profile name="48kHz-video">
@@ -85,7 +85,7 @@
       <param name="locked-sound" value="conference/conf-locked.wav"/>
       <param name="is-locked-sound" value="conference/conf-is-locked.wav"/>
       <param name="is-unlocked-sound" value="conference/conf-is-unlocked.wav"/>
-      <param name="conference-flags" value="livearray-json-status|json-events|livearray-sync|minimize-video-encoding"/>
+      <param name="conference-flags" value="minimize-video-encoding"/>
       <!-- <param name="member-flags" value="mute-detect"/> -->
       <param name="video-mode" value="passthrough"/>
       <!-- <param name="video-canvas-size" value="1920x1080"/> -->
