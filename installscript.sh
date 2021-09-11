@@ -4,7 +4,7 @@
 # This script will not run if that is not the case.
 
 # Set to 'true' if done localizing the following block
-LOCALIZED='true'
+LOCALIZED='false'
 
 # Localize to suite your environment
 DEFAULT_PASSWORD='napw'
