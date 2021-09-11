@@ -278,8 +278,8 @@ EOF
 # install audiobot
 cp ~/freeswitch-connector/abotstarter.sh /usr/local/bin
 cp ~/freeswitch-connector/audiobot.sh /usr/local/bin
-chmod + x /usr/local/bin/abotstarter.sh
-chmod + x /usr/local/bin/audiobot.sh
+chmod +x /usr/local/bin/abotstarter.sh
+chmod +x /usr/local/bin/audiobot.sh
 
 cat << EOF > /etc/systemd/system/audiobot.service
 [Unit]
