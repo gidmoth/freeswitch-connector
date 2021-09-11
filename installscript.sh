@@ -68,6 +68,7 @@ fi
 
 # install freeswitch and some convenience tools
 apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg normalize-audio inotify-tools \
     gnupg2 wget lsb-release ca-certificates locales curl unzip \
     && wget -O - https://files.freeswitch.org/repo/deb/debian-release/fsstretch-archive-keyring.asc | apt-key add - \
     && echo "deb http://files.freeswitch.org/repo/deb/debian-release/ `lsb_release -sc` main" > /etc/apt/sources.list.d/freeswitch.list \
@@ -280,5 +281,19 @@ cp ~/freeswitch-connector/audiobot.sh /usr/local/bin
 chmod + x /usr/local/bin/abotstarter.sh
 chmod + x /usr/local/bin/audiobot.sh
 
+cat << EOF > /etc/systemd/system/audiobot.service
+[Unit]
+Description=audioconverter for recordings
+After=network.target freeswitch.service
+
+[Service]
+Environment=RECPATH=$RECPATH
+ExecStart=/usr/local/bin/abotstarter.sh
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
 # enable service
 systemctl enable connector.service
+systemctl enable audiobot.service
