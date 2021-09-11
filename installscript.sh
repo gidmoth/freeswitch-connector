@@ -274,5 +274,11 @@ ExecStart=/usr/bin/node /connector/connector.js
 WantedBy=multi-user.target
 EOF
 
+# install audiobot
+cp ~/freeswitch-connector/abotstarter.sh /usr/local/bin
+cp ~/freeswitch-connector/audiobot.sh /usr/local/bin
+chmod + x /usr/local/bin/abotstarter.sh
+chmod + x /usr/local/bin/audiobot.sh
+
 # enable service
 systemctl enable connector.service
