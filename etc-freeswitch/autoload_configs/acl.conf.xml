@@ -9,7 +9,10 @@
          loopback.auto - ACL for your local lan.
     -->
 
-    <list name="domains" default="deny">
+    <list name="oldswitchlist" default="deny">
+	    <node type="allow" cidr="62.245.152.46/32" />
     </list>
   </network-lists>
 </configuration>
+
+

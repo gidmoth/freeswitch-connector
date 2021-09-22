@@ -8,7 +8,7 @@
     <param name="sessions-per-second" value="30"/>
 
     <!-- Default Global Log Level - value is one of debug,info,notice,warning,err,crit,alert -->
-    <param name="loglevel" value="debug"/>
+    <param name="loglevel" value="err"/>
 
     <!-- RTP port range -->
     <param name="rtp-start-port" value="$${rtp_start_port}"/>

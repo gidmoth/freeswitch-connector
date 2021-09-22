@@ -1,11 +1,14 @@
-<profile name="internal">
+<profile name="oldswitch">
   <settings>
-    <param name="auth-calls" value="true"/>
+    <param name="auth-calls" value="false"/>
     <param name="apply-nat-acl" value="nat.auto"/>
+
+    <param name="apply-inbound-acl" value="oldswitchlist"/>
+    <param name="apply-register-acl" value="oldswitchlist"/>
 
     <param name="tls-version" value="$${sip_tls_version}"/>
     <param name="tls" value="$${internal_ssl_enable}"/>
-    <param name="tls-sip-port" value="$${internal_tls_port}"/>
+    <param name="tls-sip-port" value="$${external_tls_port}"/>
     <param name="tls-bind-params" value="transport=tls"/>
     <!-- Set to true to not bind on the normal sip-port but only on the TLS port -->
     <param name="tls-only" value="$${internal_tls_only}"/>
@@ -42,13 +45,13 @@
     <action application="set" data="inherit_codec=true"/>
 
     <!-- bind to websocket port -->
-    <param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
+    <!-- <param name="ext-rtp-ip" value="$${external_rtp_ip}"/>
     <param name="ext-sip-ip" value="$${external_sip_ip}"/>
-    <param name="wss-binding" value="$${wss_binding}"/>
+    <param name="wss-binding" value="$${wss_binding}"/> -->
 
     <param name="rtp-ip" value="$${local_ip_v4}"/>
     <param name="sip-ip" value="$${local_ip_v4}"/>
-    <param name="sip-port" value="$${internal_sip_port}"/>
+    <param name="sip-port" value="$${external_sip_port}"/>
     <!-- listen to outband dtmf -->
     <param name="liberal-dtmf" value="true"/>
     <!-- track multiple registrations by contact field, init contact for dialplan -->

@@ -50,7 +50,7 @@
       <!-- autorecording -->
       <param name="min-required-recording-participants" value="2"/>
       <param name="auto-record" value="$${recordings_dir}/${conference_name}-${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
-      <!-- <param name="moh-sound" value="$${hold_music}"/> -->
+      <param name="moh-sound" value="glados16.wav"/>
       <!-- <param name="enter-sound" value="tone_stream://%(200,0,500,600,700)"/> -->
       <!-- <param name="exit-sound" value="tone_stream://%(500,0,300,200,100,50,25)"/> -->
       <param name="kicked-sound" value="conference/conf-kicked.wav"/>
@@ -78,7 +78,7 @@
       <!-- autorecording -->
       <param name="min-required-recording-participants" value="2"/>
       <param name="auto-record" value="$${recordings_dir}/${conference_name}-${strftime(%Y-%m-%d-%H-%M-%S)}.wav"/>
-      <!-- <param name="moh-sound" value="$${hold_music}"/> -->
+      <param name="moh-sound" value="glados48.wav"/>
       <!-- <param name="enter-sound" value="tone_stream://%(200,0,500,600,700)"/> -->
       <!-- <param name="exit-sound" value="tone_stream://%(500,0,300,200,100,50,25)"/> -->
       <param name="kicked-sound" value="conference/conf-kicked.wav"/>

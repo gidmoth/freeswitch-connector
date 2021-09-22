@@ -5,6 +5,6 @@
 
   <settings>
     <param name="colorize" value="true"/>
-    <param name="loglevel" value="debug"/>
+    <param name="loglevel" value="ERR"/>
   </settings>
 </configuration>
