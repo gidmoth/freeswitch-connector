@@ -4,13 +4,13 @@
 # This script will not run if that is not the case.
 
 # Set to 'true' if done localizing the following block
-LOCALIZED='true'
+LOCALIZED='false'
 
 # Localize to suite your environment
 DEFAULT_PASSWORD='napw'
 SOUND_PREFIX='$${sounds_dir}/en/us/callie'
-DOMAIN='gsphone.c8h10n4o2.gs'
-DOMAIN_NAME='gsphone.c8h10n4o2.gs'
+DOMAIN='host.example.com'
+DOMAIN_NAME='host.example.com'
 GLOBAL_CODEC_PREFS='OPUS,G722,H264,VP8'
 OUTBOUND_CODEC_PREFS='OPUS,G722,H264,VP8'
 EXTERNAL_RTP_IP='$${local_ip_v4}'
@@ -42,14 +42,14 @@ SWITCHCONF='/etc/freeswitch'
 NODE_ENV='production'
 FASTIPORT='443'
 FASTIIP='0.0.0.0'
-CONHOSTNAME='gsphone.c8h10n4o2.gs'
+CONHOSTNAME='host.example.com'
 STATICPATH='/static'
 FASTICERT='/etc/freeswitch/tls/fullchain.pem'
 FASTIKEY='/etc/freeswitch/tls/privkey.pem'
 UCSOFTWARE='https://downloads.polycom.com/voice/voip/uc/Polycom-UC-Software-4.0.15-rts22-release-sig-split.zip'
 RECPATH='/recordings'
 # For TLS
-CRYPTDOM='gsphone.c8h10n4o2.gs'
+CRYPTDOM='host.example.com'
 
 # Print help if not localized
 if [ $LOCALIZED != 'true' ]
@@ -278,8 +278,8 @@ EOF
 # install audiobot
 cp ~/freeswitch-connector/abotstarter.sh /usr/local/bin
 cp ~/freeswitch-connector/audiobot.sh /usr/local/bin
-chmod + x /usr/local/bin/abotstarter.sh
-chmod + x /usr/local/bin/audiobot.sh
+chmod +x /usr/local/bin/abotstarter.sh
+chmod +x /usr/local/bin/audiobot.sh
 
 cat << EOF > /etc/systemd/system/audiobot.service
 [Unit]
